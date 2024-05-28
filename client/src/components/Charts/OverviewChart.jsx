@@ -76,7 +76,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 // THE LINE CHART
-export default function SimpleLineChart({ daysCount }) {
+export default function OverviewChart({ chartType, daysCount }) {
   const { theme } = useTheme();
   const isLightMode = theme === "light";
   const revenueData = useSelector((state) => state.revenue.data);
@@ -124,30 +124,34 @@ export default function SimpleLineChart({ daysCount }) {
     console.log("COMBINED_DATA for lineChart --> ", combinedData);
     console.log("TRANSFORMED_DATA for lineChart --> ", transformedData);
   }
+  const ChartComponent = chartType === "bar" ? BarChart : LineChart;
+  const DataComponent = chartType === "bar" ? Bar : Line;
 
   return (
     <ResponsiveContainer width="100%" height="80%">
-      <LineChart
+      <ChartComponent
         width={500}
         height={290}
         data={transformedData}
         margin={{ top: 5, right: 35, left: 20, bottom: 0 }}
       >
         <Tooltip content={<CustomTooltip />} />
-        <Line
+        <DataComponent
           type="monotone"
           dataKey="Revenue"
           stroke="#6366f1"
+          fill="#6366f1"
           strokeWidth="2px"
           activeDot={{
             r: 8,
             style: { fill: "#6366f1", stroke: "#6366f1", opacity: 0.65 },
           }}
         />
-        <Line
+        <DataComponent
           type="monotone"
           dataKey="Expense"
           stroke={isLightMode ? "black" : "darkGray"}
+          fill={isLightMode ? "black" : "darkGray"}
           style={{ opacity: 0.25 }}
           strokeWidth="2px"
           activeDot={{
@@ -168,7 +172,7 @@ export default function SimpleLineChart({ daysCount }) {
           axisLine={true}
         />
         <Legend />
-      </LineChart>
+      </ChartComponent>
     </ResponsiveContainer>
   );
 }

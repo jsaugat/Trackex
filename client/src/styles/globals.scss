@@ -83,7 +83,7 @@
 }
 
 /* 
- ? SCROLLBAR CUSTOMIZATION 
+ ? INPUT CUSTOMIZATION 
 */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -119,6 +119,11 @@ input:-webkit-autofill:active {
   position: relative;
   width: 4px;
   opacity: 0.1;
+}
+
+//! doesn't work
+.app-outlet-container::-webkit-scrollbar {
+  opacity: 0;
 }
 
 /* Track */

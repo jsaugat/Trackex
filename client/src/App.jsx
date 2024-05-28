@@ -63,7 +63,7 @@ export default function App() {
         <main
           className={cn(
             //* md:h-calc(100vh-1.5rem), in tailwind, 1.5rem = 6 units
-            "relative z-[2] h-full md:h-[calc(100vh-1.5rem)] m-1 md:m-3 px-5 md:px-7 py-5 md:py-7 w-full flex-1 border-2 border-white dark:border-border rounded-lg md:rounded-3xl shadow-lg overflow-scroll shadow-indigo-300 dark:shadow-none overflow-x-hidden",
+            "relative z-[2] h-full md:h-[calc(100vh-1.5rem)] m-1 md:m-3 px-5 md:px-7 py-5 md:py-7 w-full flex-1 border-2 border-white dark:border-border rounded-lg md:rounded-3xl shadow-lg shadow-indigo-300 dark:shadow-none ",
             // BG: Light Mode
             "bg-gradient-to-b from-background via-indigo-200 to-background ",
             // BG: Dark Mode
@@ -72,7 +72,9 @@ export default function App() {
           )}
         >
           <Header /> {/* HEADER  */}
-          <Outlet /> {/* BODY */}
+          <main className="app-outlet-container h-full pb-2 dark:pb-0 overflow-x-hidden overflow-y-scroll">
+            <Outlet /> {/* BODY */}
+          </main>
         </main>
       </main>
 

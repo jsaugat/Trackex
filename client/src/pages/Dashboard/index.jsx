@@ -1,23 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Card from "@/pages/Dashboard/_components/Card";
 import { default as CardContainer } from "@/components/Card/Container";
-import SimpleLineChart from "@/components/Charts/SimpleLineChart";
-import SimpleBarChart from "@/components/Charts/SimpleBarChart";
 import SaleRow from "@/pages/Dashboard/_components/SaleRow";
 import GradientBorder from "@/components/GradientBorder";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { useSelector } from "react-redux";
 import {
-  Activity,
-  LoaderCircle,
   TrendingUp,
   TrendingDown,
   Wallet,
-  RouteOff,
   ServerOff,
-  ArrowUpWideNarrow,
   Users,
-  ListFilter
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import NewTransactionCard from "./_components/NewTransactionCard";
@@ -26,7 +19,7 @@ import NoRecords from "@/components/NoRecords";
 import { useGetTopCustomersQuery, useGetTopSellingProductsByQuantityQuery, useGetTopSellingProductsByRevenueQuery } from "@/slices/api/topStats.api";
 import { useDispatch } from "react-redux";
 import { setTopCustomers, setTopProductsByQuantity, setTopProductsByRevenue } from "@/slices/topStats";
-import { Separator } from "@/components/ui/separator";
+import OverviewSection from "./_sections/OverviewSection";
 
 // const cardData = [
 //   {
@@ -54,8 +47,6 @@ import { Separator } from "@/components/ui/separator";
 // ];
 
 export default function Dashboard() {
-  //? Toggle last days count in line chart
-  const [daysCount, setDaysCount] = useState("7");
   //? RTK Queries
   const { data: fetchedTopCustomers, refetch: refetchTopCustomers } = useGetTopCustomersQuery();
   const { data: fetchedTopSellingProductsByQuantity, refetch: refetchTopSellingProductsByQuantity } = useGetTopSellingProductsByQuantityQuery();
@@ -145,7 +136,7 @@ export default function Dashboard() {
     <main className="flex flex-col h-full">
       {/* <main className=""> */}
       {/* Upper Section */}
-      <section className="mb-4 grid grid-cols-1 gap-4 transition-all sm:grid-cols-2 xl:grid-cols-4">
+      <section className="mb-4 grid grid-cols-3 gap-4 transition-all sm:grid-cols-2 xl:grid-cols-4">
         {/* New Transaction */}
         <NewTransactionCard />
         {/* Revenue, Expense, Balance */}
@@ -163,33 +154,8 @@ export default function Dashboard() {
 
       {/* Lower section */}
       <section className="h-full flex-auto grid grid-cols-1 lg:grid-cols-2 gap-4 transition-all">
-        {/* Chart */}
-        <CardContainer className="p-7">
-          <section className="text-xl w-full flex items-center justify-between">
-            <h3>
-              Overview{" "}
-              <span className="text-sm text-muted-foreground">
-              </span>
-            </h3>
-            <div className="text-sm flex items-baseline gap-2">
-              {/* Last */}
-              <ToggleGroup type="single" variant="outline" size="sm" value={daysCount}
-                onValueChange={(value) => {
-                  if (value) setDaysCount(value);
-                }}>
-                <ToggleGroupItem value="7">7 days</ToggleGroupItem>
-                <ToggleGroupItem value="14">14 days</ToggleGroupItem>
-                <ToggleGroupItem value="30">30 days</ToggleGroupItem>
-              </ToggleGroup>
-            </div>
-          </section>
-          {salesData.length === 0 && expensesData.length === 0 ? (
-            <NoRecords missingThing="transactions" icon={RouteOff} />
-          ) : (
-            <SimpleLineChart daysCount={daysCount} />
-          )}
-          {/* <SimpleBarChart /> */}
-        </CardContainer>
+        {/* //? Chart */}
+        <OverviewSection salesData={salesData} expensesData={expensesData} />
 
         {/* //?Recent Sales */}
         {/* <RecentSales salesData={salesData} /> */}
@@ -222,18 +188,18 @@ const TopSellingProducts = ({ topProductsByQuantity, topProductsByRevenue }) => 
       <CardContainer className="min-h-full max-h-[20rem] border dark:border-transparent justify-start">
         <div className="">
           <h3 className="mb-1 text-xl flex items-center gap-2">
-            <ArrowUpWideNarrow className="size-5" />
+            <TrendingUp className="size-5" />
             <span>Top-selling products</span>
           </h3>
-          <section className="w-fit ml-auto">
+          <section className="w-fit">
             <ToggleGroup
               type="single"
               variant="outline"
               size="sm"
               value={toggleType}
               onValueChange={(value) => { if (value) setToggleType(value) }}>
-              <ToggleGroupItem value="revenue">Revenue</ToggleGroupItem>
-              <ToggleGroupItem value="quantity">Quantity</ToggleGroupItem>
+              <ToggleGroupItem value="revenue" className="rounded-full">Revenue</ToggleGroupItem>
+              <ToggleGroupItem value="quantity" className="rounded-full">Quantity</ToggleGroupItem>
             </ToggleGroup>
           </section>
         </div>
