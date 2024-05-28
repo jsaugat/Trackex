@@ -11,22 +11,22 @@ import { Gauge, ToggleLeft, ToggleRight } from "lucide-react";
 Chart.register(ArcElement);
 
 export default function DoughnutChart() {
-  // State to toggle between showing revenue and expenses data
+  //? State to toggle between showing revenue and expenses data
   const [showRevenue, setShowRevenue] = useState(true);
-  // Select revenue and expenses data from redux state
+  //? Select revenue and expenses data from redux state
   const revenueData = useSelector((state) => state.revenue.data || []);
   const expensesData = useSelector((state) => state.expenses.data || []);
 
-  // Hooks
+  //? Hooks
   const { coolColors, warmColors } = useColors();
   const { totalRevenue, totalExpense } = useFinancialSummary();
 
-  // Toggle the data between revenue and expenses
+  //? Toggle the data between revenue and expenses
   const toggleData = () => {
     setShowRevenue((prev) => !prev);
   };
 
-  // Compute the data for the chart based on the current state (revenue or expenses)
+  //? Compute the data for the chart based on the current state (revenue or expenses)
   const currentData = useMemo(() => {
     const data = showRevenue ? revenueData : expensesData; // Choose the data based on the toggle state
     const totalAmount = data.reduce((sum, item) => sum + item.amount, 0); // Calculate the total amount
@@ -50,7 +50,8 @@ export default function DoughnutChart() {
     const labels = Object.keys(groupedData);
     //? Calculate percentage values
     const values = Object.values(groupedData)
-      .map((value) => (value / totalAmount) * 100)
+      .map((value) => (value / totalAmount) * 100) // calculate the percentage
+      .sort((a, b) => b - a) // sort the values highest to lowest
       .map((value) => (value < 1 ? 1 : value).toFixed(2)); // if the percentage is less than 1 make it 1.
 
     const colors = labels.map((_, index) => {
@@ -65,7 +66,7 @@ export default function DoughnutChart() {
     return { labels, values, colors };
   }, [showRevenue, revenueData, expensesData, coolColors, warmColors]);
 
-  // Chart configuration
+  //? Chart configuration
   const config = {
     data: {
       labels: currentData.labels, // Set the labels
@@ -76,8 +77,8 @@ export default function DoughnutChart() {
           borderColor: currentData.colors, // Set the border colors
           hoverOffset: 27,
           offset: 20,
-          borderRadius: 30,
-          spacing: 8,
+          borderRadius: 0,
+          spacing: 10,
         },
       ],
     },
@@ -111,7 +112,7 @@ export default function DoughnutChart() {
             </span>
           </h3>
         </div>
-        <div className="h-full pt-8 flex flex-col gap-4">
+        <div className="h-full pt-8 flex flex-col gap-4 ">
           <Labels data={currentData} /> {/* Render the Labels component */}
         </div>
       </div>
@@ -119,6 +120,7 @@ export default function DoughnutChart() {
   );
 }
 
+//? Chart Header
 function ChartTitle({ showRevenue, toggleData }) {
   return (
     <section className="mb-6 flex justify-between">

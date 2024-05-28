@@ -27,7 +27,7 @@ function LabelComponent({ name, color, percent }) {
         />
         <h3>{name}</h3>
       </div>
-      <h3>{} {percent}%</h3>
+      <h3>{ } {percent}%</h3>
     </div>
   );
 }
