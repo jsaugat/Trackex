@@ -3,7 +3,6 @@ import Card from "@/pages/Dashboard/_components/Card";
 import { default as CardContainer } from "@/components/Card/Container";
 import SaleRow from "@/pages/Dashboard/_components/SaleRow";
 import GradientBorder from "@/components/GradientBorder";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { useSelector } from "react-redux";
 import {
   TrendingUp,
@@ -16,10 +15,8 @@ import { cn } from "@/lib/utils";
 import NewTransactionCard from "./_components/NewTransactionCard";
 import useFinancialSummary from "@/hooks/useFinancialSummary";
 import NoRecords from "@/components/NoRecords";
-import { useGetTopCustomersQuery, useGetTopSellingProductsByQuantityQuery, useGetTopSellingProductsByRevenueQuery } from "@/slices/api/topStats.api";
-import { useDispatch } from "react-redux";
-import { setTopCustomers, setTopProductsByQuantity, setTopProductsByRevenue } from "@/slices/topStats";
-import OverviewSection from "./_sections/OverviewSection";
+import Overview from "./_sections/Overview";
+import TopStats from "./_sections/TopStats";
 
 // const cardData = [
 //   {
@@ -47,38 +44,17 @@ import OverviewSection from "./_sections/OverviewSection";
 // ];
 
 export default function Dashboard() {
-  //? RTK Queries
-  const { data: fetchedTopCustomers, refetch: refetchTopCustomers } = useGetTopCustomersQuery();
-  const { data: fetchedTopSellingProductsByQuantity, refetch: refetchTopSellingProductsByQuantity } = useGetTopSellingProductsByQuantityQuery();
-  const { data: fetchedTopSellingProductsByRevenue, refetch: refetchTopSellingProductsByRevenue } = useGetTopSellingProductsByRevenueQuery();
   //? Redux store.
   const { _id } = useSelector((state) => state.auth.userInfo); // for auth
   const salesData = useSelector((state) => state.revenue.data || []);
   const expensesData = useSelector((state) => state.expenses.data || []);
-  const idk = useSelector((state) => state.topStats);
-  const topCustomers = useSelector(state => state.topStats.topCustomers || []);
-  const topProductsByQuantity = useSelector(state => state.topStats.topProductsByQuantity || []);
-  const topProductsByRevenue = useSelector(state => state.topStats.topProductsByRevenue || []);
   //? Hooks
   const { totalRevenue, totalExpense, totalBalance } = useFinancialSummary();
-  const dispatch = useDispatch();
 
   useEffect(() => {
     console.log("salesData", salesData);
     console.log("totalRevenue ", totalRevenue);
   }, [salesData, _id]);
-
-  useEffect(() => {
-    if (!fetchedTopCustomers || !fetchedTopSellingProductsByQuantity || !fetchedTopSellingProductsByRevenue) return;
-    dispatch(setTopCustomers(fetchedTopCustomers));
-    dispatch(setTopProductsByQuantity(fetchedTopSellingProductsByQuantity));
-    dispatch(setTopProductsByRevenue(fetchedTopSellingProductsByRevenue));
-  }, [dispatch, fetchedTopCustomers, fetchedTopSellingProductsByQuantity, fetchedTopSellingProductsByRevenue])
-
-  console.log("idk", idk)
-  console.log("topCustomers", topCustomers);
-  console.log("topProductsByQuantity", topProductsByQuantity);
-  console.log("topProductsByRevenue", topProductsByRevenue);
 
   //? State for card data
   const [cardData, setCardData] = useState([
@@ -155,148 +131,19 @@ export default function Dashboard() {
       {/* Lower section */}
       <section className="h-full flex-auto grid grid-cols-1 lg:grid-cols-2 gap-4 transition-all">
         {/* //? Chart */}
-        <OverviewSection salesData={salesData} expensesData={expensesData} />
+        <Overview salesData={salesData} expensesData={expensesData} />
 
         {/* //?Recent Sales */}
         {/* <RecentSales salesData={salesData} /> */}
 
         {/* //?Top Stats */}
-        <section className="topStats grid grid-cols-2 gap-4">
-          <TopSellingProducts
-            topProductsByQuantity={topProductsByQuantity}
-            topProductsByRevenue={topProductsByRevenue}
-          />
-          <TopCustomers topCustomers={topCustomers} />
-        </section>
+        <TopStats />
 
+        {/* </main> */}
       </section>
-      {/* </main> */}
     </main>
   );
 }
-
-//? Top Stats
-const TopSellingProducts = ({ topProductsByQuantity, topProductsByRevenue }) => {
-  const [toggleType, setToggleType] = useState("revenue");
-  const topProducts = toggleType === "revenue" ? topProductsByRevenue : topProductsByQuantity;
-
-  return (
-    <GradientBorder
-      radius="3xl"
-      className="dark:bg-gradient-to-r hover:dark:via-primary/40 hover:dark:bg-gradient-to-bl"
-    >
-      <CardContainer className="relative pb-0 min-h-full max-h-[20rem] border dark:border-transparent justify-start">
-        {/* blurred cover on the bottom */}
-        <div className="absolute left-[5%] bottom-0 mx-auto w-[90%] h-9 bg-gradient-to-b from-transparent via-background to-background" />
-        <div className="">
-          <h3 className="mb-1 text-xl flex items-center gap-2">
-            <TrendingUp className="size-5" />
-            <span>Top-selling products</span>
-          </h3>
-          <section className="w-fit">
-            <ToggleGroup
-              type="single"
-              variant="outline"
-              size="sm"
-              value={toggleType}
-              onValueChange={(value) => { if (value) setToggleType(value) }}>
-              <ToggleGroupItem value="revenue" className="rounded-full text-[0.8rem]">Revenue</ToggleGroupItem>
-              <ToggleGroupItem value="quantity" className="rounded-full text-[0.8rem]">Quantity</ToggleGroupItem>
-            </ToggleGroup>
-          </section>
-        </div>
-        <section
-          className={cn(
-            "flex-auto h-full w-full pr-3 overflow-y-scroll",
-            topProducts?.length === 0 && "flex items-start"
-          )}
-        >
-          {topProducts?.length > 0 ? (
-            topProducts.map(data => {
-              const count = data.totalRevenue || data.totalQuantity;
-              return (
-                <section key={data.description} className="py-2 border-b flex justify-between items-end" >
-                  {/* description */}
-                  <div className="grid">
-                    <span className="w-fit px-2 text-xs text-muted-foreground border rounded-full">
-                      {data._id.category}
-                    </span>
-                    {data._id.description}
-                  </div>
-                  {/* count */}
-                  <div className="px-2 border rounded-xl" >
-                    {toggleType === "revenue" ? <span className="text-sm text-muted-foreground" >NPR </span> : ""}
-                    {count === data.totalRevenue ? count.toLocaleString() : count}
-                  </div>
-                </section>)
-            }
-            )) : (<NoRecords
-              missingThing="sales"
-              icon={ServerOff}
-              className="top-[1.45rem]"
-            />)
-          }
-        </section>
-      </CardContainer>
-    </GradientBorder>
-  )
-}
-const TopCustomers = ({ topCustomers }) => (
-  <GradientBorder
-    radius="3xl"
-    className="dark:bg-gradient-to-r hover:dark:via-primary/40 hover:dark:bg-gradient-to-bl"
-  >
-    <CardContainer className="relative pb-0 min-h-full border dark:border-transparent justify-start">
-      {/* blurred cover on the bottom */}
-      <div className="absolute left-[5%] bottom-0 mx-auto w-[90%] h-9 bg-gradient-to-b from-transparent via-background to-background" />
-      {/* Header */}
-      <div className="">
-        <h3 className="text-xl flex items-center gap-2">
-          <Users className="size-4" />
-          <span>Top clients</span>
-        </h3>
-      </div>
-      {/* Body */}
-      <section
-        className={cn(
-          "flex-auto h-[20rem] w-full pr-3 overflow-y-scroll",
-          topCustomers?.length === 0 && "flex items-start"
-        )}
-      >
-        <div className="w-fit ml-auto text-muted-foreground text-sm">Total spent</div>
-        {topCustomers?.length > 0 ? (
-          topCustomers.map((data, idx) => {
-            return (
-              <div className="mb-2 flex items-center justify-between">
-                <section key={data.idx} className="flex items-center gap-2" >
-                  {/* Customer Icon */}
-                  <figure className="h-10 w-10 rounded-full bg-secondary dark:bg-foreground p-1">
-                    <img
-                      width={200}
-                      height={200}
-                      src={`https://api.dicebear.com/7.x/lorelei/svg?seed=${data._id}`}
-                      alt="avatar"
-                    />
-                  </figure>
-                  {/* Customer Name */}
-                  <div >
-                    {data._id}
-                  </div>
-                </section>
-                {/* Total spent */}
-                <span className="px-2 border rounded-full">+ {data.totalRevenue.toLocaleString()}</span>
-              </div>
-            )
-          })) : (<NoRecords
-            missingThing="customer"
-            icon={ServerOff}
-            className="top-[1.45rem]"
-          />)
-        }
-      </section>
-    </CardContainer>
-  </GradientBorder>
-)
 
 //? Recent Sales
 const RecentSales = ({ salesData }) => (

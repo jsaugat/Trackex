@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { BarChart3, LineChart, RouteOff } from "lucide-react";
 
-export default function OverviewSection({ salesData, expensesData }) {
+export default function Overview({ salesData, expensesData }) {
   //? Toggle last days count in line chart
   const [daysCount, setDaysCount] = useState("30");
   const [chartType, setChartType] = useState("line");
