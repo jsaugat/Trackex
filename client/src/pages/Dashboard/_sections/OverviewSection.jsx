@@ -4,7 +4,7 @@ import OverviewChart from '@/components/Charts/OverviewChart';
 import NoRecords from '@/components/NoRecords';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { BarChart3, RouteOff } from "lucide-react";
+import { BarChart3, LineChart, RouteOff } from "lucide-react";
 
 export default function OverviewSection({ salesData, expensesData }) {
   //? Toggle last days count in line chart
@@ -29,7 +29,18 @@ export default function OverviewSection({ salesData, expensesData }) {
           </span>
         </h3>
         <div className="text-sm flex items-center gap-4">
-          <Button variant="outline" size="icon" onClick={chartToggleHandler} className="rounded-full p-0.5" ><BarChart3 className="size-4" /></Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={chartToggleHandler}
+            className="rounded-full p-0.5"
+          >
+            {chartType === "line" ?
+              <BarChart3 className="size-4" />
+              :
+              <LineChart className="size-4" />
+            }
+          </Button>
           {/* Last 7 days, 14 days, 30 days */}
           <ToggleGroup type="single" variant="outline" size="sm" value={daysCount}
             onValueChange={(value) => {

@@ -124,6 +124,8 @@ export default function OverviewChart({ chartType, daysCount }) {
     console.log("COMBINED_DATA for lineChart --> ", combinedData);
     console.log("TRANSFORMED_DATA for lineChart --> ", transformedData);
   }
+
+  //? Dynamic chart components
   const ChartComponent = chartType === "bar" ? BarChart : LineChart;
   const DataComponent = chartType === "bar" ? Bar : Line;
 
@@ -135,7 +137,7 @@ export default function OverviewChart({ chartType, daysCount }) {
         data={transformedData}
         margin={{ top: 5, right: 35, left: 20, bottom: 0 }}
       >
-        <Tooltip content={<CustomTooltip />} />
+        <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255, 0.1)" }} />
         <DataComponent
           type="monotone"
           dataKey="Revenue"
@@ -150,9 +152,9 @@ export default function OverviewChart({ chartType, daysCount }) {
         <DataComponent
           type="monotone"
           dataKey="Expense"
-          stroke={isLightMode ? "black" : "darkGray"}
-          fill={isLightMode ? "black" : "darkGray"}
-          style={{ opacity: 0.25 }}
+          stroke={isLightMode ? "#383838" : "white"}
+          fill={isLightMode ? "#383838" : "darkGray"}
+          style={{ opacity: 0.55 }}
           strokeWidth="2px"
           activeDot={{
             r: 6,
