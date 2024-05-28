@@ -1,0 +1,35 @@
+/* 
+ ? GRADIENT BORDER 
+*/
+.dark {
+  #gradientBorder {
+    overflow: hidden;
+    --direction: to top;
+
+    &::before {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      opacity: 0;
+      transition: all 1s ease-in-out;
+      background-image: linear-gradient(
+        var(--direction),
+        rgb(44, 44, 44),
+        rgba(255, 255, 255, 0.3),
+        rgb(32, 32, 32)
+      );
+      // border-radius: 24px ;
+    }
+
+    /* Hover effect */
+    &:hover {
+      &::before {
+        opacity: 1;
+      }
+    }
+  }
+}
