@@ -13,7 +13,7 @@ import { useGetAllRevenueQuery } from "./slices/api/revenue.api";
 import { useGetAllExpensesQuery } from "./slices/api/expenses.api";
 import { addFetchedExpenses } from "./slices/expensesSlice";
 import { addFetchedRevenue } from "./slices/revenueSlice";
-import { SidebarProvider } from "@/hooks/useSidebar.js"
+import { SidebarProvider } from "@/context/useSidebar.jsx"
 
 export default function App() {
   const { userInfo } = useSelector((state) => state.auth);

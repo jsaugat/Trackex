@@ -185,7 +185,9 @@ const TopSellingProducts = ({ topProductsByQuantity, topProductsByRevenue }) => 
       radius="3xl"
       className="dark:bg-gradient-to-r hover:dark:via-primary/40 hover:dark:bg-gradient-to-bl"
     >
-      <CardContainer className="min-h-full max-h-[20rem] border dark:border-transparent justify-start">
+      <CardContainer className="relative pb-0 min-h-full max-h-[20rem] border dark:border-transparent justify-start">
+        {/* blurred cover on the bottom */}
+        <div className="absolute left-[5%] bottom-0 mx-auto w-[90%] h-8 bg-gradient-to-b from-transparent via-background to-background" />
         <div className="">
           <h3 className="mb-1 text-xl flex items-center gap-2">
             <TrendingUp className="size-5" />
@@ -213,13 +215,13 @@ const TopSellingProducts = ({ topProductsByQuantity, topProductsByRevenue }) => 
             topProducts.map(data => {
               const count = data.totalRevenue || data.totalQuantity;
               return (
-                <section key={data.description} className="py-2 border-b flex justify-between items-center" >
+                <section key={data.description} className="py-2 border-b flex justify-between items-end" >
                   {/* description */}
                   <div className="grid">
-                    {data._id.description}
-                    <span className="text-xs text-muted-foreground">
+                    <span className="w-fit px-2 text-xs text-muted-foreground border rounded-full">
                       {data._id.category}
                     </span>
+                    {data._id.description}
                   </div>
                   {/* count */}
                   <div className="px-2 border rounded-xl" >
@@ -244,7 +246,9 @@ const TopCustomers = ({ topCustomers }) => (
     radius="3xl"
     className="dark:bg-gradient-to-r hover:dark:via-primary/40 hover:dark:bg-gradient-to-bl"
   >
-    <CardContainer className="min-h-full border dark:border-transparent justify-start">
+    <CardContainer className="relative pb-0 min-h-full border dark:border-transparent justify-start">
+      {/* blurred cover on the bottom */}
+      <div className="absolute left-[5%] bottom-0 mx-auto w-[90%] h-8 bg-gradient-to-b from-transparent via-background to-background" />
       <div className="">
         <h3 className="text-xl flex items-center gap-2">
           <Users className="size-4" />

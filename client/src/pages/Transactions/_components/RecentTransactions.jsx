@@ -199,6 +199,7 @@ export default function RecentTransactions() {
                           _id={transaction._id}
                           type={transaction.type}
                           description={transaction.description}
+                          category={transaction.category}
                           amount={transaction.amount}
                           customer={transaction.customer}
                           entity={transaction.entity}
