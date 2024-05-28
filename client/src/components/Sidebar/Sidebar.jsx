@@ -11,6 +11,7 @@ import { Nav } from "./Nav";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/Logo/Logo";
 import { useSelector } from "react-redux";
+import { useSidebar } from "@/context/useSidebar";
 
 const navLinks = [
   { title: "Dashboard", href: "/", icon: Activity },
@@ -19,12 +20,10 @@ const navLinks = [
 ];
 
 export default function Sidebar() {
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const { isCollapsed, toggleSidebar } = useSidebar();
   const userInfo = useSelector((state) => state.auth.userInfo || {});
   const screenWidth = useWindowWidth();
   const isMobile = screenWidth < 768;
-
-  const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
   return (
     <aside className="hidden border-r border-white dark:border-border shadow-md shadow-indigo-200 dark:shadow-none h-screen bg-background dark:bg-muted/10 md:flex flex-col">

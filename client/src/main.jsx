@@ -22,7 +22,6 @@ import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import PrivateRoute from "@/components/PrivateRoute";
 import TimeAgo from "javascript-time-ago";
-
 import en from "javascript-time-ago/locale/en";
 import ru from "javascript-time-ago/locale/ru";
 import Users from "./pages/Admin/Users.jsx";

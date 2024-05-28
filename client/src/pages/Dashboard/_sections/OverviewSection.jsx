@@ -28,7 +28,7 @@ export default function OverviewSection({ salesData, expensesData }) {
           <span className="text-sm text-muted-foreground">
           </span>
         </h3>
-        <div className="text-sm flex items-center gap-4">
+        <div className="text-sm flex items-center gap-2">
           <Button
             variant="outline"
             size="icon"
