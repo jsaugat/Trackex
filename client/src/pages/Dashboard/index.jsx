@@ -187,7 +187,7 @@ const TopSellingProducts = ({ topProductsByQuantity, topProductsByRevenue }) => 
     >
       <CardContainer className="relative pb-0 min-h-full max-h-[20rem] border dark:border-transparent justify-start">
         {/* blurred cover on the bottom */}
-        <div className="absolute left-[5%] bottom-0 mx-auto w-[90%] h-8 bg-gradient-to-b from-transparent via-background to-background" />
+        <div className="absolute left-[5%] bottom-0 mx-auto w-[90%] h-9 bg-gradient-to-b from-transparent via-background to-background" />
         <div className="">
           <h3 className="mb-1 text-xl flex items-center gap-2">
             <TrendingUp className="size-5" />
@@ -200,8 +200,8 @@ const TopSellingProducts = ({ topProductsByQuantity, topProductsByRevenue }) => 
               size="sm"
               value={toggleType}
               onValueChange={(value) => { if (value) setToggleType(value) }}>
-              <ToggleGroupItem value="revenue" className="rounded-full">Revenue</ToggleGroupItem>
-              <ToggleGroupItem value="quantity" className="rounded-full">Quantity</ToggleGroupItem>
+              <ToggleGroupItem value="revenue" className="rounded-full text-[0.8rem]">Revenue</ToggleGroupItem>
+              <ToggleGroupItem value="quantity" className="rounded-full text-[0.8rem]">Quantity</ToggleGroupItem>
             </ToggleGroup>
           </section>
         </div>
@@ -248,24 +248,28 @@ const TopCustomers = ({ topCustomers }) => (
   >
     <CardContainer className="relative pb-0 min-h-full border dark:border-transparent justify-start">
       {/* blurred cover on the bottom */}
-      <div className="absolute left-[5%] bottom-0 mx-auto w-[90%] h-8 bg-gradient-to-b from-transparent via-background to-background" />
+      <div className="absolute left-[5%] bottom-0 mx-auto w-[90%] h-9 bg-gradient-to-b from-transparent via-background to-background" />
+      {/* Header */}
       <div className="">
         <h3 className="text-xl flex items-center gap-2">
           <Users className="size-4" />
           <span>Top clients</span>
         </h3>
       </div>
+      {/* Body */}
       <section
         className={cn(
           "flex-auto h-[20rem] w-full pr-3 overflow-y-scroll",
           topCustomers?.length === 0 && "flex items-start"
         )}
       >
+        <div className="w-fit ml-auto text-muted-foreground text-sm">Total spent</div>
         {topCustomers?.length > 0 ? (
           topCustomers.map((data, idx) => {
             return (
               <div className="mb-2 flex items-center justify-between">
                 <section key={data.idx} className="flex items-center gap-2" >
+                  {/* Customer Icon */}
                   <figure className="h-10 w-10 rounded-full bg-secondary dark:bg-foreground p-1">
                     <img
                       width={200}
@@ -274,11 +278,13 @@ const TopCustomers = ({ topCustomers }) => (
                       alt="avatar"
                     />
                   </figure>
-                  <div>
+                  {/* Customer Name */}
+                  <div >
                     {data._id}
                   </div>
                 </section>
-                <span>{data.totalRevenue.toLocaleString()}</span>
+                {/* Total spent */}
+                <span className="px-2 border rounded-full">+ {data.totalRevenue.toLocaleString()}</span>
               </div>
             )
           })) : (<NoRecords

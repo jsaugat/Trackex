@@ -29,6 +29,15 @@ export default function OverviewSection({ salesData, expensesData }) {
           </span>
         </h3>
         <div className="text-sm flex items-center gap-2">
+          {/* Last 7 days, 14 days, 30 days */}
+          <ToggleGroup type="single" variant="outline" size="sm" value={daysCount}
+            onValueChange={(value) => {
+              if (value) setDaysCount(value);
+            }}>
+            <ToggleGroupItem value="7" className="rounded-full">7 days</ToggleGroupItem>
+            <ToggleGroupItem value="14" className="rounded-full">14 days</ToggleGroupItem>
+            <ToggleGroupItem value="30" className="rounded-full">30 days</ToggleGroupItem>
+          </ToggleGroup>
           <Button
             variant="outline"
             size="icon"
@@ -41,15 +50,6 @@ export default function OverviewSection({ salesData, expensesData }) {
               <LineChart className="size-4" />
             }
           </Button>
-          {/* Last 7 days, 14 days, 30 days */}
-          <ToggleGroup type="single" variant="outline" size="sm" value={daysCount}
-            onValueChange={(value) => {
-              if (value) setDaysCount(value);
-            }}>
-            <ToggleGroupItem value="7" className="rounded-full">7 days</ToggleGroupItem>
-            <ToggleGroupItem value="14" className="rounded-full">14 days</ToggleGroupItem>
-            <ToggleGroupItem value="30" className="rounded-full">30 days</ToggleGroupItem>
-          </ToggleGroup>
         </div>
       </section>
       {salesData.length === 0 && expensesData.length === 0 ? (

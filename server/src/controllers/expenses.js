@@ -19,9 +19,19 @@ const getExpenses = asyncHandler(async (req, res, next) => {
  *  @route   POST /api/expenses/
  */
 const createExpense = asyncHandler(async (req, res, next) => {
-  const requestData = req.body;
-  const savedExpense = await Expense.create({
-    ...requestData,
+  const expensesEntry = req.body;
+
+  // if expensesEntry is an array
+  if (Array.isArray(expensesEntry)) {
+    const expensesEntries = expensesEntry; // plural now :)
+    const createdExpenses = await Expense.insertMany(
+      expensesEntries.map((entry) => ({ ...entry, type: "expense" }))
+    );
+    res.status(201).json(createdExpenses);
+    return;
+  }
+  const createdExpense = await Expense.create({
+    ...expensesEntry,
     type: "expense",
   });
 
@@ -30,7 +40,7 @@ const createExpense = asyncHandler(async (req, res, next) => {
   // req.body.amount = savedExpense.amount; // Assuming amount is present in savedExpense
   // req.body.date = savedExpense.date; // Assuming date is present in savedExpense
   // await updateMonthHistory(req, res, next);
-  res.status(201).json(savedExpense);
+  res.status(201).json(createdExpense);
 });
 
 /**
