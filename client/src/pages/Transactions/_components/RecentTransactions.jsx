@@ -84,34 +84,43 @@ export default function RecentTransactions() {
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
 
-      //? Filter transactions based on selected tab [ week | month | year ].
-      const now = new Date();
-      let filteredByTime = mergedTransactions.filter((transaction) => {
-        const transactionDate = new Date(transaction.createdAt);
-        if (selectedTab === "week") {
-          // Week
-          const oneWeekAgo = new Date();
-          oneWeekAgo.setDate(now.getDate() - 7);
-          console.log("transaction date: ", transactionDate);
-          console.log("oneWeekAgo: ", oneWeekAgo);
-          return transactionDate >= oneWeekAgo;
-        } else if (selectedTab === "month") {
-          // Month
-          const oneMonthAgo = new Date();
-          oneMonthAgo.setMonth(now.getMonth() - 1);
-          return transactionDate >= oneMonthAgo;
-        } else if (selectedTab === "year") {
-          // Year
-          const oneYearAgo = new Date();
-          oneYearAgo.setFullYear(now.getFullYear() - 1);
-          return transactionDate >= oneYearAgo;
-        }
-        return true;
-      });
+      // Filter transactions based on selected tab [ week | month | year ].
+      // const now = new Date();
+      // let filteredByTime = mergedTransactions.filter((transaction) => {
+      //   const transactionDate = new Date(transaction.createdAt);
+      //   if (selectedTab === "week") {
+      //     // Week
+      //     const oneWeekAgo = new Date();
+      //     oneWeekAgo.setDate(now.getDate() - 7);
+      //     console.log("transaction date: ", transactionDate);
+      //     console.log("oneWeekAgo: ", oneWeekAgo);
+      //     return transactionDate >= oneWeekAgo;
+      //   } else if (selectedTab === "month") {
+      //     // Month
+      //     const oneMonthAgo = new Date();
+      //     oneMonthAgo.setMonth(now.getMonth() - 1);
+      //     return transactionDate >= oneMonthAgo;
+      //   } else if (selectedTab === "year") {
+      //     // Year
+      //     const oneYearAgo = new Date();
+      //     oneYearAgo.setFullYear(now.getFullYear() - 1);
+      //     return transactionDate >= oneYearAgo;
+      //   }
+      //   return true;
+      // });
 
-      setFilteredTransactions(filteredByTime);
+      //? Filter based on Search Query
+      const filteredByQuery = mergedTransactions.filter(transaction => {
+        const searchedDescription = transaction.description?.toLowerCase().includes(searchQuery.toLowerCase());
+        const searchedCustomer = transaction.customer?.toLowerCase().includes(searchQuery.toLowerCase());
+        const searchedCategory = transaction.category?.toLowerCase().includes(searchQuery.toLowerCase());
+        const searchedTransactions = searchedDescription || searchedCustomer || searchedCategory;
+        return searchedTransactions;
+      })
+
+      setFilteredTransactions(filteredByQuery);
     }
-  }, [allExpenses, allRevenue, filterOptions]);
+  }, [allExpenses, allRevenue, filterOptions, searchQuery]);
 
   //? Handle filter options selections
   const handleSelect = (id) => {
