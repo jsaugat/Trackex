@@ -158,7 +158,7 @@ export default function OverviewChart({ chartType, daysCount }) {
           strokeWidth="2px"
           activeDot={{
             r: 6,
-            style: { fill: "var(--theme-primary)", opacity: 0.25 },
+            style: { fill: "var(--theme-primary)", opacity: 0.35 },
           }}
         />
         <CartesianGrid strokeDasharray="4 4" stroke="transparent" />
