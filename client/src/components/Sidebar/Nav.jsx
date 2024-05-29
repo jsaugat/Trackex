@@ -43,14 +43,14 @@ export function Nav({ links, isCollapsed, className }) {
                       }),
                       "h-10 w-10",
                       isActive &&
-                        "dark:bg-muted dark:text-foreground dark:hover:bg-muted dark:hover:text-white"
+                      "dark:bg-muted dark:text-foreground dark:hover:bg-muted dark:hover:text-white"
                     )}
                   >
                     <link.icon className="h-4 w-4" />
                     <span className="sr-only">{link.href}</span>
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent side="right">{link.title}</TooltipContent>
+                <TooltipContent side="right" className="border bg-transparent backdrop-blur-sm text-foreground" >{link.title}</TooltipContent>
               </Tooltip>
             ) : (
               //? is not Collapsed
@@ -62,7 +62,7 @@ export function Nav({ links, isCollapsed, className }) {
                     variant: isActive ? "default" : "ghost",
                   }),
                   isActive &&
-                    "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white border dark:border-muted",
+                  "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white border dark:border-muted",
                   "flex justify-start gap-4 w-44"
                 )}
               >

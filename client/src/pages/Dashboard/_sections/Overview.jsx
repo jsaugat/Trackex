@@ -5,6 +5,7 @@ import NoRecords from '@/components/NoRecords';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { BarChart3, LineChart, RouteOff } from "lucide-react";
+import { Separator } from '@/components/ui/separator';
 
 export default function Overview({ salesData, expensesData }) {
   //? Toggle last days count in line chart
@@ -28,8 +29,8 @@ export default function Overview({ salesData, expensesData }) {
           <span className="text-sm text-muted-foreground">
           </span>
         </h3>
-        <div className="text-sm flex items-center gap-2">
-          {/* Last 7 days, 14 days, 30 days */}
+        <section className="text-sm flex items-center gap-3">
+          {/* //? Last 7 days, 14 days, 30 days */}
           <ToggleGroup type="single" variant="outline" size="sm" value={daysCount}
             onValueChange={(value) => {
               if (value) setDaysCount(value);
@@ -38,6 +39,11 @@ export default function Overview({ salesData, expensesData }) {
             <ToggleGroupItem value="14" className="rounded-full">14 days</ToggleGroupItem>
             <ToggleGroupItem value="30" className="rounded-full">30 days</ToggleGroupItem>
           </ToggleGroup>
+
+          {/* //? Separator */}
+          <div className="h-7 w-[1px] bg-border" />
+
+          {/* //? Chart Toggle */}
           <Button
             variant="outline"
             size="icon"
@@ -50,7 +56,7 @@ export default function Overview({ salesData, expensesData }) {
               <LineChart className="size-4" />
             }
           </Button>
-        </div>
+        </section>
       </section>
       {salesData.length === 0 && expensesData.length === 0 ? (
         <NoRecords missingThing="transactions" icon={RouteOff} />

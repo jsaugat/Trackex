@@ -10,6 +10,12 @@ import {
   BarChart2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import NoRecords from "@/components/NoRecords";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,6 +26,7 @@ import {
 import { setTopCustomers, setTopProductsByQuantity, setTopProductsByRevenue } from "@/slices/topStats";
 import GradientBorder from '@/components/GradientBorder';
 import CardContainer from '@/components/Card/Container';
+import MyTooltip from '@/components/MyTooltip';
 
 
 export default function TopStats() {
@@ -73,8 +80,8 @@ export default function TopStats() {
               {mode === "customers" && "Top customers"}
             </span>
           </h3>
-          {/* Filters */}
-          <section className="w-fit flex items-center gap-2" >
+          {/* //? Filters */}
+          <section className="w-fit flex items-center gap-3" >
             {mode === "products" && (
               <ToggleGroup
                 type="single"
@@ -90,9 +97,20 @@ export default function TopStats() {
                 </ToggleGroupItem>
               </ToggleGroup>
             )}
-            <Button onClick={handleModeSwitch} variant="outline" size="icon" className="rounded-full" >
-              <ArrowLeftRight className="size-4" />
-            </Button>
+            {/* //? Separator */}
+            <div className="h-7 w-[1px] bg-border" />
+            {/* //? Mode Switch */}
+            <MyTooltip
+              trigger={
+                <Button onClick={handleModeSwitch} variant="outline" size="icon" className="rounded-full" >
+                  {mode === "products" && <Users className="size-4" />}
+                  {mode === "customers" && < PackagePlus className="size-4" />}
+                </Button>
+              }
+              content={mode === "products" ? "Top Customers" : "Top Products"}
+              side="top"
+            />
+
           </section>
         </header>
         {mode === "products" && (
