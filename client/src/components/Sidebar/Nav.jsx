@@ -12,6 +12,7 @@ import {
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { ModeToggle } from "@/components/mode-toggle";
+import MyTooltip from "../MyTooltip";
 
 export function Nav({ links, isCollapsed, className }) {
   const location = useLocation();
@@ -32,26 +33,28 @@ export function Nav({ links, isCollapsed, className }) {
             const isActive = location.pathname === link.href;
             //? isCollapsed
             return isCollapsed ? (
-              <Tooltip key={index} delayDuration={0}>
-                <TooltipTrigger asChild>
-                  <Link
-                    to={link.href}
-                    className={cn(
-                      buttonVariants({
-                        variant: isActive ? "default" : "ghost",
-                        size: "icon",
-                      }),
-                      "h-10 w-10",
-                      isActive &&
-                      "dark:bg-muted dark:text-foreground dark:hover:bg-muted dark:hover:text-white"
-                    )}
-                  >
-                    <link.icon className="h-4 w-4" />
-                    <span className="sr-only">{link.href}</span>
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="border bg-transparent backdrop-blur-sm text-foreground" >{link.title}</TooltipContent>
-              </Tooltip>
+              <div key={index}>
+                <MyTooltip
+                  trigger={
+                    <Link
+                      to={link.href}
+                      className={cn(
+                        buttonVariants({
+                          variant: isActive ? "default" : "ghost",
+                          size: "icon",
+                        }),
+                        "h-10 w-10",
+                        isActive &&
+                        "dark:bg-muted dark:text-foreground dark:hover:bg-muted dark:hover:text-white"
+                      )}
+                    >
+                      <link.icon className="h-4 w-4" />
+                      <span className="sr-only">{link.href}</span>
+                    </Link>
+                  }
+                  content={link.title}
+                />
+              </div>
             ) : (
               //? is not Collapsed
               <Link

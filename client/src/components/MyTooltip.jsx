@@ -11,7 +11,7 @@ export default function MyTooltip({ trigger, content, delayDuration = 300, side 
     <TooltipProvider>
       <Tooltip delayDuration={delayDuration} >
         <TooltipTrigger>{trigger}</TooltipTrigger>
-        <TooltipContent side={side} className="text-foreground bg-transparent backdrop-blur-sm border">
+        <TooltipContent side={side} className="text-foreground bg-secondary backdrop-blur-sm border">
           <p>{content}</p>
         </TooltipContent>
       </Tooltip>

@@ -32,7 +32,7 @@ import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { ListFilter, Check, ServerOff } from "lucide-react";
 import { useSelector } from "react-redux";
 import TransactionTableRow from "./TransactionsTableRow";
-import NoRecords from "@/components/NoRecords";
+import DateRangePicker from "./DateRangePicker"
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -147,35 +147,40 @@ export default function RecentTransactions() {
         </TabsList> */}
         {/* //? Filter */}
         <section className="w-full flex items-center justify-between gap-2">
+          {/* Search bar */}
           <SearchBar
-            className=""
             searchQuery={searchQuery}
             handleSearchInputChange={handleSearchInputChange}
             placeholder="Search transactions"
           />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-7 gap-2 text-sm">
-                <ListFilter className="h-3.5 w-3.5" />
-                <span className="sr-only sm:not-sr-only">Filter</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {filterOptions.map(({ id, label, selected }) => (
-                <DropdownMenuCheckboxItem
-                  key={id}
-                  checked={selected}
-                  onClick={() => handleSelect(id)}
-                  className="flex"
-                >
-                  {/* {selected && <Check className="size-4" />} */}
-                  <span>{label}</span>
-                </DropdownMenuCheckboxItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <section className="flex items-center gap-2">
+            {/* Date picker */}
+            <DateRangePicker className="text-sm" />
+            {/* Filter transaction types */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="" className="gap-2 text-sm rounded-full">
+                  <ListFilter className="size-4" />
+                  <span className="sr-only sm:not-sr-only">Filter</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuLabel>Filter by</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {filterOptions.map(({ id, label, selected }) => (
+                  <DropdownMenuCheckboxItem
+                    key={id}
+                    checked={selected}
+                    onClick={() => handleSelect(id)}
+                    className="flex"
+                  >
+                    {/* {selected && <Check className="size-4" />} */}
+                    <span>{label}</span>
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </section>
         </section>
       </section>
       {/* //? Table */}

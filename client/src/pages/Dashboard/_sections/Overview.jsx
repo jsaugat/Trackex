@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { BarChart3, LineChart, RouteOff } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
+import MyTooltip from '@/components/MyTooltip';
 
 export default function Overview({ salesData, expensesData }) {
   //? Toggle last days count in line chart
@@ -44,18 +45,24 @@ export default function Overview({ salesData, expensesData }) {
           <div className="h-7 w-[1px] bg-border" />
 
           {/* //? Chart Toggle */}
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={chartToggleHandler}
-            className="rounded-full p-0.5"
-          >
-            {chartType === "line" ?
-              <BarChart3 className="size-4" />
-              :
-              <LineChart className="size-4" />
+          <MyTooltip
+            trigger={
+
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={chartToggleHandler}
+                className="rounded-full p-0.5"
+              >
+                {chartType === "line" ?
+                  <BarChart3 className="size-4" />
+                  :
+                  <LineChart className="size-4" />
+                }
+              </Button>
             }
-          </Button>
+            content={chartType === "line" ? "Bar Chart" : chartType === "bar" && "Line chart"}
+          />
         </section>
       </section>
       {salesData.length === 0 && expensesData.length === 0 ? (

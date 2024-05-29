@@ -193,10 +193,10 @@ export default function TransactionTableRow({
           />
         ) : (
           <>
-            <div className="w-fit mb-2 px-2 text-xs text-muted-foreground border rounded-full">
+            <div className="w-full text-center mb-2 px-2 text-xs text-muted-foreground border rounded-lg">
               {category}
             </div>
-            <div className="w-fit p-1 px-2.5 font-medium bg-muted/60 rounded-xl">
+            <div className="w-full text-center p-1 px-2.5 font-medium bg-muted/60 rounded-md">
               {description}
             </div>
           </>
@@ -273,9 +273,9 @@ export default function TransactionTableRow({
             className="max-w-28 p-0 px-2.5 bg-background border rounded-md"
           />
         ) : type === "revenue" ? (
-          <span className="p-1 px-2.5 text-emerald-500">+ {amount}</span>
+          <span className="p-1 px-2.5 text-lg">+ {amount}</span>
         ) : (
-          <span className="p-1 px-2.5 text-rose-500">( {amount} )</span>
+          <span className="p-1 px-2.5 text-lg">( {amount} )</span>
         )}
       </TableCell>
 

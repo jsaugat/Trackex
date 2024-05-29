@@ -163,7 +163,7 @@ const ProfileDropdown = ({ trigger, handleLogout }) => {
         <DropdownMenuItem>
           <div
             onClick={handleLogout}
-            className="group size-full hover:text-red-500 flex items-center gap-6"
+            className="group size-full flex items-center gap-6"
           >
             <LogOut strokeWidth="1.8px" size="16px" />
             <div className="">Logout</div>

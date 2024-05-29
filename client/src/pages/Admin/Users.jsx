@@ -72,7 +72,12 @@ export default function Users() {
   return (
     <main>
       {/* SearchBar */}
-      <SearchBar value={searchQuery} onChange={handleSearchInputChange} placeholder={"Search members"} />
+      <SearchBar
+        searchQuery={searchQuery}
+        handleSearchInputChange={handleSearchInputChange}
+        placeholder={"Search members"}
+        className="mb-3"
+      />
 
       {/* Users List */}
       <article className="text-[0.9rem] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-start gap-3">

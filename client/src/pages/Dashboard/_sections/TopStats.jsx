@@ -74,7 +74,8 @@ export default function TopStats() {
         <header className="flex justify-between" >
           {/* Title */}
           <h3 className="mb-1 text-xl flex items-center gap-2">
-            <PackagePlus className="size-6" />
+            {mode === "products" && <PackagePlus className="size-6" />}
+            {mode === "customers" && <Users className="size-5" />}
             <span>
               {mode === "products" && "Top-selling products"}
               {mode === "customers" && "Top customers"}
