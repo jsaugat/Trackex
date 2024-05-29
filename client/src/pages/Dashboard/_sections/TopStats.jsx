@@ -8,7 +8,6 @@ import {
   UserCheck,
   ArrowLeftRight,
   BarChart2,
-  Gem
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
@@ -84,7 +83,7 @@ export default function TopStats() {
                 value={toggleType}
                 onValueChange={(value) => { if (value) setToggleType(value) }}>
                 <ToggleGroupItem value="revenue" className="rounded-full space-x-2">
-                  <Gem className="size-4" /><span>Revenue</span>
+                  <TrendingUp className="size-4" /><span>Revenue</span>
                 </ToggleGroupItem>
                 <ToggleGroupItem value="quantity" className="rounded-full space-x-2">
                   <BarChart2 className="size-4" /><span>Quantity</span>

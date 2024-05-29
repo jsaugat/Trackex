@@ -378,9 +378,21 @@ export default function CreateExpenseDialog({ trigger, type }) {
       return `Amount limited to ${maxDigits} digits.`;
     }
 
-    // Check if the value is less than the minimum amount
+    //? Check if the value is less than the minimum amount
     if (parseInt(value, 10) < minAmount) {
       return `Amount must be at least ${minAmount}.`;
+    }
+
+    return true; // Return true if no validation errors
+  };
+
+  //! VALIDATE Quantity
+  const validateQuantity = (value) => {
+    const maxQuantity = 100; // Maximum quantity
+
+    //? Check if the value is less than the minimum amount
+    if (parseInt(value, 10) > maxQuantity) {
+      return `Maximum quantity limit is ${maxQuantity}.`;
     }
 
     return true; // Return true if no validation errors
@@ -557,6 +569,7 @@ export default function CreateExpenseDialog({ trigger, type }) {
                   errors={errors}
                   control={control}
                   validateAmount={validateAmount}
+                  validateQuantity={validateQuantity}
                   handleCategoryChange={handleCategoryChange}
                   deleteExpenseItem={deleteExpenseItem}
                   expenseList={expenseList}
@@ -613,13 +626,14 @@ const ExpenseListItem = ({
   errors,
   control,
   validateAmount,
+  validateQuantity,
   handleCategoryChange,
   index,
   deleteExpenseItem,
   expenseList
 }) => {
   return (
-    <li className="w-full h-20 flex items-start gap-5">
+    <li className="min-w-[60rem] h-20 flex items-start gap-5">
       {/* Row Title */}
       <div className="min-w-fit h-full">
         <h3 className="py-1 px-3 text-[0.8rem] font-medium uppercase dark:bg-muted border dark:border-foreground/40 rounded-full shadow-md shadow-indigo-400 dark:shadow-none">
@@ -627,7 +641,7 @@ const ExpenseListItem = ({
         </h3>
       </div>
       {/* Fields */}
-      <div className="grid grid-cols-3 gap-4 items-center justify-between">
+      <div className="grid lg:grid-cols-4 gap-4 items-center justify-between">
         {/* Category */}
         <div className="grid flex-1">
           <label>
@@ -690,6 +704,25 @@ const ExpenseListItem = ({
             {errors.expenses?.[index]?.amount && (
               <p className="mt-2 text-red-600 text-xs">
                 {errors.expenses?.[index]?.amount?.message}
+              </p>
+            )}
+          </div>
+        </div>
+        {/* Quantity */}
+        <div className="grid flex-1">
+          <label>Quantity</label>
+          <Input
+            type="number"
+            placeholder="XX"
+            {...register(`expenses[${index}].quantity`, {
+              validate: validateQuantity,
+            })}
+          />
+          {/* Error Div */}
+          <div className="h-6">
+            {errors.expenses?.[index]?.quantity && (
+              <p className="mt-2 text-red-600 text-xs">
+                {errors.expenses?.[index]?.quantity?.message}
               </p>
             )}
           </div>

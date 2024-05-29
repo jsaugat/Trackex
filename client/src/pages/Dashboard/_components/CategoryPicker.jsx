@@ -121,7 +121,7 @@ export default function CategoryPicker({ type, onChange, field }) {
           variant="outline"
           role="combobox"
           aria-expanded="open"
-          className="w-full justify-between p-2"
+          className="min-w-full justify-between p-2"
         >
           <span className={!field.value && "text-muted-foreground"}>
             {selectedCategory ? (

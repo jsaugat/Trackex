@@ -14,7 +14,7 @@ export const expensesApiSlice = emptySplitApi.injectEndpoints({
       query: (data) => ({
         url: `${BASE_URL}`,
         method: "POST",
-        body: data,
+        body: { expensesEntries: data },
       }),
       invalidatesTags: ["Expense", "TopStats"],
     }),

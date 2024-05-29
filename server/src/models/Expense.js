@@ -20,6 +20,10 @@ const expenseSchema = new Schema(
       type: Number,
       required: true,
     },
+    quantity: {
+      type: Number,
+      required: false,
+    },
     category: {
       type: String,
       required: true,

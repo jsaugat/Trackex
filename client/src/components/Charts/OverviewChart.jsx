@@ -145,16 +145,16 @@ export default function OverviewChart({ chartType, daysCount }) {
           fill="#6366f1"
           strokeWidth="2px"
           activeDot={{
-            r: 8,
-            style: { fill: "#6366f1", stroke: "#6366f1", opacity: 0.65 },
+            r: 8, // dot size - radius
+            style: { fill: "#6366f1", stroke: "#6366f1", opacity: 0.65 }, // line chart hover dot
           }}
         />
         <DataComponent
           type="monotone"
           dataKey="Expense"
-          stroke={isLightMode ? "#383838" : "white"}
+          stroke={isLightMode ? "#383838" : "darkGray"}
           fill={isLightMode ? "#383838" : "darkGray"}
-          style={{ opacity: 0.55 }}
+          style={{ opacity: 0.55 }} // expense line color
           strokeWidth="2px"
           activeDot={{
             r: 6,

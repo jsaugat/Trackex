@@ -31,7 +31,7 @@ import {
   removeUserLocally,
   updateUserLocally,
 } from "@/slices/admin/usersSlice.js";
-import { Input } from "@/components/ui/input";
+import SearchBar from "@/components/SearchBar";
 
 export default function Users() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -71,16 +71,10 @@ export default function Users() {
 
   return (
     <main>
-      <div className="px-3 w-fit mb-3 bg-background border rounded-full flex items-center gap-2">
-        <Search className="size-5" />
-        <Input
-          type="text"
-          placeholder="Search members..."
-          value={searchQuery}
-          onChange={handleSearchInputChange}
-          className="p-2 bg-transparent border-none focus:ring-0 focus:border-none focus:outline-none focus-visible:ring-0 rounded-full"
-        />
-      </div>
+      {/* SearchBar */}
+      <SearchBar value={searchQuery} onChange={handleSearchInputChange} placeholder={"Search members"} />
+
+      {/* Users List */}
       <article className="text-[0.9rem] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-start gap-3">
         {isGettingUsers ? (
           <Loader />

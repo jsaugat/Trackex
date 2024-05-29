@@ -84,6 +84,18 @@ export default function CreateRevenueDialog({ trigger, type }) {
     return true; // Return true if no validation errors
   };
 
+  //! VALIDATE Quantity
+  const validateQuantity = (value) => {
+    const maxQuantity = 20; // Maximum quantity
+
+    //? Check if the value is less than the minimum amount
+    if (parseInt(value, 10) > maxQuantity) {
+      return `Maximum quantity limit is ${maxQuantity}.`;
+    }
+
+    return true; // Return true if no validation errors
+  };
+
   //? ADD NEW Product List Item
   const addNewProductItem = (e) => {
     e.preventDefault();
@@ -226,9 +238,10 @@ export default function CreateRevenueDialog({ trigger, type }) {
   );
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={setOpen} >
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="md:min-w-fit md:max-w-[80%]">
+      {/* <DialogContent className="md:min-w-fit md:max-w-[80%]"> */}
+      <DialogContent className="md:min-w-fit md:max-w-full">
         <DialogHeader>
           <DialogTitle>
             Create a new <span className="capitalize">{type}</span> transaction
@@ -313,6 +326,7 @@ export default function CreateRevenueDialog({ trigger, type }) {
                   errors={errors}
                   control={control}
                   validateAmount={validateAmount}
+                  validateQuantity={validateQuantity}
                   handleCategoryChange={handleCategoryChange}
                   deleteProductItem={deleteProductItem}
                   productList={productList}
@@ -388,22 +402,24 @@ const ProductListItem = ({
   errors,
   control,
   validateAmount,
+  validateQuantity,
   handleCategoryChange,
   index,
   deleteProductItem,
   productList
 }) => {
   return (
-    <li className="w-full h-20 flex items-start gap-5">
+    <li className="min-w-[60rem] h-20 flex items-start gap-5">
       {/* Row Title */}
       <div className="min-w-fit h-full">
         <h3 className="py-1 px-3 text-[0.8rem] font-medium uppercase dark:bg-muted border dark:border-foreground/40 rounded-full shadow-md shadow-indigo-400 dark:shadow-none">
           Product {index < 9 ? `0${index + 1}` : index + 1}
         </h3>
       </div>
+
       {/* Fields */}
-      <div className="grid grid-cols-3 gap-4 items-center justify-between">
-        {/* Category */}
+      <main className="grid grid-cols-4 gap-4 items-center justify-between">
+        {/* //? Category */}
         <div className="grid flex-1">
           <label>
             Category <RequiredStar />
@@ -420,26 +436,28 @@ const ProductListItem = ({
               />
             )}
           />
-          {/* Error Div */}
+          {/* //! error Div */}
           <div className="h-6">
             {errors.products?.[index]?.category && (
               <p className="mt-2 text-red-600 text-xs">Category is required</p>
             )}
           </div>
         </div>
-        {/* Description */}
+
+        {/* //? Description */}
         <div className="grid flex-1">
           <label>
             Description <RequiredStar />
           </label>
           <Input
-            placeholder={type === "expense" ? "Internet" : "Hair Gel"}
+            placeholder={type === "expense" ? "Internet" : "Lipstick"}
             autoComplete="off"
             {...register(`products[${index}].description`, {
               required: "Description is required",
             })}
+            className=""
           />
-          {/* Error Div */}
+          {/* //! error Div */}
           <div className="h-6">
             {errors.products?.[index]?.description && (
               <p className="mt-2 text-red-600 text-xs">
@@ -448,7 +466,8 @@ const ProductListItem = ({
             )}
           </div>
         </div>
-        {/* Amount */}
+
+        {/* //? Amount */}
         <div className="grid flex-1">
           <label>
             Amount (NPR) <RequiredStar />
@@ -460,7 +479,7 @@ const ProductListItem = ({
               validate: validateAmount,
             })}
           />
-          {/* Error Div */}
+          {/* //! error Div */}
           <div className="h-6">
             {errors.products?.[index]?.amount && (
               <p className="mt-2 text-red-600 text-xs">
@@ -469,7 +488,27 @@ const ProductListItem = ({
             )}
           </div>
         </div>
-      </div>
+
+        {/* //? Quantity */}
+        <div className="grid flex-1">
+          <label>Quantity</label>
+          <Input
+            type="number"
+            placeholder="XX"
+            {...register(`products[${index}].quantity`, {
+              validate: validateQuantity,
+            })}
+          />
+          {/* //! error Div */}
+          <div className="h-6">
+            {errors.products?.[index]?.quantity && (
+              <p className="mt-2 text-red-600 text-xs">
+                {errors.products?.[index]?.quantity?.message}
+              </p>
+            )}
+          </div>
+        </div>
+      </main>
       <div className="h-full flex justify-center items-center">
         <Button
           variant="outline"

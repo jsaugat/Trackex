@@ -19,19 +19,19 @@ const getExpenses = asyncHandler(async (req, res, next) => {
  *  @route   POST /api/expenses/
  */
 const createExpense = asyncHandler(async (req, res, next) => {
-  const expensesEntry = req.body;
+  const { expensesEntries } = req.body;
 
-  // if expensesEntry is an array
-  if (Array.isArray(expensesEntry)) {
-    const expensesEntries = expensesEntry; // plural now :)
+  //? multiple expensesEntry (if array)
+  if (Array.isArray(expensesEntries)) {
     const createdExpenses = await Expense.insertMany(
       expensesEntries.map((entry) => ({ ...entry, type: "expense" }))
     );
     res.status(201).json(createdExpenses);
     return;
   }
+  //? single expenseEntry
   const createdExpense = await Expense.create({
-    ...expensesEntry,
+    ...expensesEntries,
     type: "expense",
   });
 

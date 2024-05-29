@@ -27,6 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import SearchBar from "@/components/SearchBar";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { ListFilter, Check, ServerOff } from "lucide-react";
 import { useSelector } from "react-redux";
@@ -47,6 +48,7 @@ const reducer = (state, action) => {
 };
 
 export default function RecentTransactions() {
+  const [searchQuery, setSearchQuery] = useState("");
   const [filterOptions, dispatch] = useReducer(reducer, [
     { id: 1, label: "All", selected: true },
     { id: 2, label: "Expenses", selected: false },
@@ -111,9 +113,14 @@ export default function RecentTransactions() {
     }
   }, [allExpenses, allRevenue, filterOptions]);
 
-  // Handle filter options selections
+  //? Handle filter options selections
   const handleSelect = (id) => {
     dispatch({ type: "SELECT", id });
+  };
+
+  //? Handle search input
+  const handleSearchInputChange = (e) => {
+    setSearchQuery(e.target.value);
   };
 
   return (
@@ -130,7 +137,13 @@ export default function RecentTransactions() {
           <TabsTrigger value="year">Year</TabsTrigger>
         </TabsList> */}
         {/* //? Filter */}
-        <div className="flex items-center gap-2">
+        <section className="w-full flex items-center justify-between gap-2">
+          <SearchBar
+            className=""
+            searchQuery={searchQuery}
+            handleSearchInputChange={handleSearchInputChange}
+            placeholder="Search transactions"
+          />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="h-7 gap-2 text-sm">
@@ -154,7 +167,7 @@ export default function RecentTransactions() {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
+        </section>
       </section>
       {/* //? Table */}
       <TabsContent value={selectedTab} className="flex-auto">
