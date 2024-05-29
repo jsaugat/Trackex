@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { cn } from "@/lib/utils";
 import {
   TrendingUp,
-  PackagePlus,
+  Package,
   ServerOff,
   Users,
   UserCheck,
-  ArrowLeftRight,
+  AlignStartVertical,
   BarChart2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,10 +20,10 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import NoRecords from "@/components/NoRecords";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  useGetTopCustomersQuery, useGetTopSellingProductsByQuantityQuery,
+  useGetTopCustomersQuery, useGetTopSellingCategoriesByRevenueQuery, useGetTopSellingProductsByQuantityQuery,
   useGetTopSellingProductsByRevenueQuery
 } from "@/slices/api/topStats.api";
-import { setTopCustomers, setTopProductsByQuantity, setTopProductsByRevenue } from "@/slices/topStats";
+import { setTopCustomers, setTopProductsByQuantity, setTopProductsByRevenue, setTopCategoriesByRevenue } from "@/slices/topStats";
 import GradientBorder from '@/components/GradientBorder';
 import CardContainer from '@/components/Card/Container';
 import MyTooltip from '@/components/MyTooltip';
@@ -38,10 +38,12 @@ export default function TopStats() {
   const { data: fetchedTopCustomers, refetch: refetchTopCustomers } = useGetTopCustomersQuery();
   const { data: fetchedTopSellingProductsByQuantity, refetch: refetchTopSellingProductsByQuantity } = useGetTopSellingProductsByQuantityQuery();
   const { data: fetchedTopSellingProductsByRevenue, refetch: refetchTopSellingProductsByRevenue } = useGetTopSellingProductsByRevenueQuery();
+  const { data: fetchedTopSellingCategoriesByRevenue, refetch: refetchTopSellingCategoriesByRevenue } = useGetTopSellingCategoriesByRevenueQuery();
   //? RTK Store
   const topCustomers = useSelector(state => state.topStats.topCustomers || []);
   const topProductsByQuantity = useSelector(state => state.topStats.topProductsByQuantity || []);
   const topProductsByRevenue = useSelector(state => state.topStats.topProductsByRevenue || []);
+  const topCategoriesByRevenue = useSelector(state => state.topStats.topCategoriesByRevenue || []);
   //? Hooks
   const dispatch = useDispatch();
 
@@ -51,16 +53,17 @@ export default function TopStats() {
     dispatch(setTopCustomers(fetchedTopCustomers));
     dispatch(setTopProductsByQuantity(fetchedTopSellingProductsByQuantity));
     dispatch(setTopProductsByRevenue(fetchedTopSellingProductsByRevenue));
-  }, [dispatch, fetchedTopCustomers, fetchedTopSellingProductsByQuantity, fetchedTopSellingProductsByRevenue])
+    dispatch(setTopCategoriesByRevenue(fetchedTopSellingCategoriesByRevenue));
+    console.log("TOP CATEGOREIS: ", topCategoriesByRevenue)
+    //* NOTE: THESE DEPENDENCIES CONTRIBUTE IN INSTANT RENDERING OF TOP STATS AFTER ADDITION OF PRODUCTS
+  }, [dispatch, fetchedTopCustomers, fetchedTopSellingProductsByQuantity, fetchedTopSellingProductsByRevenue, fetchedTopSellingCategoriesByRevenue])
 
-  //? Mode Switch Handler
-  const handleModeSwitch = () => {
-    if (mode === "products") {
-      setMode("customers");
-    } else {
-      setMode("products");
-    }
+  //? Mode Toggle Handler
+  const handleModeToggle = (newMode) => {
+    setMode(newMode);
   }
+  //? Array of modes
+  const modes = ["products", "customers", "categories"];
 
   return (
     <GradientBorder
@@ -73,12 +76,15 @@ export default function TopStats() {
         {/* Header */}
         <header className="flex justify-between" >
           {/* Title */}
+
           <h3 className="mb-1 text-xl flex items-center gap-2">
-            {mode === "products" && <PackagePlus className="size-6" />}
-            {mode === "customers" && <Users className="size-5" />}
+            {mode === "products" && <Package className="size-6" />}
+            {mode === "customers" && <Users className="size-6" />}
+            {mode === "categories" && <AlignStartVertical className="size-5" />}
             <span>
               {mode === "products" && "Top-selling products"}
               {mode === "customers" && "Top customers"}
+              {mode === "categories" && "Top categories"}
             </span>
           </h3>
           {/* //? Filters */}
@@ -89,7 +95,9 @@ export default function TopStats() {
                 variant="outline"
                 size="sm"
                 value={toggleType}
-                onValueChange={(value) => { if (value) setToggleType(value) }}>
+                onValueChange={(value) => { if (value) setToggleType(value) }}
+                className="p-1 border rounded-full"
+              >
                 <ToggleGroupItem value="revenue" className="rounded-full space-x-2">
                   <TrendingUp className="size-4" /><span>Revenue</span>
                 </ToggleGroupItem>
@@ -101,16 +109,14 @@ export default function TopStats() {
             {/* //? Separator */}
             <div className="h-7 w-[1px] bg-border" />
             {/* //? Mode Switch */}
-            <MyTooltip
-              trigger={
-                <Button onClick={handleModeSwitch} variant="outline" size="icon" className="rounded-full" >
-                  {mode === "products" && <Users className="size-4" />}
-                  {mode === "customers" && < PackagePlus className="size-4" />}
-                </Button>
+            <>
+              {modes
+                .filter(m => m !== mode) // loop through inactive modes and render the Togglers
+                .map(m => (
+                  <Toggler mode={m} handleModeToggle={handleModeToggle} />
+                ))
               }
-              content={mode === "products" ? "Top Customers" : "Top Products"}
-              side="top"
-            />
+            </>
 
           </section>
         </header>
@@ -124,8 +130,34 @@ export default function TopStats() {
         {mode === "customers" && (
           <TopCustomers topCustomers={topCustomers} />
         )}
+        {mode === "categories" && (
+          <TopCategories topCategoriesByRevenue={topCategoriesByRevenue} />
+        )}
       </CardContainer>
     </GradientBorder>
+  )
+}
+
+//? Toggler Button
+const Toggler = ({ mode, handleModeToggle }) => {
+  return (
+    <MyTooltip
+      trigger={
+        <Button
+          variant="outline"
+          size="icon"
+          className="rounded-full flex items-center justify-center"
+          onClick={() => handleModeToggle(mode)}
+        >
+          {mode === "products" && <Package className="size-4" />}
+          {mode === "customers" && <Users className="size-4" />}
+          {mode === "categories" && <AlignStartVertical className="size-4" />}
+        </Button>
+      }
+      content="Top Customers"
+      side="top"
+    />
+
   )
 }
 
@@ -213,6 +245,43 @@ const TopCustomers = ({ topCustomers }) => (<>
         )
       })) : (<NoRecords
         missingThing="customer"
+        icon={ServerOff}
+        className="top-[1.45rem]"
+      />)
+    }
+  </section>
+</>
+)
+const TopCategories = ({ topCategoriesByRevenue }) => (<>
+  {/* Body */}
+  <section
+    className={cn(
+      "flex-auto h-[20rem] w-full pr-3 overflow-y-scroll",
+      topCategoriesByRevenue?.length === 0 && "flex items-start"
+    )}
+  >
+    <div className="w-fit ml-auto text-muted-foreground text-sm"></div>
+    {topCategoriesByRevenue?.length > 0 ? (
+      topCategoriesByRevenue.map((data, idx) => {
+        return (
+          <div className="py-1 border-b flex items-center justify-between">
+            <section key={data.idx} className="flex items-center gap-2" >
+              {/* Customer Name */}
+              <section className="flex items-center gap-2">
+                <div className="p-1 w-fit border rounded-full">{data.icon}</div>
+                {data.category}
+              </section>
+            </section>
+            {/* Total spent */}
+            <span className="px-2 border rounded-full flex gap-2">
+              <span className="text-muted-foreground" >NPR</span>
+              <span>+ {data.totalRevenue.toLocaleString()}</span>
+            </span>
+          </div>
+        )
+      })) : (
+      <NoRecords
+        missingThing="categories"
         icon={ServerOff}
         className="top-[1.45rem]"
       />)

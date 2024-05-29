@@ -20,6 +20,11 @@ export const topStatsApiSlice = emptySplitApi.injectEndpoints({
       query: () => `${BASE_URL}/top-products-by-revenue`,
       providesTags: ["TopStats"],
     }),
+    //? GET Top Selling Categories by Revenue
+    getTopSellingCategoriesByRevenue: builder.query({
+      query: () => `${BASE_URL}/top-categories-by-revenue`,
+      providesTags: ["TopStats"],
+    }),
   }),
 });
 
@@ -27,4 +32,5 @@ export const {
   useGetTopCustomersQuery,
   useGetTopSellingProductsByQuantityQuery,
   useGetTopSellingProductsByRevenueQuery,
+  useGetTopSellingCategoriesByRevenueQuery,
 } = topStatsApiSlice;

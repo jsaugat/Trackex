@@ -4,6 +4,7 @@ const initialState = {
   topCustomers: [],
   topProductsByQuantity: [],
   topProductsByRevenue: [],
+  topCategoriesByRevenue: [],
 };
 
 const topStatsSlice = createSlice({
@@ -19,10 +20,13 @@ const topStatsSlice = createSlice({
     setTopProductsByRevenue: (state, action) => {
       state.topProductsByRevenue = action.payload;
     },
+    setTopCategoriesByRevenue: (state, action) => {
+      state.topCategoriesByRevenue = action.payload;
+    },
   },
 });
 
-export const { setTopCustomers, setTopProductsByQuantity, setTopProductsByRevenue } =
+export const { setTopCustomers, setTopProductsByQuantity, setTopProductsByRevenue, setTopCategoriesByRevenue } =
   topStatsSlice.actions;
 
 export default topStatsSlice.reducer;

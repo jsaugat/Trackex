@@ -491,7 +491,7 @@ const ProductListItem = ({
 
         {/* //? Quantity */}
         <div className="grid flex-1">
-          <label>Quantity</label>
+          <label>Quantity (Optional)</label>
           <Input
             type="number"
             placeholder="XX"
