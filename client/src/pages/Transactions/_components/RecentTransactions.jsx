@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -48,6 +48,8 @@ const reducer = (state, action) => {
 };
 
 export default function RecentTransactions() {
+  //? Local States
+  const searchInputRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterOptions, dispatch] = useReducer(reducer, [
     { id: 1, label: "All", selected: true },
@@ -132,6 +134,11 @@ export default function RecentTransactions() {
     setSearchQuery(e.target.value);
   };
 
+  //? Activate search on component mount
+  useEffect(() => {
+    searchInputRef.current && searchInputRef.current.focus();
+  }, []);
+
   return (
     <Tabs
       defaultValue="week"
@@ -152,6 +159,7 @@ export default function RecentTransactions() {
             searchQuery={searchQuery}
             handleSearchInputChange={handleSearchInputChange}
             placeholder="Search transactions"
+            searchInputRef={searchInputRef}
           />
           <section className="flex items-center gap-2">
             {/* Date picker */}
@@ -159,7 +167,7 @@ export default function RecentTransactions() {
             {/* Filter transaction types */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="" className="gap-2 text-sm rounded-full">
+                <Button variant="outline" size="" className="p-3 gap-2 text-sm rounded-full">
                   <ListFilter className="size-4" />
                   <span className="sr-only sm:not-sr-only">Filter</span>
                 </Button>

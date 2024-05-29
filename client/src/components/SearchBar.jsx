@@ -3,7 +3,7 @@ import { Search } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { cn } from '@/lib/utils';
 
-export default function SearchBar({ searchQuery, handleSearchInputChange, className, placeholder }) {
+export default function SearchBar({ searchInputRef, searchQuery, handleSearchInputChange, className, placeholder }) {
   return (
     <main className={cn("px-3 w-fit bg-background border rounded-full flex items-center", className)} >
       <span>
@@ -11,6 +11,7 @@ export default function SearchBar({ searchQuery, handleSearchInputChange, classN
       </span>
       <span>
         <Input
+          ref={searchInputRef}
           type="text"
           placeholder={placeholder ? placeholder : "Search items.."}
           value={searchQuery}
