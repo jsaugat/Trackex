@@ -1,4 +1,4 @@
-import MonthHistory from "../models/MonthHistory.js";
+import MonthHistory from "../models/archive/MonthHistory.js";
 
 // Middleware function to update MonthHistory
 const updateMonthHistory = async (req, res, next) => {

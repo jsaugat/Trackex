@@ -64,22 +64,26 @@ export default function TopStats() {
   }
   //? Array of modes
   const modes = ["products", "customers", "categories"];
+  const productsFilterOptions = [
+    { id: "revenue", icon: TrendingUp },
+    { id: "quantity", icon: BarChart2 }
+  ];
 
   return (
     <GradientBorder
       radius="3xl"
       className="dark:bg-gradient-to-r hover:dark:via-primary/40 hover:dark:bg-gradient-to-bl"
     >
-      <CardContainer className="relative pb-0 min-h-full max-h-[20rem] border dark:border-transparent justify-start">
+      <CardContainer className="relative pb-2 min-h-full max-h-[20rem] border dark:border-transparent justify-start">
         {/* blur bottom */}
-        <div className="absolute left-[2%] bottom-0 mx-auto w-[98%] h-9 bg-gradient-to-b from-transparent via-background to-background" />
+        <div className="absolute left-[1%] bottom-0 rounded-b-full mx-auto w-[98%] h-9 bg-gradient-to-b from-transparent via-background to-background" />
         {/* Header */}
-        <header className="flex justify-between" >
+        <header className="flex justify-between items-start" >
           {/* Title */}
 
           <h3 className="mb-1 text-xl flex items-center gap-2">
-            {mode === "products" && <Package className="size-6" />}
-            {mode === "customers" && <Users className="size-6" />}
+            {mode === "products" && <Package className="size-5" />}
+            {mode === "customers" && <Users className="size-5" />}
             {mode === "categories" && <AlignStartVertical className="size-5" />}
             <span>
               {mode === "products" && "Top-selling products"}
@@ -98,12 +102,19 @@ export default function TopStats() {
                 onValueChange={(value) => { if (value) setToggleType(value) }}
                 className="p-1 border rounded-full"
               >
-                <ToggleGroupItem value="revenue" className="rounded-full space-x-2">
-                  <TrendingUp className="size-4" /><span>Revenue</span>
-                </ToggleGroupItem>
-                <ToggleGroupItem value="quantity" className="rounded-full space-x-2">
-                  <BarChart2 className="size-4" /><span>Quantity</span>
-                </ToggleGroupItem>
+                {
+                  productsFilterOptions.map((option) => (
+                    <ToggleGroupItem
+                      value={option.id}
+                      className={cn(
+                        "h-[1.65rem] rounded-full space-x-2",
+                        mode !== option && "border-none text-muted-foreground hover:bg-transparent",
+                      )}
+                    >
+                      <option.icon className="size-4" /><span className="capitalize">{option.id}</span>
+                    </ToggleGroupItem>
+                  ))
+                }
               </ToggleGroup>
             )}
             {/* //? Separator */}
@@ -154,7 +165,7 @@ const Toggler = ({ mode, handleModeToggle }) => {
           {mode === "categories" && <AlignStartVertical className="size-4" />}
         </Button>
       }
-      content="Top Customers"
+      content={`Top ${mode}`}
       side="top"
     />
 

@@ -33,6 +33,7 @@ import { ListFilter, Check, ServerOff } from "lucide-react";
 import { useSelector } from "react-redux";
 import TransactionTableRow from "./TransactionsTableRow";
 import DateRangePicker from "./DateRangePicker"
+import { addDays, subMonths, subYears } from "date-fns";
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -50,7 +51,13 @@ const reducer = (state, action) => {
 export default function RecentTransactions() {
   //? Local States
   const searchInputRef = useRef(null);
+  // SEARCH
   const [searchQuery, setSearchQuery] = useState("");
+  // DATE
+  const [date, setDate] = useState({
+    from: subMonths(new Date(), 1),
+    to: new Date(),
+  });
   const [filterOptions, dispatch] = useReducer(reducer, [
     { id: 1, label: "All", selected: true },
     { id: 2, label: "Expenses", selected: false },
@@ -64,8 +71,9 @@ export default function RecentTransactions() {
   console.log("filterOptions: ", filterOptions);
   console.log("filteredTransactions: ", filteredTransactions);
 
+  //? MAIN SIDE-EFFECT
   useEffect(() => {
-    // selectedFilter is the selected filter option.
+    // 'selectedFilter' (all, revenue, expenses) is the selected filter option.
     const selectedFilter = filterOptions.find(
       (option) => option.selected
     ).label;
@@ -112,7 +120,7 @@ export default function RecentTransactions() {
       // });
 
       //? Filter based on Search Query
-      const filteredByQuery = mergedTransactions.filter(transaction => {
+      let transactions = mergedTransactions.filter(transaction => {
         const searchedDescription = transaction.description?.toLowerCase().includes(searchQuery.toLowerCase());
         const searchedCustomer = transaction.customer?.toLowerCase().includes(searchQuery.toLowerCase());
         const searchedCategory = transaction.category?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -120,9 +128,17 @@ export default function RecentTransactions() {
         return searchedTransactions;
       })
 
-      setFilteredTransactions(filteredByQuery);
+      //? Filter based on date range selection
+      if (date?.from && date?.to) {
+        transactions = transactions.filter(transaction => {
+          const transactionDate = new Date(transaction.date);
+          return transactionDate >= date.from && transactionDate <= date.to;
+        })
+      }
+
+      setFilteredTransactions(transactions);
     }
-  }, [allExpenses, allRevenue, filterOptions, searchQuery]);
+  }, [allExpenses, allRevenue, filterOptions, searchQuery, date]);
 
   //? Handle filter options selections
   const handleSelect = (id) => {
@@ -138,6 +154,7 @@ export default function RecentTransactions() {
   useEffect(() => {
     searchInputRef.current && searchInputRef.current.focus();
   }, []);
+
 
   return (
     <Tabs
@@ -163,7 +180,7 @@ export default function RecentTransactions() {
           />
           <section className="flex items-center gap-2">
             {/* Date picker */}
-            <DateRangePicker className="text-sm" />
+            <DateRangePicker className="text-sm" date={date} setDate={setDate} />
             {/* Filter transaction types */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

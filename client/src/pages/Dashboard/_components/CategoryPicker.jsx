@@ -133,7 +133,7 @@ export default function CategoryPicker({ type, onChange, field }) {
           <ChevronsUpDown strokeWidth="1px" size={"13px"} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[164px] md:w-[220px] p-1">
+      <PopoverContent className="w-[164px] md:w-[220px] h-[320px] p-1">
         {/* Command Box */}
         <Command onSubmit={(e) => e.preventDefault()}>
           <CommandInput placeholder="Search category..." />

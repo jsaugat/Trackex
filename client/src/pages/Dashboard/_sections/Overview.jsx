@@ -7,11 +7,13 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { BarChart3, LineChart, RouteOff } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import MyTooltip from '@/components/MyTooltip';
+import { cn } from '@/lib/utils';
 
 export default function Overview({ salesData, expensesData }) {
   //? Toggle last days count in line chart
   const [daysCount, setDaysCount] = useState("30");
   const [chartType, setChartType] = useState("line");
+  const daysCountOptions = [7, 14, 30];
 
   //? Chart(type) toggle handler
   const chartToggleHandler = () => {
@@ -21,6 +23,7 @@ export default function Overview({ salesData, expensesData }) {
       setChartType("line");
     }
   }
+
 
   return (
     <CardContainer className="p-7">
@@ -32,13 +35,19 @@ export default function Overview({ salesData, expensesData }) {
         </h3>
         <section className="text-sm flex items-center gap-3">
           {/* //? Last 7 days, 14 days, 30 days */}
-          <ToggleGroup type="single" variant="outline" size="sm" value={daysCount}
+          <ToggleGroup type="single" variant="outline" size="sm" value={daysCount} className="p-1 border rounded-full"
             onValueChange={(value) => {
               if (value) setDaysCount(value);
             }}>
-            <ToggleGroupItem value="7" className="rounded-full">7 days</ToggleGroupItem>
-            <ToggleGroupItem value="14" className="rounded-full">14 days</ToggleGroupItem>
-            <ToggleGroupItem value="30" className="rounded-full">30 days</ToggleGroupItem>
+            {daysCountOptions.map(count => (
+              <ToggleGroupItem
+                key={count}
+                value={count.toString()}
+                className={cn("h-[1.65rem] border-none rounded-full text-muted-foreground hover:bg-transparent")}
+              >
+                {count} days
+              </ToggleGroupItem>
+            ))}
           </ToggleGroup>
 
           {/* //? Separator */}

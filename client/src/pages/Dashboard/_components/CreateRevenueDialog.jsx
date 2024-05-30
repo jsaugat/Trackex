@@ -86,7 +86,7 @@ export default function CreateRevenueDialog({ trigger, type }) {
 
   //! VALIDATE Quantity
   const validateQuantity = (value) => {
-    const maxQuantity = 20; // Maximum quantity
+    const maxQuantity = 100; // Maximum quantity
 
     //? Check if the value is less than the minimum amount
     if (parseInt(value, 10) > maxQuantity) {
