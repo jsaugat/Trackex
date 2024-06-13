@@ -108,7 +108,7 @@ export default function TopStats() {
                       value={option.id}
                       className={cn(
                         "h-[1.65rem] rounded-full space-x-2",
-                        mode !== option && "border-none text-muted-foreground hover:bg-transparent",
+                        mode !== option && "text-muted-foreground hover:bg-transparent",
                       )}
                     >
                       <option.icon className="size-4" /><span className="capitalize">{option.id}</span>
