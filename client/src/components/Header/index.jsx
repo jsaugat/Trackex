@@ -152,13 +152,14 @@ export default function index() {
 }
 
 const ProfileDropdown = ({ trigger, handleLogout }) => {
-  const { email } = useSelector((state) => state.auth.userInfo);
+  const userInfo = useSelector((state) => state.auth.userInfo || []);
+  console.log("userInfo", userInfo);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
       <DropdownMenuContent className="p-2 rounded-xl bg-background/30 dark:bg-transparent backdrop-blur-xl dark:backdrop-blur-lg shadow-lg ">
-        <DropdownMenuLabel>{email}</DropdownMenuLabel>
+        <DropdownMenuLabel>{userInfo?.email}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <div

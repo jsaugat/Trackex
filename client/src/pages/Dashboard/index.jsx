@@ -45,7 +45,7 @@ import TopStats from "./_sections/TopStats";
 
 export default function Dashboard() {
   //? Redux store.
-  const { _id } = useSelector((state) => state.auth.userInfo); // for auth
+  const userInfo = useSelector((state) => state.auth.userInfo || []); // for auth
   const salesData = useSelector((state) => state.revenue.data || []);
   const expensesData = useSelector((state) => state.expenses.data || []);
   //? Hooks
@@ -54,7 +54,7 @@ export default function Dashboard() {
   useEffect(() => {
     console.log("salesData", salesData);
     console.log("totalRevenue ", totalRevenue);
-  }, [salesData, _id]);
+  }, [salesData, userInfo?._id]);
 
   //? State for card data
   const [cardData, setCardData] = useState([

@@ -21,7 +21,7 @@ export default function Logo({ isCollapsed, textClasses }) {
               textClasses
             )}
           >
-            TRACKEX
+            TRACKER
           </h2>
         )}
       </div>
