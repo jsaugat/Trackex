@@ -79,7 +79,7 @@ export default function index() {
     const { pathname } = location;
     switch (pathname) {
       case "/":
-        return `${greet()}, ${currentUser?.name.split(" ")[0]}!`;
+        return `${greet()}, ${currentUser?.name?.split(" ")[0]}!`;
       case "/transactions":
         return "Transactions";
       case "/admin/users":
