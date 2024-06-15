@@ -16,6 +16,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
     isAdmin: {
       type: Boolean,
       required: true,
@@ -36,7 +40,7 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-//? Check is password entered for login matches with the one in db.
+//? Check if password entered for login matches with the one in db.
 userSchema.methods.passwordMatches = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
