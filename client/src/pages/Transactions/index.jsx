@@ -19,7 +19,7 @@ export default function Transactions() {
   const dispatch = useDispatch();
 
   return (
-    <main className="relative h-full">
+    <main className="relative h-full overflow-hidden">
       <section className="h-full w-full flex flex-col lg:flex-row gap-4 items-start justify-start">
         {/* //? CHARTS */}
         <aside className="min-h-full max-h-[20rem] flex flex-col gap-4">

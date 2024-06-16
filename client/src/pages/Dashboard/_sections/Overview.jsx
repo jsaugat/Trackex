@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 
 export default function Overview({ salesData, expensesData }) {
   //? Toggle last days count in line chart
-  const [daysCount, setDaysCount] = useState("30");
+  const [daysCount, setDaysCount] = useState("7");
   const [chartType, setChartType] = useState("line");
   const daysCountOptions = [7, 14, 30];
 

@@ -86,9 +86,9 @@ export default function TopStats() {
             {mode === "customers" && <Users className="size-5" />}
             {mode === "categories" && <AlignStartVertical className="size-5" />}
             <span>
-              {mode === "products" && "Top-selling products"}
-              {mode === "customers" && "Top customers"}
-              {mode === "categories" && "Top categories"}
+              {mode === "products" && "Top selling products"}
+              {mode === "customers" && "Top spending customers"}
+              {mode === "categories" && "Top selling categories"}
             </span>
           </h3>
           {/* //? Filters */}
@@ -107,7 +107,7 @@ export default function TopStats() {
                     <ToggleGroupItem
                       value={option.id}
                       className={cn(
-                        "h-[1.65rem] rounded-full space-x-2",
+                        "h-[1.65rem] border-none rounded-full space-x-2",
                         mode !== option && "text-muted-foreground hover:bg-transparent",
                       )}
                     >
@@ -230,7 +230,7 @@ const TopCustomers = ({ topCustomers }) => (<>
       topCustomers?.length === 0 && "flex items-start"
     )}
   >
-    <div className="w-fit ml-auto text-muted-foreground text-sm">Total spent</div>
+    {/* <div className="w-fit ml-auto text-muted-foreground text-sm">Total spent</div> */}
     {topCustomers?.length > 0 ? (
       topCustomers.map((data, idx) => {
         return (
@@ -251,7 +251,10 @@ const TopCustomers = ({ topCustomers }) => (<>
               </div>
             </section>
             {/* Total spent */}
-            <span className="px-2 border rounded-full">+ {data.totalRevenue.toLocaleString()}</span>
+            <p className="px-2 border rounded-full space-x-1">
+              <span className="text-muted-foreground text-sm" >NPR </span>
+              <span>+ {data.totalRevenue.toLocaleString()}</span>
+            </p>
           </div>
         )
       })) : (<NoRecords
@@ -277,15 +280,14 @@ const TopCategories = ({ topCategoriesByRevenue }) => (<>
         return (
           <div className="py-1 border-b flex items-center justify-between">
             <section key={data.idx} className="flex items-center gap-2" >
-              {/* Customer Name */}
+              {/* Category */}
               <section className="flex items-center gap-2">
                 <div className="p-1 w-fit border rounded-full">{data.icon}</div>
                 {data.category}
               </section>
             </section>
-            {/* Total spent */}
-            <span className="px-2 border rounded-full flex gap-2">
-              <span className="text-muted-foreground" >NPR</span>
+            <span className="px-2 border rounded-full flex items-center gap-2">
+              <span className="text-muted-foreground text-sm" >NPR </span>
               <span>+ {data.totalRevenue.toLocaleString()}</span>
             </span>
           </div>

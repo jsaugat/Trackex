@@ -86,15 +86,25 @@ export default function CreateRevenueDialog({ trigger, type }) {
 
   //! VALIDATE Quantity
   const validateQuantity = (value) => {
+    const minQuantity = 1;   // Minimum quantity
     const maxQuantity = 100; // Maximum quantity
 
-    //? Check if the value is less than the minimum amount
-    if (parseInt(value, 10) > maxQuantity) {
+    // Convert value to an integer
+    const intValue = parseInt(value, 10);
+
+    // Check if the value is less than the minimum quantity
+    if (intValue < minQuantity) {
+      return `Minimum quantity limit is ${minQuantity}.`;
+    }
+
+    // Check if the value is greater than the maximum quantity
+    if (intValue > maxQuantity) {
       return `Maximum quantity limit is ${maxQuantity}.`;
     }
 
     return true; // Return true if no validation errors
   };
+
 
   //? ADD NEW Product List Item
   const addNewProductItem = (e) => {

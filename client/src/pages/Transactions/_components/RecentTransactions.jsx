@@ -55,7 +55,7 @@ export default function RecentTransactions() {
   const [searchQuery, setSearchQuery] = useState("");
   // DATE
   const [date, setDate] = useState({
-    from: subMonths(new Date(), 1),
+    from: subMonths(new Date(), 3),
     to: new Date(),
   });
   const [filterOptions, dispatch] = useReducer(reducer, [
