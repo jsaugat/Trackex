@@ -71,12 +71,13 @@ const registerUser = asyncHandler(async (req, res, next) => {
     console.log("Verification token", token)
 
     // Send verification email
+    console.log(process.env.BASE_URLq)
     const verificationUrl = `http://${process.env.BASE_URL}/api/auth/confirmation/${token.token}`;
     const message = `Hello ${user.name},\n\nPlease verify your account by clicking the link: \n${verificationUrl}\n\nThank You!\n`;
 
     try {
       await sendEmail(user.email, "TRACKEX Authentication", message);
-      res.status(200).json(`A verification email has been sent to ${user.email}. It will expire after one hour. If you do not receive the verification email, click on resend token.`);
+      res.status(200).json(`A verification email has been sent to ${user.email}. It will expire after one hour.`);
     } catch (error) {
       res.status(500).json({ message: "Technical Issue! Please click on resend to verify your email." });
     }
