@@ -147,7 +147,7 @@ export default function CreateRevenueDialog({ trigger, type }) {
         customer: type === "revenue" ? data.customer : "",
       }));
       console.log('TRANSFORMED-DATA: ', data)
-      const url = 'http://localhost:5000/api/revenue/invoice';
+      const url = `${import.meta.env.VITE_API_BASE_URL}/api/revenue/invoice`;
 
       setIsDownloadingPDF(true);
       const response = await axios.post(url, transformedData);

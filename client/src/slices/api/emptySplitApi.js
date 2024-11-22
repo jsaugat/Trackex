@@ -6,7 +6,7 @@ import { fetchBaseQuery, createApi } from "@reduxjs/toolkit/query/react";
 
 export const emptySplitApi = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:5000/api/",
+    baseUrl: `${import.meta.env.VITE_API_BASE_URL}/api/`,
     prepareHeaders: (headers, { getState }) => {
       const token = getState().auth.userInfo?.token;
       console.log("Token :", token);

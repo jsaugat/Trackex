@@ -7,3 +7,5 @@
 - Allow categories of same name 
 - Update salesCard after creating new revenue.
 - Aggregate MonthHistory and YearHistory
+
+## Contributors

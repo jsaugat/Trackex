@@ -142,7 +142,7 @@ const UserCard = ({
 
   const handleRoleChange = async (idToUpdate) => {
     console.log("ID to update:", idToUpdate);
-    const url = `http://localhost:5000/api/admin/users/${idToUpdate}`;
+    const url = `${import.meta.env.VITE_API_BASE_URL}/api/admin/users/${idToUpdate}`;
 
     // Define the data to send
     const dataToSend = {

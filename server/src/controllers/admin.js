@@ -29,7 +29,7 @@ export const updateUser = asyncHandler(async (req, res) => {
 
   console.log("newIsAdmin : ", newIsAdmin);
 
-  user.name = newName || user.name;
+  user.name = newName || user.name; 
   user.email = newEmail || user.email;
   // boolean is taken care of this way
   user.isAdmin = newIsAdmin === undefined ? user.isAdmin : newIsAdmin;
