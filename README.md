@@ -1,13 +1,23 @@
-## Introduction
-Trackex - The Financial Tracker is a custom web application designed to address the financial management needs of XXX Cosmetics. With its sleek and user-friendly dashboard, it allows the team to efficiently monitor and improve financial performance. The application includes features for tracking revenue and expenses, as well as generating invoices for clients.
+# Trackex - The Financial Tracker  
 
-## Installation
-- cd server
-- npm install -D nodemon
-- npm install express mongodb mongoose cors dotenv cookie-parser
+## Introduction  
+**Trackex is a custom-built web application tailored to meet the financial management needs of **XXX Cosmetics**. With a modern, intuitive dashboard, Trackex empowers teams to efficiently monitor revenue, track expenses, and generate invoices for clients. This tool is designed to streamline financial processes and drive improved financial performance.  
 
-## To Dos
-- Allow categories of same name 
-- Update salesCard after creating new revenue.
-- Aggregate MonthHistory and YearHistory
+## Key Features  
+- **Dashboard:** A sleek and user-friendly interface for an overview of financial metrics.  
+- **Revenue and Expense Tracking:** Keep a detailed log of income and expenditures.  
+- **Invoice Management:** Quickly generate professional invoices for clients.  
 
+## Getting Started  
+
+### Prerequisites  
+Ensure you have the following installed:  
+- [Node.js](https://nodejs.org/) (LTS version recommended)  
+- [npm](https://www.npmjs.com/) (comes with Node.js)  
+
+### Installation  
+
+1. Clone the repository:  
+   ```bash
+   git clone https://github.com/your-username/trackex.git
+   cd trackex
