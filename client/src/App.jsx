@@ -14,6 +14,7 @@ import { useGetAllExpensesQuery } from "./slices/api/expenses.api";
 import { addFetchedExpenses } from "./slices/expensesSlice";
 import { addFetchedRevenue } from "./slices/revenueSlice";
 import { SidebarProvider } from "@/context/useSidebar.jsx"
+import { Analytics } from '@vercel/analytics/react';
 
 export default function App() {
   const { userInfo } = useSelector((state) => state.auth);
@@ -82,6 +83,7 @@ export default function App() {
 
         <Toaster />
         <SonnerToaster />
+        <Analytics /> {/* Vercel Analytics */}
         {/* </main> */}
       </SidebarProvider>
     </ThemeProvider>
