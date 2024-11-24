@@ -38,7 +38,7 @@ const PORT = process.env.PORT || 8080;
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`👁️  WATCHING PORT : http://localhost:${PORT}`);
+      console.log(`👁️  WATCHING PORT : ${process.env.BASE_URL || `http://localhost:${PORT}`}`);
     });
   })
   .catch((error) => {
