@@ -9,7 +9,7 @@ export const emptySplitApi = createApi({
     baseUrl: `${import.meta.env.VITE_API_BASE_URL}/api/`,
     prepareHeaders: (headers, { getState }) => {
       const token = getState().auth.userInfo?.token;
-      console.log("Token :", token);
+      // console.log("Token :", token);
 
       // If we have a token set in state, let's assume that we should be passing it.
       if (token) {

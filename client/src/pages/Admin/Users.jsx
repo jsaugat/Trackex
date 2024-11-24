@@ -151,7 +151,7 @@ const UserCard = ({
 
     // Define the bearer token
     const token = currentUser.token;
-    console.log("token: " + token);
+    // console.log("token: " + token);
 
     try {
       setIsChangingRole(true);

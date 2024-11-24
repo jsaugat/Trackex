@@ -8,7 +8,7 @@ const validateToken = asyncHandler(async function (req, res, next) {
   console.log("authorization :: ", authorization, "- validateToken middleware");
   const token = authorization?.split(" ")[1];
 
-  console.log("Token :: ", token, "-validateToken middleware");
+  // console.log("Token :: ", token, "-validateToken middleware");
   //? If token is present
   if (token) {
     try {

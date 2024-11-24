@@ -8,6 +8,7 @@ export const authApiSlice = emptySplitApi.injectEndpoints({
         url: `${USERS_URL}/login`,
         method: "POST",
         body: data,
+        mode: 'no-cors',
       }),
     }),
     logout: builder.mutation({
