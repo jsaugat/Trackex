@@ -1,7 +1,7 @@
 # Trackex - The Financial Tracker  
 
 ## Introduction  
-**Trackex is a custom-built web application tailored to meet the financial management needs of **XXX Cosmetics**. With a modern, intuitive dashboard, Trackex empowers teams to efficiently monitor revenue, track expenses, and generate invoices for clients. This tool is designed to streamline financial processes and drive improved financial performance.  
+**Trackex is a custom-built web application tailored to meet the financial management needs of **XXX Cosmetics**. With a modern, intuitive dashboard, Trackex empowers teams to efficiently monitor revenue, track expenses, and generate invoices for clients. This tool is designed to streamline financial processes and drive improved financial performance.***
 
 ## Key Features  
 - **Dashboard:** A sleek and user-friendly interface for an overview of financial metrics.  
