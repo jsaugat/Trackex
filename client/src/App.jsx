@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { ThemeProvider } from "@/components/theme-provider"; //shadcn
 import { Outlet, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -13,21 +13,21 @@ import { useGetAllRevenueQuery } from "./slices/api/revenue.api";
 import { useGetAllExpensesQuery } from "./slices/api/expenses.api";
 import { addFetchedExpenses } from "./slices/expensesSlice";
 import { addFetchedRevenue } from "./slices/revenueSlice";
-import { SidebarProvider } from "@/context/useSidebar.jsx"
-import { Analytics } from '@vercel/analytics/react';
+import { SidebarProvider } from "@/context/useSidebar.jsx";
+import { Analytics } from "@vercel/analytics/react";
 
 export default function App() {
   const { userInfo } = useSelector((state) => state.auth);
   const {
     data: allRevenue,
-    isLoading: isFetchingAllRevenue,
-    error: allRevenueError,
+    // isLoading: isFetchingAllRevenue,
+    // error: allRevenueError,
     refetch: refetchRevenue,
   } = useGetAllRevenueQuery();
   const {
     data: allExpenses,
-    isLoading: isFetchingAllExpenses,
-    error: allExpensesError,
+    // isLoading: isFetchingAllExpenses,
+    // error: allExpensesError,
     refetch: refetchExpenses,
   } = useGetAllExpensesQuery();
   const navigate = useNavigate();
@@ -47,12 +47,12 @@ export default function App() {
     dispatch(addFetchedExpenses(allExpenses));
   }, [allExpenses, allRevenue, userInfo]);
 
-  useEffect(() => {
-    (async () => {
-      const LocomotiveScroll = (await import("locomotive-scroll")).default;
-      const locomotiveScroll = new LocomotiveScroll();
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     const LocomotiveScroll = (await import("locomotive-scroll")).default;
+  //     const locomotiveScroll = new LocomotiveScroll();
+  //   })();
+  // }, []);
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
@@ -71,7 +71,7 @@ export default function App() {
               "bg-gradient-to-b from-background via-indigo-200 to-background ",
               // BG: Dark Mode
               "dark:bg-gradient-to-br dark:from-background dark:via-muted/5 dark:to-muted/30 dark:to-90%",
-              "flex flex-col"
+              "flex flex-col",
             )}
           >
             <Header /> {/* HEADER  */}
@@ -80,7 +80,6 @@ export default function App() {
             </main>
           </main>
         </main>
-
         <Toaster />
         <SonnerToaster />
         <Analytics /> {/* Vercel Analytics */}

@@ -1,4 +1,3 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./styles/globals.scss";
@@ -9,9 +8,7 @@ import { store } from "@/store.js";
 // router
 import {
   Route,
-  Router,
   RouterProvider,
-  Routes,
   createBrowserRouter,
   createRoutesFromElements,
 } from "react-router-dom";
@@ -46,7 +43,7 @@ const routes = createRoutesFromElements(
     {/* Separate routes for Login and Signup without layout */}
     <Route path="/login" element={<Login />} />
     <Route path="/signup" element={<Signup />} />
-  </Route>
+  </Route>,
 );
 
 const router = createBrowserRouter(routes);
@@ -56,5 +53,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Provider store={store}>
       <RouterProvider router={router} />
     </Provider>
-  </ErrorBoundary>
+  </ErrorBoundary>,
 );
