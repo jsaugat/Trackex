@@ -102,3 +102,6 @@ example-directory/
 
 # Public directory
 public/
+
+# Docs
+/@docs
