@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
+const roles = ["owner", "admin", "standard"]; // define allowed roles
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -16,17 +18,23 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    isAdmin: {
-      type: Boolean,
+    role: {
+      type: String,
+      enum: roles,
+      default: "standard", // default role for new users
+      required: true,
+    },
+    organization: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Organization",
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 //? Hash password before saving to database (each time when 'password' is modified)
 userSchema.pre("save", async function (next) {
-  //? this = current Model
   if (!this.isModified("password")) {
     return next();
   }
@@ -36,7 +44,7 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-//? Check is password entered for login matches with the one in db.
+//? Check if password entered for login matches with the one in db.
 userSchema.methods.passwordMatches = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
