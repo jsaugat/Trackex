@@ -9,7 +9,6 @@ import { setCredentials } from "@/slices/authSlice.js";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import FormContainer from "@/components/AuthForm";
-import { toast as sonnerToast } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import Icon from "@/components/Logo/Icon";
 import { Toaster } from "@/components/ui/toaster";

@@ -17,6 +17,7 @@ import Dashboard from "@/pages/Dashboard";
 import Transactions from "@/pages/Transactions";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
+import Invite from "@/pages/Invite";
 import PrivateRoute from "@/components/PrivateRoute";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
@@ -43,6 +44,7 @@ const routes = createRoutesFromElements(
     {/* Separate routes for Login and Signup without layout */}
     <Route path="/login" element={<Login />} />
     <Route path="/signup" element={<Signup />} />
+    <Route path="/invite/:token" element={<Invite />} />
   </Route>,
 );
 

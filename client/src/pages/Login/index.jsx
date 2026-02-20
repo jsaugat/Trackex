@@ -8,7 +8,6 @@ import { setCredentials } from "@/slices/authSlice"; // after hitting backend ap
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { toast as sonnerToast } from "sonner";
-import Logo from "@/components/Logo/Logo";
 import { ThemeProvider } from "@/components/theme-provider";
 import FormContainer from "@/components/AuthForm";
 import Icon from "@/components/Logo/Icon";
@@ -38,10 +37,12 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
     // empty fields validation
     if (password === "" || email === "") {
       sonnerToast.error("Please fill in all the fields !!");
     }
+
     try {
       //? Step 1: Hit backend api and retrieve data
       const res = await login({ email, password }).unwrap(); // unwrap unwraps the promise?
