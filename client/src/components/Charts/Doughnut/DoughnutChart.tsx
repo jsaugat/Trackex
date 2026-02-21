@@ -7,7 +7,7 @@ import useFinancialSummary from "@/hooks/useFinancialSummary";
 import { useSelector } from "react-redux";
 import { Gauge, ToggleLeft, ToggleRight } from "lucide-react";
 
-// Register the ArcElement with Chart.js
+// Register the ArcElement with Chart
 Chart.register(ArcElement);
 
 export default function DoughnutChart() {

@@ -32,7 +32,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { toast as sonnerToast } from "sonner";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
-import { DateToUTCDate } from "@/utils/helpers.js";
+import { DateToUTCDate } from "@/utils/helpers";
 import { useCreateExpenseMutation } from "@/slices/api/expenses.api";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastAction } from "@/components/ui/toast";

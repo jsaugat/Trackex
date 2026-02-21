@@ -1,13 +1,16 @@
 import { cn } from "@/lib/utils";
-import "@/styles/animate.scss";
-// import "@/utils/borderSpin.js";
+import "@/styles/animate.css";
+// import "@/utils/borderSpin";
 import { useEffect } from "react";
 
 export default function GradientBorder({ children, className, radius }) {
   useEffect(() => {
-    const gradientBorder = document.querySelector("#gradientBorder");
+    const gradientBorder = document.querySelector(
+      "#gradientBorder",
+    ) as HTMLElement;
+    if (!gradientBorder) return;
 
-    gradientBorder.addEventListener("mouseover", function () {
+    const handleMouseOver = () => {
       // Array of possible gradient directions
       const directions = [
         "to top",
@@ -26,13 +29,15 @@ export default function GradientBorder({ children, className, radius }) {
 
       // Set the random direction as a CSS variable for the specific element
       gradientBorder.style.setProperty("--direction", randomDirection);
-    });
+    };
+
+    gradientBorder.addEventListener("mouseover", handleMouseOver);
 
     // Cleanup: Remove event listener when component unmounts
     return () => {
-      gradientBorder.removeEventListener("mouseover", () => {});
+      gradientBorder.removeEventListener("mouseover", handleMouseOver);
     };
-  }); // Empty dependency array ensures the effect runs only once when component mounts
+  }, []); // Empty dependency array ensures the effect runs only once when component mounts
 
   return (
     <div
@@ -41,14 +46,14 @@ export default function GradientBorder({ children, className, radius }) {
         ` relative 
           p-[0.06rem] 
           bg-transparent
-          dark:bg-gradient-to-r 
+          dark:bg-linear-to-r 
           from-secondary 
           via-primary/20 
           to-secondary 
           hover:via-primary/60
           rounded-${radius} 
         `,
-        className
+        className,
       )}
     >
       <div className="relative z-10 h-full">{children}</div>

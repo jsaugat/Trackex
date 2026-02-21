@@ -2,9 +2,9 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { useRegisterMutation } from "@/slices/api/auth.api.js";
+import { useRegisterMutation } from "@/slices/api/auth.api";
 // after hitting backend api and getting data we gotta set it to STATE and LOCAL-STORAGE
-import { setCredentials } from "@/slices/authSlice.js";
+import { setCredentials } from "@/slices/authSlice";
 // Components
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";

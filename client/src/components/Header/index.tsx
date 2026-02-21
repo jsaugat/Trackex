@@ -30,7 +30,7 @@ import { useLogoutMutation } from "@/slices/api/auth.api";
 import { clearCredentials } from "@/slices/authSlice";
 import GradientBorder from "../GradientBorder";
 import { ChevronDown } from "lucide-react";
-import { useTheme } from "@/components/theme-provider.jsx";
+import { useTheme } from "@/components/theme-provider";
 import { getCurrentTime } from "@/utils/helpers";
 import { LogOut, Clock3 } from "lucide-react";
 

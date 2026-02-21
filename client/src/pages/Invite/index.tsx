@@ -99,9 +99,9 @@ function Invite() {
         </Button>
         <FormContainer
           submitHandler={handleInviteSubmit}
-          className="py-8 px-6 sm:px-10 max-w-sm sm:max-w-lg min-w-[600px] w-full mx-auto"
+          className="py-8 px-6 sm:px-10 max-w-sm sm:max-w-md w-full mx-auto"
         >
-          <div className="mb-6 flex flex-col items-start text-left">
+          <div className="mb-6 flex flex-col items-start text-left w-full">
             <h3 className="text-2xl font-bold tracking-tight">
               Join your team
             </h3>
@@ -109,7 +109,7 @@ function Invite() {
               Complete your profile to join {organizationName}.
             </p>
           </div>
-          <div className="flex flex-col items-start gap-3">
+          <div className="flex flex-col items-start gap-3  w-full">
             {/* Hidden fields */}
             <input type="hidden" name="token" value={token || ""} />
             <input type="hidden" name="organizationId" value={organizationId} />
@@ -149,11 +149,12 @@ function Invite() {
               />
             </div>
 
+            {/* Org */}
             <div className="w-full space-y-1">
               <label className="text-sm font-semibold mb-1.5 block text-left">
                 Joining Organization
               </label>
-              <div className="flex items-center px-3 py-3 bg-muted/40 border rounded-lg w-full">
+              <div className="flex items-center px-3 py-2 bg-muted/40 border rounded-lg w-full">
                 <Building2 className="size-4 text-muted-foreground mr-2 shrink-0" />
                 <span className="text-sm italic text-muted-foreground flex-1 truncate text-left">
                   {organizationName}
@@ -162,9 +163,10 @@ function Invite() {
               </div>
             </div>
 
-            <div className="w-full bg-yellow-500/10 dark:bg-yellow-500/10 border border-yellow-500/20 dark:border-yellow-500/20 rounded-lg p-3 flex items-center gap-2.5">
-              <Info className="size-[1.1rem] text-yellow-600 dark:text-yellow-500 shrink-0" />
-              <span className="text-sm text-yellow-800 dark:text-yellow-400">
+            {/* Role badge */}
+            <div className="w-full bg-amber-500/10 dark:bg-amber-500/10 border border-amber-500/20 dark:border-amber-500/20 rounded-lg p-2 flex items-center gap-2.5">
+              <Info className="size-[1.1rem] text-amber-600 dark:text-amber-500 shrink-0" />
+              <span className="text-sm text-amber-800 dark:text-amber-400">
                 Role: <strong className="font-bold">{role}</strong>
               </span>
             </div>

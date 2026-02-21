@@ -3,8 +3,8 @@ import Form from "./_archive/Form";
 import RecentTransactions from "./_components/RecentTransactions";
 //? Redux Toolkit
 import { useDispatch } from "react-redux";
-import { useGetAllExpensesQuery } from "@/slices/api/expenses.api.js";
-import { useGetAllRevenueQuery } from "@/slices/api/revenue.api.js";
+import { useGetAllExpensesQuery } from "@/slices/api/expenses.api";
+import { useGetAllRevenueQuery } from "@/slices/api/revenue.api";
 import { addExpenseLocally } from "@/slices/expensesSlice";
 import { addRevenueLocally } from "@/slices/revenueSlice";
 import NewTransactionCard from "../Dashboard/_components/NewTransactionCard";

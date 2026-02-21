@@ -13,23 +13,23 @@ import { useGetAllRevenueQuery } from "./slices/api/revenue.api";
 import { useGetAllExpensesQuery } from "./slices/api/expenses.api";
 import { addFetchedExpenses } from "./slices/expensesSlice";
 import { addFetchedRevenue } from "./slices/revenueSlice";
-import { SidebarProvider } from "@/context/useSidebar.jsx";
+import { SidebarProvider } from "@/context/useSidebar";
 import { Analytics } from "@vercel/analytics/react";
 
 export default function App() {
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state: any) => state.auth);
   const {
     data: allRevenue,
     // isLoading: isFetchingAllRevenue,
     // error: allRevenueError,
     refetch: refetchRevenue,
-  } = useGetAllRevenueQuery();
+  } = useGetAllRevenueQuery(undefined);
   const {
     data: allExpenses,
     // isLoading: isFetchingAllExpenses,
     // error: allExpensesError,
     refetch: refetchExpenses,
-  } = useGetAllExpensesQuery();
+  } = useGetAllExpensesQuery(undefined);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 

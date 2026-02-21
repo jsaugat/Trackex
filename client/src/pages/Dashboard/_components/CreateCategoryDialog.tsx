@@ -35,8 +35,8 @@ import { useCreateCategoryMutation } from "@/slices/api/categories.api";
 import { useTheme } from "@/components/theme-provider";
 import { useDispatch } from "react-redux";
 import { createCategoryLocally } from "@/slices/categoriesSlice";
-import Test from "./Test.jsx";
-import { ToastAction } from "@/components/ui/toast.jsx";
+import Test from "./Test";
+import { ToastAction } from "@/components/ui/toast";
 
 export default function NewCategoryDialog({ type, successCallback }) {
   const [createCategory, { data, error, isLoading, isSuccess, isError }] =

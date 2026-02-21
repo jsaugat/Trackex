@@ -1,9 +1,9 @@
 import React from "react";
 import { AudioLines } from "lucide-react";
-import Icon from "./Icon.jsx";
-import { useTheme } from "@/components/theme-provider.jsx";
+import Icon from "./Icon";
+import { useTheme } from "@/components/theme-provider";
 import { Link } from "react-router-dom";
-import { cn } from "@/utils/cn.js";
+import { cn } from "@/utils/cn";
 
 export default function Logo({ isCollapsed, textClasses }) {
   const { theme } = useTheme();

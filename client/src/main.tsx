@@ -1,10 +1,10 @@
 import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
-import "./styles/globals.scss";
-import ErrorBoundary from "./utils/ErrorBoundary.jsx";
+import App from "./App";
+import "./styles/globals.css";
+import ErrorBoundary from "./utils/ErrorBoundary";
 // RTK
 import { Provider } from "react-redux";
-import { store } from "@/store.js";
+import { store } from "@/store";
 // router
 import {
   Route,
@@ -22,28 +22,25 @@ import PrivateRoute from "@/components/PrivateRoute";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import ru from "javascript-time-ago/locale/ru";
-import Users from "./pages/Admin/Users.jsx";
-import AdminRoute from "./components/AdminRoute.jsx";
+import Users from "./pages/Admin/Users";
+import AdminRoute from "./components/AdminRoute";
 
 TimeAgo.addDefaultLocale(en);
 TimeAgo.addLocale(ru);
 
 const routes = createRoutesFromElements(
-  <Route>
+  <Route errorElement={<div>Something went wrong</div>}>
     <Route path="/" element={<App />}>
-      {/* Place Outlet in App.jsx */}
-      <Route path="" element={<Dashboard />} />
+      <Route index element={<Dashboard />} />
       <Route path="transactions" element={<Transactions />} />
-      {/* Private Routes */}
-      <Route path="" element={<PrivateRoute />}>
+      <Route element={<PrivateRoute />}>
         <Route path="admin/*" element={<AdminRoute />}>
           <Route path="users" element={<Users />} />
         </Route>
       </Route>
     </Route>
-    {/* Separate routes for Login and Signup without layout */}
     <Route path="/login" element={<Login />} />
-    <Route path="/signup" element={<Signup />} />
+    <Route path="/register" element={<Signup />} />
     <Route path="/invite/:token" element={<Invite />} />
   </Route>,
 );

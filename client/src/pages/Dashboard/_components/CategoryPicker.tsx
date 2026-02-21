@@ -20,14 +20,14 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 
-import "@/styles/app.scss";
+import "@/styles/app.css";
 import NewCategoryDialog from "./CreateCategoryDialog";
 import { cn } from "@/lib/utils";
 import { useSelector, useDispatch } from "react-redux";
 import {
   useDeleteCategoryMutation,
   useGetCategoriesQuery,
-} from "@/slices/api/categories.api.js";
+} from "@/slices/api/categories.api";
 import { setCategories, deleteCategoryLocally } from "@/slices/categoriesSlice";
 import { toast } from "@/components/ui/use-toast";
 import { ChevronsUpDown, Check, Trash2, Loader } from "lucide-react";
@@ -60,7 +60,7 @@ export default function CategoryPicker({ type, onChange, field }) {
   //? categories of currentUser
   const categories = categoriesData.filter(
     // (category) => category.userId === currentUser._id && category.type === type
-    (category) => category.type === type
+    (category) => category.type === type,
   );
 
   useEffect(() => {
@@ -72,7 +72,7 @@ export default function CategoryPicker({ type, onChange, field }) {
 
   //? Current Selection
   const selectedCategory = categories?.find(
-    (category) => category.name === value
+    (category) => category.name === value,
   );
 
   //? To be called when a new category is created
@@ -83,7 +83,7 @@ export default function CategoryPicker({ type, onChange, field }) {
       refetchCategories();
       setOpen((prev) => !prev);
     },
-    [setValue, setOpen]
+    [setValue, setOpen],
   );
 
   const handleCategoryDelete = async (idToDelete, catName) => {
@@ -127,7 +127,9 @@ export default function CategoryPicker({ type, onChange, field }) {
             {selectedCategory ? (
               <CategoryItem category={selectedCategory} />
             ) : (
-              <p className="text-muted-foreground font-normal" >Select category...</p>
+              <p className="text-muted-foreground font-normal">
+                Select category...
+              </p>
             )}
           </span>
           <ChevronsUpDown strokeWidth="1px" size={"13px"} />
@@ -153,7 +155,7 @@ export default function CategoryPicker({ type, onChange, field }) {
             </CommandEmpty>
           )}
           <CommandGroup className="">
-            <CommandList className="" >
+            <CommandList className="">
               {/* Scroll Section */}
               <section className="w-full max-h-[400px]">
                 {isFetchingCategories && (
@@ -177,7 +179,7 @@ export default function CategoryPicker({ type, onChange, field }) {
                           <Check
                             className={cn(
                               "mx-2 w-4 h-4 opacity-0",
-                              value === category.name && "opacity-100"
+                              value === category.name && "opacity-100",
                             )}
                           />
                         </CommandItem>

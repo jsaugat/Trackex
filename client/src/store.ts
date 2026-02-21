@@ -1,11 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "./slices/authSlice.js";
-import expensesReducer from "./slices/expensesSlice.js";
-import revenueReducer from "./slices/revenueSlice.js";
-import categoriesReducer from "./slices/categoriesSlice.js";
-import usersReducer from "./slices/admin/usersSlice.js";
-import topStatsReducer from "./slices/topStats.js";
-import { emptySplitApi } from "./slices/api/emptySplitApi.js";
+import authReducer from "./slices/authSlice";
+import expensesReducer from "./slices/expensesSlice";
+import revenueReducer from "./slices/revenueSlice";
+import categoriesReducer from "./slices/categoriesSlice";
+import usersReducer from "./slices/admin/usersSlice";
+import topStatsReducer from "./slices/topStats";
+import { emptySplitApi } from "./slices/api/emptySplitApi";
 
 export const store = configureStore({
   reducer: {

@@ -23,7 +23,7 @@ import { CalendarIcon, Loader, CircleCheck, Plus, Trash2, Download } from "lucid
 import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
-import { DateToUTCDate } from "@/utils/helpers.js";
+import { DateToUTCDate } from "@/utils/helpers";
 import { useCreateExpenseMutation } from "@/slices/api/expenses.api";
 import { useCreateRevenueMutation } from "@/slices/api/revenue.api";
 import { useDispatch, useSelector } from "react-redux";

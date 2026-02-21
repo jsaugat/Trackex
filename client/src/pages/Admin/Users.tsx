@@ -25,12 +25,12 @@ import {
   useDeleteUserMutation,
   useGetUsersQuery,
   useUpdateUserMutation,
-} from "@/slices/admin/users.api.js";
+} from "@/slices/admin/users.api";
 import {
   addFetchedUsers,
   removeUserLocally,
   updateUserLocally,
-} from "@/slices/admin/usersSlice.js";
+} from "@/slices/admin/usersSlice";
 import SearchBar from "@/components/SearchBar";
 
 export default function Users() {
@@ -169,7 +169,7 @@ const UserCard = ({
         throw new Error("Network response was not ok " + response.statusText);
       }
 
-      const data = await response.json(); // Parse the JSON response
+      const data = await responseon(); // Parse the JSON response
       console.log("Success:", data); // Handle the response data
 
       // Dispatch the updateUserLocally action

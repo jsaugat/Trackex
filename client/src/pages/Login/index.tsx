@@ -75,7 +75,7 @@ function Login() {
         <Button
           variant="outline"
           className="absolute top-6 right-6"
-          onClick={() => navigate("/signup")}
+          onClick={() => navigate("/register")}
         >
           Sign Up
         </Button>
@@ -116,7 +116,7 @@ function Login() {
           </div>
           <div className="mt-12">
             Don't have an account?{" "}
-            <Link to="/signup" className="text-blue-500 hover:underline">
+            <Link to="/register" className="text-blue-500 hover:underline">
               Create an account
             </Link>
           </div>
