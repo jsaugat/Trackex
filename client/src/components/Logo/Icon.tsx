@@ -1,4 +1,10 @@
-export default ({ theme, className }) => {
+export default ({
+  theme = "dark",
+  className = "",
+}: {
+  theme?: string;
+  className?: string;
+}) => {
   return (
     <svg
       width="25"

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux"; // to get user data from state and also dispatch
+import { useAppSelector, useAppDispatch } from "@/hooks/storeHooks"; // to get user data from state and also dispatch
 import { useLoginMutation } from "@/slices/api/auth.api"; // hit backend api
 import { setCredentials } from "@/slices/authSlice"; // after hitting backend api and getting data we gotta set it to STATE and LOCAL-STORAGE
 // toast
@@ -22,10 +22,10 @@ function Login() {
     ref.current.focus();
   }, []);
 
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useAppSelector((state) => state.auth);
   // check auth state in devtools
   // (notion: https://shorturl.at/eDKZ0)
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [login, { isLoading }] = useLoginMutation();
   const { toast } = useToast();
@@ -80,7 +80,7 @@ function Login() {
           Sign Up
         </Button>
         <FormContainer submitHandler={handleLogin} className="py-20">
-          <h3 className="text-3xl font-bold mb-[4rem] flex items-center gap-3">
+          <h3 className="text-3xl font-bold mb-16 flex items-center gap-3">
             Log in to Tracker
           </h3>
           <div className="flex flex-col items-start">
@@ -105,9 +105,17 @@ function Login() {
               placeholder=""
               className={`${inputCSS}`}
             />
+            <div className="w-full flex justify-end mt-2">
+              <Link
+                to="/forgot-password"
+                className="text-xs text-blue-500 hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
             <Button
               disabled={isLoading}
-              variant=""
+              variant="default"
               className="mt-14 w-full rounded-lg"
             >
               {isLoading && <Loader className="animate-spin size-4" />}

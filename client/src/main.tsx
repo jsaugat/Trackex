@@ -12,12 +12,17 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
 } from "react-router-dom";
-// import V0 from "./components/v0";
-import Dashboard from "@/pages/Dashboard";
-import Transactions from "@/pages/Transactions";
-import Login from "@/pages/Login";
-import Signup from "@/pages/Signup";
-import Invite from "@/pages/Invite";
+
+import {
+  Dashboard,
+  Transactions,
+  Login,
+  Register,
+  Invite,
+  ForgotPassword,
+  ResetPassword,
+} from "@/pages";
+
 import PrivateRoute from "@/components/PrivateRoute";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
@@ -40,7 +45,9 @@ const routes = createRoutesFromElements(
       </Route>
     </Route>
     <Route path="/login" element={<Login />} />
-    <Route path="/register" element={<Signup />} />
+    <Route path="/register" element={<Register />} />
+    <Route path="/forgot-password" element={<ForgotPassword />} />
+    <Route path="/reset-password/:token" element={<ResetPassword />} />
     <Route path="/invite/:token" element={<Invite />} />
   </Route>,
 );
