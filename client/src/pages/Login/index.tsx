@@ -80,9 +80,12 @@ function Login() {
           Sign Up
         </Button>
         <FormContainer submitHandler={handleLogin} className="py-20">
-          <h3 className="text-3xl font-bold mb-16 flex items-center gap-3">
-            Log in to Tracker
-          </h3>
+          <div className="mb-6 text-left w-full">
+            <h3 className="text-3xl font-bold">Welcome back</h3>
+            <p className="text-sm text-muted-foreground mt-2">
+              Sign in to access your workspace.
+            </p>
+          </div>
           <div className="flex flex-col items-start">
             <label htmlFor="" className="mb-1 mt-3 font-medium">
               Email
@@ -119,13 +122,13 @@ function Login() {
               className="mt-14 w-full rounded-lg"
             >
               {isLoading && <Loader className="animate-spin size-4" />}
-              {!isLoading && <span>Log In</span>}
+              {!isLoading && <span className="font-semibold">Sign In</span>}
             </Button>
           </div>
-          <div className="mt-12">
-            Don't have an account?{" "}
+          <div className="mt-4 mx-auto">
+            Not associated with any organization?{" "}
             <Link to="/register" className="text-blue-500 hover:underline">
-              Create an account
+              Register
             </Link>
           </div>
           {/* {error && <div className="error">{error}</div>} */}

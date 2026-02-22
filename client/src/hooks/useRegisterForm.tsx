@@ -6,12 +6,15 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { TriangleAlert } from "lucide-react";
+import { generateSlugWithSuffix } from "@/utils/generateSlugWithSuffix";
 
 export function useRegisterForm() {
   const nameRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     name: "",
     email: "",
+    orgName: "",
+    orgSlug: "",
     password: "",
     confirmPassword: "",
   });
@@ -32,7 +35,17 @@ export function useRegisterForm() {
 
   const handleChange =
     (field: keyof typeof form) => (e: ChangeEvent<HTMLInputElement>) => {
-      setForm((prev) => ({ ...prev, [field]: e.target.value }));
+      const value = e.target.value;
+      setForm((prev) => {
+        const newState = { ...prev, [field]: value };
+
+        // Auto-generate slug if orgName is changed
+        if (field === "orgName") {
+          newState.orgSlug = generateSlugWithSuffix(value);
+        }
+
+        return newState;
+      });
     };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -47,7 +60,13 @@ export function useRegisterForm() {
       return;
     }
 
-    if (!form.name || !form.email || !form.password) {
+    if (
+      !form.name ||
+      !form.email ||
+      !form.password ||
+      !form.orgName ||
+      !form.orgSlug
+    ) {
       toast({
         variant: "destructive",
         title: "Please fill in all the fields!",
