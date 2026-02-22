@@ -31,7 +31,10 @@ export default function AuthInitializer({
     }
   }, [userProfile, isError, dispatch]);
 
-  if (isFetching && !userInfo) {
+  // Block rendering until userInfo is populated (or there's no token / an error)
+  // This prevents a race condition where isFetching goes false before useEffect
+  // dispatches setUserInfo, causing guards to see null userInfo for one frame.
+  if (token && !userInfo && !isError) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader className="animate-spin text-primary size-8" />

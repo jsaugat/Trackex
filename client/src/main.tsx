@@ -51,12 +51,15 @@ const routes = createRoutesFromElements(
     <Route element={<AuthGuard />}>
       {/* Under Workspace — org membership check */}
       <Route path="/:orgSlug" element={<OrgGuard />}>
-        <Route index element={<Navigate to="dashboard" replace />} />
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="transactions" element={<Transactions />} />
-        {/* Admin-only routes */}
-        <Route path="admin/*" element={<AdminGuard />}>
-          <Route path="users" element={<Users />} />
+        {/* App layout — sidebar, header, toasters */}
+        <Route element={<App />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="transactions" element={<Transactions />} />
+          {/* Admin-only routes */}
+          <Route path="admin/*" element={<AdminGuard />}>
+            <Route path="users" element={<Users />} />
+          </Route>
         </Route>
       </Route>
     </Route>
