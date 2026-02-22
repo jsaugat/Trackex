@@ -23,7 +23,7 @@ import { setCredentials } from "@/slices/authSlice";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster";
-import { Loader, Building, ShieldCheck } from "lucide-react";
+import { Loader, Building, ShieldCheck, Eye, EyeOff } from "lucide-react";
 import AuthForm from "@/components/AuthForm";
 import { ThemeProvider } from "@/components/theme-provider";
 import Icon from "@/components/Logo/Icon";
@@ -54,25 +54,37 @@ const InputField: React.FC<InputFieldProps> = ({
   prefix,
   className,
 }) => {
+  const [showPassword, setShowPassword] = useState(false);
+  const inputType = type === "password" && showPassword ? "text" : type;
+
   return (
     <div className={cn("flex flex-col items-start w-full", className)}>
       <label className="mb-1 mt-3 text-sm font-medium">{label}</label>
-      <div className="flex w-full">
+      <div className="flex w-full relative">
         {prefix && (
           <span className="flex items-center px-3 rounded-l-lg border border-r-0 bg-muted/20 text-muted-foreground text-xs">
             {prefix}
           </span>
         )}
         <input
-          type={type}
+          type={inputType}
           value={value}
           onChange={onChange}
           placeholder={placeholder}
           ref={refProp}
           className={`rounded-lg px-3 py-1 bg-transparent border focus:ring-white/20 focus:border-white/10 flex-1 placeholder-muted-foreground/50 transition-all duration-200 ${
             prefix ? "rounded-l-none" : ""
-          }`}
+          } ${type === "password" ? "pr-10" : ""}`}
         />
+        {type === "password" && (
+          <button
+            type="button"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white transition-colors"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+        )}
       </div>
     </div>
   );

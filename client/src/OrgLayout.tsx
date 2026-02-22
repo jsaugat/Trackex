@@ -11,7 +11,8 @@ export default function OrgLayout() {
   }
 
   // Check if user is a member of the organization
-  const isMember = userInfo.workspaceSlug === workspaceSlug;
+  console.log("userinfo", userInfo, userInfo.organization.slug, workspaceSlug);
+  const isMember = userInfo.organization.slug === workspaceSlug;
 
   // Org not found or user not part of it
   if (!isMember) {

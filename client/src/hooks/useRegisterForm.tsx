@@ -51,6 +51,7 @@ export function useRegisterForm() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
+    // Check if passwords match
     if (form.password !== form.confirmPassword) {
       toast({
         variant: "destructive",
@@ -74,6 +75,8 @@ export function useRegisterForm() {
       });
       return;
     }
+
+    console.log("registerform", form);
 
     try {
       const res = await register({ ...form }).unwrap();

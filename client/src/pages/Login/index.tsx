@@ -12,11 +12,12 @@ import { ThemeProvider } from "@/components/theme-provider";
 import FormContainer from "@/components/AuthForm";
 import Icon from "@/components/Logo/Icon";
 import { Toaster } from "@/components/ui/toaster";
-import { Loader } from "lucide-react";
+import { Loader, Eye, EyeOff } from "lucide-react";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const ref = useRef(null);
   useEffect(() => {
     ref.current.focus();
@@ -101,13 +102,22 @@ function Login() {
             <label htmlFor="" className="mb-1 mt-3 font-medium">
               Password
             </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder=""
-              className={`${inputCSS}`}
-            />
+            <div className="relative w-full sm:w-[20rem]">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder=""
+                className={`${inputCSS} w-full pr-10`}
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white transition-colors"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
             <div className="w-full flex justify-end mt-2">
               <Link
                 to="/forgot-password"
