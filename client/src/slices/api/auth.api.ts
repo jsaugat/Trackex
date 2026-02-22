@@ -30,6 +30,12 @@ export const authApiSlice = emptySplitApi.injectEndpoints({
         body: data,
       }),
     }),
+    getProfile: builder.query<any, void>({
+      query: () => ({
+        url: `${USERS_URL}/profile`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -38,4 +44,5 @@ export const {
   useLogoutMutation,
   useRegisterMutation,
   useUpdateUserMutation,
+  useGetProfileQuery,
 } = authApiSlice;

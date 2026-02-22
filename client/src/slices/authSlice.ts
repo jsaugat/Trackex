@@ -1,29 +1,38 @@
-/*
- ? LocalStorage stuffs: take user data from api and store them in LocalStorage and auth State and remove from LocalStorage on Logout
- */
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { createSlice } from "@reduxjs/toolkit";
+export interface AuthState {
+  userInfo: any | null;
+  token: string | null;
+}
 
-const initialState = {
-  userInfo: localStorage.getItem("userInfo")
-    ? JSON.parse(localStorage.getItem("userInfo"))
-    : null,
+const initialState: AuthState = {
+  userInfo: null,
+  token: null,
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setCredentials: (state, action) => {
+    setCredentials: (state, action: PayloadAction<any>) => {
+      // Destructure token out of the payload if it exists
+      const { token, ...user } = action.payload;
+      if (token) {
+        state.token = token;
+      }
+      // Depending on the payload, if it doesn't have a token, we don't overwrite the existing one here
+      state.userInfo = { ...state.userInfo, ...user };
+    },
+    setUserInfo: (state, action: PayloadAction<any>) => {
       state.userInfo = action.payload;
-      localStorage.setItem("userInfo", JSON.stringify(action.payload));
     },
     clearCredentials: (state) => {
       state.userInfo = null;
-      localStorage.removeItem("userInfo");
+      state.token = null;
     },
   },
 });
 
-export const { setCredentials, clearCredentials } = authSlice.actions;
+export const { setCredentials, setUserInfo, clearCredentials } =
+  authSlice.actions;
 export default authSlice.reducer;
