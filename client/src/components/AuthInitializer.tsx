@@ -1,3 +1,8 @@
+/**
+ * This component is used to initialize the authentication state.
+ * It is used in the App component to check if the user is authenticated.
+ */
+
 import React, { useEffect } from "react";
 import { useGetProfileQuery } from "@/slices/api/auth.api";
 import { useAppSelector, useAppDispatch } from "@/hooks/storeHooks";

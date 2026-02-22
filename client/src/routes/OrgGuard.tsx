@@ -8,7 +8,6 @@ export default function OrgGuard() {
 
   // Check if user is a member of the organization
   const isMember = userInfo?.organization?.slug === orgSlug;
-  console.log("userInfo in org guard", userInfo, orgSlug);
 
   if (!isMember) {
     return <Navigate to={ROUTES.NOT_AUTHORIZED} replace />;
