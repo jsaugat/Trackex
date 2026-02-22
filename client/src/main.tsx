@@ -2,6 +2,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./styles/globals.css";
 import ErrorBoundary from "./utils/ErrorBoundary";
+import { ThemeProvider } from "@/components/theme-provider";
 // RTK
 import { Provider } from "react-redux";
 import { store } from "@/store";
@@ -25,13 +26,13 @@ import {
   NotAuthorized,
 } from "@/pages";
 
-import PrivateRoute from "@/routes/PrivateRoute";
+import AuthGuard from "@/routes/AuthGuard";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import ru from "javascript-time-ago/locale/ru";
 import Users from "./pages/Admin/Users";
-import AdminRoute from "./routes/AdminRoute";
-import OrgLayout from "./OrgLayout";
+import AdminGuard from "./routes/AdminGuard";
+import OrgGuard from "./routes/OrgGuard";
 import { RootRedirect } from "./routes/RootRedirect";
 
 import { PersistGate } from "redux-persist/integration/react";
@@ -46,19 +47,21 @@ const routes = createRoutesFromElements(
     {/* Root Redirect to Dashboard if logged in */}
     <Route path="/" element={<RootRedirect />} />
 
-    {/* Under Workspace */}
-    <Route path="/:orgId" element={<OrgLayout />}>
-      <Route element={<PrivateRoute />}>
+    {/* Authenticated routes */}
+    <Route element={<AuthGuard />}>
+      {/* Under Workspace — org membership check */}
+      <Route path="/:orgSlug" element={<OrgGuard />}>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="transactions" element={<Transactions />} />
-        <Route path="admin/*" element={<AdminRoute />}>
+        {/* Admin-only routes */}
+        <Route path="admin/*" element={<AdminGuard />}>
           <Route path="users" element={<Users />} />
         </Route>
       </Route>
     </Route>
 
-    {/* Under Root */}
+    {/* Public routes */}
     <Route path="/login" element={<Login />} />
     <Route path="/register" element={<Register />} />
     <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -72,11 +75,13 @@ const router = createBrowserRouter(routes);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   // <ErrorBoundary fallback="Something went wrong :(">
-  <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
-      <AuthInitializer>
-        <RouterProvider router={router} />
-      </AuthInitializer>
-    </PersistGate>
-  </Provider>,
+  <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <AuthInitializer>
+          <RouterProvider router={router} />
+        </AuthInitializer>
+      </PersistGate>
+    </Provider>
+  </ThemeProvider>,
 );

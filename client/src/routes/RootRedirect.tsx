@@ -12,5 +12,5 @@ export function RootRedirect() {
   if (!organization) return <Navigate to="/register" replace />;
 
   // Redirect to dashboard if logged in
-  return <Navigate to={`/${organization.workspaceSlug}/dashboard`} replace />;
+  return <Navigate to={`/${organization.slug}/dashboard`} replace />;
 }

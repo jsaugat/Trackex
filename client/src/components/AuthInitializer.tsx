@@ -17,7 +17,7 @@ export default function AuthInitializer({
     isFetching,
     isError,
   } = useGetProfileQuery(undefined, {
-    skip: !token || !!userInfo,
+    skip: !token || !!userInfo, // skip if token is not present or user info is already present
   });
 
   useEffect(() => {

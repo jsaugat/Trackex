@@ -138,8 +138,27 @@ const logoutUser = asyncHandler(async (req, res, next) => {
  * @access  Private
  */
 const getUserProfile = asyncHandler(async (req, res, next) => {
-  const { _id, name, email } = req.user;
-  res.status(200).json({ _id, name, email });
+  const user = await User.findById(req.user._id).populate("organization");
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  const org = user.organization;
+  res.status(200).json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    organization: org
+      ? {
+          _id: org._id,
+          name: org.name,
+          slug: org.slug,
+        }
+      : undefined,
+  });
 });
 
 /**
@@ -167,12 +186,11 @@ const updateUserProfile = asyncHandler(async (req, res, next) => {
       name: updatedUser.name,
       email: updatedUser.email,
       role: updatedUser.role,
-      workspaceSlug: org ? org.slug : undefined,
       organization: org
         ? {
             _id: org._id,
             name: org.name,
-            workspaceSlug: org.slug,
+            slug: org.slug,
           }
         : undefined,
     });
