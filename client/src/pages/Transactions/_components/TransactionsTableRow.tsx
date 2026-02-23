@@ -35,7 +35,7 @@ import {
 import { removeRevenueLocally } from "@/slices/revenueSlice";
 import { useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { removeExpenseLocally } from "@/slices/expensesSlice";
 
 // TRANSACTION TABLE ROW
@@ -89,7 +89,6 @@ export default function TransactionTableRow({
   ] = useDeleteRevenueMutation();
   const isDeleting = type === "revenue" ? isDeletingRevenue : isDeletingExpense;
   const dispatch = useDispatch();
-  const { toast } = useToast();
   const inputRef = useRef(null);
 
   //? DELETE Handler
@@ -104,14 +103,8 @@ export default function TransactionTableRow({
         removeExpenseLocally(idToDelete);
       }
       console.log(type === "revenue" ? deletedRevenue : deletedExpense);
-      toast({
-        // variant: "destructive",
-        title: (
-          <span className="inline-flex items-center gap-3">
-            <Trash2 className="size-4 text-red-500" />
-            Deleted transaction successfully !
-          </span>
-        ),
+      toast.success("Deleted transaction successfully!", {
+        icon: <Trash2 className="size-4 text-red-500" />,
       });
     } catch (error) {
       console.error("Error deleting:", error);
@@ -122,7 +115,7 @@ export default function TransactionTableRow({
   const handleEditSave = async (id, type) => {
     if (isEditing) {
       //? isEditing is true implies it's definitely the SAVE button that is clicked.
-      const newData = {
+      const newData: any = {
         description: editedDescription,
         amount: editedAmount || 0,
       };
@@ -139,13 +132,8 @@ export default function TransactionTableRow({
           await updateExpense({ id, ...newData }).unwrap();
         }
         console.log("SENT UDPATE: ", { id, ...newData });
-        toast({
-          title: (
-            <span className="inline-flex items-center gap-3">
-              <CircleCheck className="size-4 text-green-500" />
-              Updated transaction successfully
-            </span>
-          ),
+        toast.success("Updated transaction successfully", {
+          icon: <CircleCheck className="size-4 text-green-500" />,
         });
       } catch (error) {
         console.error("ERR:: Error updating transaction: ", error);
@@ -165,7 +153,7 @@ export default function TransactionTableRow({
         <div
           className={cn(
             "w-fit px-2 rounded-xl flex items-center gap-1",
-            type !== "revenue" ? "bg-rose-500/10" : "bg-indigo-500/10"
+            type !== "revenue" ? "bg-rose-500/10" : "bg-indigo-500/10",
           )}
         >
           {type === "revenue" && (
@@ -179,7 +167,9 @@ export default function TransactionTableRow({
       </TableCell>
 
       {/* //? DATE */}
-      <TableCell className="hidden md:table-cell min-w-28">{formatDMY(date)}</TableCell>
+      <TableCell className="hidden md:table-cell min-w-28">
+        {formatDMY(date)}
+      </TableCell>
 
       {/* //? DESCRIPTION */}
       <TableCell className="max-w-28">
@@ -216,7 +206,7 @@ export default function TransactionTableRow({
           <div
             className={cn(
               "font-medium max-w-full text-ellipsis overflow-hidden",
-              type === "expense" && !entity && "text-muted-foreground"
+              type === "expense" && !entity && "text-muted-foreground",
             )}
           >
             {type === "expense" ? (
@@ -283,11 +273,11 @@ export default function TransactionTableRow({
       <TableCell>
         <div className="flex gap-2 justify-end">
           <Button
-            variant={isEditing ? "" : "outline"}
+            variant={isEditing ? "default" : "outline"}
             size="sm"
             className={cn(
               "w-[70px] flex items-center gap-2",
-              isEditing ? "" : "bg-muted/60 border-transparent"
+              isEditing ? "" : "bg-muted/60 border-transparent",
             )}
             onClick={() => handleEditSave(_id, type)}
           >

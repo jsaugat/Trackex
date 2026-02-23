@@ -4,8 +4,6 @@ import { useDispatch } from "react-redux";
 /* Components */
 import Sidebar from "@/components/Sidebar/Sidebar";
 import Header from "@/components/Header";
-import { Toaster } from "./components/ui/toaster";
-import { Toaster as SonnerToaster } from "sonner";
 import { cn } from "./lib/utils";
 import { useGetAllRevenueQuery } from "./slices/api/revenue.api";
 import { useGetAllExpensesQuery } from "./slices/api/expenses.api";
@@ -43,14 +41,13 @@ export default function App() {
             "flex flex-col",
           )}
         >
-          <Header /> {/* HEADER  */}
+          <Header />
+          {/* HEADER  */}
           <main className="app-outlet-container h-full pb-2 dark:pb-0 overflow-x-hidden overflow-y-scroll">
             <Outlet /> {/* BODY */}
           </main>
         </main>
       </main>
-      <Toaster />
-      <SonnerToaster />
       <Analytics /> {/* Vercel Analytics */}
     </SidebarProvider>
   );

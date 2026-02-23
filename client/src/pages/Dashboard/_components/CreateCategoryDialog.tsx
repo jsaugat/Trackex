@@ -29,14 +29,8 @@ import {
 } from "@/components/ui/popover";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
-import { toast as sonnerToast } from "sonner";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { useCreateCategoryMutation } from "@/slices/api/categories.api";
-import { useTheme } from "@/components/theme-provider";
-import { useDispatch } from "react-redux";
-import { createCategoryLocally } from "@/slices/categoriesSlice";
-import Test from "./Test";
-import { ToastAction } from "@/components/ui/toast";
 
 export default function NewCategoryDialog({ type, successCallback }) {
   const [createCategory, { data, error, isLoading, isSuccess, isError }] =
@@ -45,7 +39,6 @@ export default function NewCategoryDialog({ type, successCallback }) {
   const form = useForm();
   const { theme } = useTheme();
   const dispatch = useDispatch();
-  const { toast } = useToast();
 
   useEffect(() => {
     console.log("type :", type);
@@ -56,41 +49,31 @@ export default function NewCategoryDialog({ type, successCallback }) {
       console.log("FormData : ", formData);
       console.log("Type : ", type);
 
-      sonnerToast.loading("Creating Category...", {
+      toast.loading("Creating Category...", {
         id: "create-category",
-        className: `bg-background border border-border text-foreground`,
-        duration: 5000,
       });
 
       try {
         const res = await createCategory({ formData, type }).unwrap();
         console.log("Response Category? : ", res);
-        toast({
-          title: (
-            <span className="inline-flex items-center justify-center gap-3">
-              <CheckCheck className="size-5 text-green-500" />
-              <p>{formData.name} category added successfully.</p>
-            </span>
-          ),
-          // description: "",
-          // action: <ToastAction altText="Okay">Okay</ToastAction>,
+        toast.success(`${formData.name} category added successfully.`, {
+          id: "create-category",
+          icon: <CheckCheck className="size-5 text-green-500" />,
         });
         form.reset({ name: "", icon: "" });
         successCallback(formData);
         setOpen((prev) => !prev); // Close Dialog
-      } catch (error) {
+      } catch (error: any) {
         console.log("Error while adding new category :: ", error);
-        toast({
-          variant: "destructive",
-          title: error?.data?.error || error.error,
-          description: "There was a problem adding the category.",
-          action: <ToastAction altText="">Try again</ToastAction>,
-        });
-      } finally {
-        sonnerToast.dismiss();
+        toast.error(
+          error?.data?.error || error.error || "Error adding category",
+          {
+            id: "create-category",
+          },
+        );
       }
     },
-    [createCategory, form, setOpen]
+    [createCategory, form, setOpen],
   );
 
   return (

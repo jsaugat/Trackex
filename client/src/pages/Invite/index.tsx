@@ -1,26 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "@/hooks/storeHooks";
 
 // Components
-import { useToast } from "@/components/ui/use-toast";
-import { ToastAction } from "@/components/ui/toast";
 import FormContainer from "@/components/AuthForm";
 import { ThemeProvider } from "@/components/theme-provider";
 import Icon from "@/components/Logo/Icon";
-import { Toaster } from "@/components/ui/toaster";
-import {
-  Loader,
-  Building2,
-  Lock,
-  Info,
-  SquareArrowRightEnter,
-  ChevronRight,
-  ArrowRight,
-  Crown,
-  UserRound,
-} from "lucide-react";
+import { toast } from "sonner";
+import { Loader, Building2, Lock, ArrowRight, UserRound } from "lucide-react";
 
 function Invite() {
   const ref = useRef(null);
@@ -29,17 +17,17 @@ function Invite() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [organizationId, setOrganizationId] = useState("");
   const [organizationName, setOrganizationName] = useState(
     "Global Innovations Ltd.",
   ); // fallback
   const [role, setRole] = useState("Standard User"); // fallback
 
-  const { userInfo } = useSelector((state) => state.auth);
+  const { userInfo } = useAppSelector((state) => state.auth);
   // Placeholder for mutation loading state
   const isLoading = false;
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
     ref.current?.focus();
@@ -73,11 +61,7 @@ function Invite() {
   const handleInviteSubmit = async (e) => {
     e.preventDefault();
     if (fullName === "" || email === "" || password === "") {
-      toast({
-        variant: "destructive",
-        title: "Please fill in all the fields!",
-        action: <ToastAction altText="Try again">Try again</ToastAction>,
-      });
+      toast.error("Please fill in all the fields!");
     } else {
       // Implement the API call here when ready
       console.log("Submit invite with:", {
@@ -86,10 +70,9 @@ function Invite() {
         fullName,
         email,
         password,
+        confirmPassword,
       });
-      toast({
-        title: "Invite accepted! (Placeholder)",
-      });
+      toast("Invite accepted! (Placeholder)");
     }
   };
 
@@ -174,39 +157,23 @@ function Invite() {
                 placeholder="••••••••"
                 className={`${inputCSS}`}
               />
-              {/* Password Strength Indicator (Commented out for now)
-              <div className="flex gap-1.5 mt-2.5">
-                <div className="h-1 bg-muted rounded-full flex-1" />
-                <div className="h-1 bg-muted rounded-full flex-1" />
-                <div className="h-1 bg-muted rounded-full flex-1" />
-                <div className="h-1 bg-muted rounded-full flex-1" />
-              </div>
-              */}
             </div>
 
             <div className="w-full">
               <label
-                htmlFor="password"
+                htmlFor="confirmPassword"
                 className="text-sm font-semibold mb-1.5 block text-left"
               >
-                Password
+                Confirm Password
               </label>
               <input
-                id="password"
+                id="confirmPassword"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
                 className={`${inputCSS}`}
               />
-              {/* Password Strength Indicator (Commented out for now)
-              <div className="flex gap-1.5 mt-2.5">
-                <div className="h-1 bg-muted rounded-full flex-1" />
-                <div className="h-1 bg-muted rounded-full flex-1" />
-                <div className="h-1 bg-muted rounded-full flex-1" />
-                <div className="h-1 bg-muted rounded-full flex-1" />
-              </div>
-              */}
             </div>
 
             {/* Org */}
@@ -261,7 +228,6 @@ function Invite() {
             .
           </p>
         </FormContainer>
-        <Toaster />
       </main>
     </ThemeProvider>
   );

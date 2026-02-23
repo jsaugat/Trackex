@@ -38,6 +38,7 @@ import { RootRedirect } from "./routes/RootRedirect";
 import { PersistGate } from "redux-persist/integration/react";
 import AuthInitializer from "./components/AuthInitializer";
 import { persistor } from "@/store";
+import { GlobalToaster } from "./components/GlobalToaster";
 
 TimeAgo.addDefaultLocale(en);
 TimeAgo.addLocale(ru);
@@ -79,6 +80,7 @@ const router = createBrowserRouter(routes);
 ReactDOM.createRoot(document.getElementById("root")).render(
   // <ErrorBoundary fallback="Something went wrong :(">
   <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <GlobalToaster />
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <AuthInitializer>

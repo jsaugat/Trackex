@@ -21,8 +21,6 @@ import { setCredentials } from "@/slices/authSlice";
 // UI Components & Utilities
 // ==============================
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import { Toaster } from "@/components/ui/toaster";
 import { Loader, Building, ShieldCheck, Eye, EyeOff } from "lucide-react";
 import AuthForm from "@/components/AuthForm";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -98,7 +96,6 @@ export default function Register() {
     useRegisterForm();
   const { userInfo } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   // Focus first input
   useEffect(() => {
@@ -214,8 +211,6 @@ export default function Register() {
             </Link>
           </div>
         </AuthForm>
-
-        <Toaster />
       </main>
     </ThemeProvider>
   );

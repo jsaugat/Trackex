@@ -5,13 +5,10 @@ import { useAppSelector, useAppDispatch } from "@/hooks/storeHooks"; // to get u
 import { useLoginMutation } from "@/slices/api/auth.api"; // hit backend api
 import { setCredentials } from "@/slices/authSlice"; // after hitting backend api and getting data we gotta set it to STATE and LOCAL-STORAGE
 // toast
-import { useToast } from "@/components/ui/use-toast";
-import { ToastAction } from "@/components/ui/toast";
-import { toast as sonnerToast } from "sonner";
+import { toast } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import FormContainer from "@/components/AuthForm";
 import Icon from "@/components/Logo/Icon";
-import { Toaster } from "@/components/ui/toaster";
 import { Loader, Eye, EyeOff } from "lucide-react";
 
 function Login() {
@@ -30,7 +27,6 @@ function Login() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [login, { isLoading }] = useLoginMutation();
-  const { toast } = useToast();
 
   //? Navigate to the Dashboard if logged in already.
   useEffect(() => {
@@ -42,7 +38,8 @@ function Login() {
 
     // empty fields validation
     if (password === "" || email === "") {
-      sonnerToast.error("Please fill in all the fields !!");
+      toast.error("Please fill in all the fields!");
+      return; // Stop execution
     }
 
     try {
@@ -51,18 +48,13 @@ function Login() {
       //? Step 2: Dispatch and set authenticated 'userInfo' in authSlice and local-storage.
       dispatch(setCredentials({ ...res }));
       navigate("/");
-      toast({
-        title: `Logged in as ${res.name}`,
+      toast.success(`Logged in as ${res.name}`, {
         description: "Your preferences are now personalized.",
-        action: <ToastAction altText="Okay">Okay</ToastAction>,
       });
     } catch (err) {
       console.log(err?.data?.message || err.error);
-      toast({
-        variant: "destructive",
-        title: err?.data?.message || err.error,
+      toast.error(err?.data?.message || err.error || "Login failed", {
         description: "There was a problem in your request.",
-        action: <ToastAction altText="Try again">Try again</ToastAction>,
       });
     }
   };
@@ -144,7 +136,6 @@ function Login() {
           </div>
           {/* {error && <div className="error">{error}</div>} */}
         </FormContainer>
-        <Toaster />
       </main>
     </ThemeProvider>
   );

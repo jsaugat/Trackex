@@ -3,8 +3,7 @@ import { useRegisterMutation } from "@/slices/api/auth.api";
 import { useDispatch, useSelector } from "react-redux";
 import { setCredentials } from "@/slices/authSlice";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
-import { ToastAction } from "@/components/ui/toast";
+import { toast } from "sonner";
 import { TriangleAlert } from "lucide-react";
 import { generateSlugWithSuffix } from "@/utils/generateSlugWithSuffix";
 
@@ -23,7 +22,6 @@ export function useRegisterForm() {
   const [register, { isLoading }] = useRegisterMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
     nameRef.current?.focus();
@@ -53,11 +51,7 @@ export function useRegisterForm() {
 
     // Check if passwords match
     if (form.password !== form.confirmPassword) {
-      toast({
-        variant: "destructive",
-        title: "Passwords do not match.",
-        action: <ToastAction altText="Try again">Try again</ToastAction>,
-      });
+      toast.error("Passwords do not match.");
       return;
     }
 
@@ -68,11 +62,7 @@ export function useRegisterForm() {
       !form.orgName ||
       !form.orgSlug
     ) {
-      toast({
-        variant: "destructive",
-        title: "Please fill in all the fields!",
-        action: <ToastAction altText="Try again">Try again</ToastAction>,
-      });
+      toast.error("Please fill in all the fields!");
       return;
     }
 
@@ -83,15 +73,7 @@ export function useRegisterForm() {
       dispatch(setCredentials({ ...res }));
       navigate("/");
     } catch (error: any) {
-      toast({
-        title: (
-          <span className="flex items-center gap-3">
-            <TriangleAlert className="size-5 text-yellow-500" />
-            {error?.data?.message || error.error || "An error occurred"}
-          </span>
-        ),
-        action: <ToastAction altText="Try again">Try again</ToastAction>,
-      });
+      toast.error(error?.data?.message || error.error || "An error occurred");
     }
   };
 
