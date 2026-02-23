@@ -139,7 +139,7 @@ export default function Register() {
             type="text"
             value={form.name}
             onChange={handleChange("name")}
-            placeholder="John Doe"
+            placeholder="Saugat Joshi"
             refProp={nameRef}
           />
 

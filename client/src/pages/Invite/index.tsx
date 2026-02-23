@@ -10,7 +10,17 @@ import FormContainer from "@/components/AuthForm";
 import { ThemeProvider } from "@/components/theme-provider";
 import Icon from "@/components/Logo/Icon";
 import { Toaster } from "@/components/ui/toaster";
-import { Loader, Building2, Lock, Info } from "lucide-react";
+import {
+  Loader,
+  Building2,
+  Lock,
+  Info,
+  SquareArrowRightEnter,
+  ChevronRight,
+  ArrowRight,
+  Crown,
+  UserRound,
+} from "lucide-react";
 
 function Invite() {
   const ref = useRef(null);
@@ -103,7 +113,7 @@ function Invite() {
         >
           <div className="mb-6 flex flex-col items-start text-left w-full">
             <h3 className="text-2xl font-bold tracking-tight">
-              Join your team
+              You're Invited
             </h3>
             <p className="text-sm text-muted-foreground mt-1.5">
               Complete your profile to join {organizationName}.
@@ -126,7 +136,7 @@ function Invite() {
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="John Doe"
+                placeholder="Saugat Joshi"
                 ref={ref}
                 className={`${inputCSS}`}
               />
@@ -144,31 +154,9 @@ function Invite() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="alex.smith@company.com"
+                placeholder="jsaugat@company.com"
                 className={`${inputCSS}`}
               />
-            </div>
-
-            {/* Org */}
-            <div className="w-full space-y-1">
-              <label className="text-sm font-semibold mb-1.5 block text-left">
-                Joining Organization
-              </label>
-              <div className="flex items-center px-3 py-2 bg-muted/40 border rounded-lg w-full">
-                <Building2 className="size-4 text-muted-foreground mr-2 shrink-0" />
-                <span className="text-sm italic text-muted-foreground flex-1 truncate text-left">
-                  {organizationName}
-                </span>
-                <Lock className="size-4 text-muted-foreground/60 ml-2 shrink-0" />
-              </div>
-            </div>
-
-            {/* Role badge */}
-            <div className="w-full bg-amber-500/10 dark:bg-amber-500/10 border border-amber-500/20 dark:border-amber-500/20 rounded-lg p-2 flex items-center gap-2.5">
-              <Info className="size-[1.1rem] text-amber-600 dark:text-amber-500 shrink-0" />
-              <span className="text-sm text-amber-800 dark:text-amber-400">
-                Role: <strong className="font-bold">{role}</strong>
-              </span>
             </div>
 
             <div className="w-full">
@@ -196,12 +184,62 @@ function Invite() {
               */}
             </div>
 
+            <div className="w-full">
+              <label
+                htmlFor="password"
+                className="text-sm font-semibold mb-1.5 block text-left"
+              >
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className={`${inputCSS}`}
+              />
+              {/* Password Strength Indicator (Commented out for now)
+              <div className="flex gap-1.5 mt-2.5">
+                <div className="h-1 bg-muted rounded-full flex-1" />
+                <div className="h-1 bg-muted rounded-full flex-1" />
+                <div className="h-1 bg-muted rounded-full flex-1" />
+                <div className="h-1 bg-muted rounded-full flex-1" />
+              </div>
+              */}
+            </div>
+
+            {/* Org */}
+            <div className="w-full space-y-1">
+              <label className="text-sm font-semibold mb-1.5 block text-left">
+                Joining Organization
+              </label>
+              <div className="flex items-center px-3 py-2 bg-blue-500/10 border border-blue-500/20 rounded-lg w-full">
+                <Building2 className="size-4 text-blue-400 mr-2 shrink-0" />
+                <span className="text-sm italic text-blue-400 font-semibold flex-1 truncate text-left">
+                  {organizationName}
+                </span>
+                <Lock className="size-4 text-blue-400 ml-2 shrink-0" />
+              </div>
+            </div>
+
+            {/* Role badge */}
+            <p className="text-sm text-muted-foreground mt-1 flex gap-2">
+              You’re joining as a{" "}
+              <span className="font-semibold text-foreground flex items-center gap-0.5">
+                <UserRound size={14} /> {role}
+              </span>
+              .
+            </p>
+
             <Button
               className="mt-4 w-full font-semibold rounded-lg text-md py-5"
               disabled={isLoading}
             >
               {isLoading && <Loader className="animate-spin size-4 mr-2" />}
-              <span>Join Organization</span>
+              {/* <SquareArrowRightEnter size={16} className="mr-2" /> */}
+              <span>Get Started</span>
+              <ArrowRight size={16} className="ml-2" />
             </Button>
           </div>
 
@@ -230,3 +268,9 @@ function Invite() {
 }
 
 export default Invite;
+
+/*  
+
+name, email, password, orgId, role
+
+*/

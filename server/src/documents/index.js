@@ -4,8 +4,8 @@ function formatDMY(date) {
     day: "2-digit",
     month: "short",
     year: "numeric",
-  }); 
-  
+  });
+
   // To transform "16 May 2024" format
   const parts = formattedDate.split(" ");
   const finalDate = `${parseInt(parts[1])} ${parts[0]} ${parts[2]}`;
@@ -14,15 +14,19 @@ function formatDMY(date) {
 }
 
 export default (products) => {
-  const totalAmount = products.reduce((sum, product) => sum + parseFloat(product.amount), 0);
+  const totalAmount = products.reduce(
+    (sum, product) => sum + parseFloat(product.amount),
+    0,
+  );
   console.log("totalAmount", totalAmount);
   console.log("products", products);
 
   // Product row in table
-  const productRows = products.map((product) => {
-    const { category, description, amount } = product;
+  const productRows = products
+    .map((product) => {
+      const { category, description, amount } = product;
 
-    return `
+      return `
     <tr>
     <td>
       <span class="product-description">${description}</span>
@@ -30,9 +34,10 @@ export default (products) => {
     <td class="product-category">${category}</td>
     <td class="product-amount">Rs. ${amount}</td>
   </tr>`;
-  }).join("");
+    })
+    .join("");
 
-    return `
+  return `
   <!DOCTYPE html>
   <html>
     <head>
@@ -476,11 +481,11 @@ export default (products) => {
         </table>
       </main>
     </body>
-  </html>`
+  </html>`;
 };
 
-
-{/* <section class="header-section">
+{
+  /* <section class="header-section">
         <div class="billed-to">
           <h3 class="header-section-title">BILLED TO :</h3>
           <div class="customer-name">John Doe</div>
@@ -498,13 +503,14 @@ export default (products) => {
             </div>
           </div>
         </div>
-      </section> */}
+      </section> */
+}
 
 // Footer
 // <div class="footer" style="display: flex; align-items: center; justify-content: center;" >
 //   <div class="footer-icon"></div>
 //   <span class="footer-text">
-    
+
 //   </span>
 // </div>
 

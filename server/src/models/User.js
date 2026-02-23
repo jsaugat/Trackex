@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
-const roles = ["owner", "admin", "standard"]; // define allowed roles
+const roles = ["owner", "manager", "member"]; // define allowed roles
 
 const userSchema = new mongoose.Schema(
   {
@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       enum: roles,
-      default: "standard", // default role for new users
+      default: "member", // default role for new users
       required: true,
     },
     organization: {

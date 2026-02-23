@@ -19,7 +19,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { CalendarIcon, Loader, CircleCheck, Plus, Trash2, Download } from "lucide-react";
+import {
+  CalendarIcon,
+  Loader,
+  CircleCheck,
+  Plus,
+  Trash2,
+  Download,
+} from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
@@ -28,9 +35,9 @@ import { useCreateExpenseMutation } from "@/slices/api/expenses.api";
 import { useCreateRevenueMutation } from "@/slices/api/revenue.api";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastAction } from "@/components/ui/toast";
-import axios from 'axios';
-import { saveAs } from 'file-saver';
-import { v4 as uuidv4 } from 'uuid';
+import axios from "axios";
+import { saveAs } from "file-saver";
+import { v4 as uuidv4 } from "uuid";
 
 export default function CreateRevenueDialog({ trigger, type }) {
   const [open, setOpen] = useState(false);
@@ -58,7 +65,7 @@ export default function CreateRevenueDialog({ trigger, type }) {
     (index, value) => {
       setValue(`products[${index}].category`, value);
     },
-    [setValue]
+    [setValue],
   );
 
   //! VALIDATE Amount
@@ -86,7 +93,7 @@ export default function CreateRevenueDialog({ trigger, type }) {
 
   //! VALIDATE Quantity
   const validateQuantity = (value) => {
-    const minQuantity = 1;   // Minimum quantity
+    const minQuantity = 1; // Minimum quantity
     const maxQuantity = 100; // Maximum quantity
 
     // Convert value to an integer
@@ -105,15 +112,14 @@ export default function CreateRevenueDialog({ trigger, type }) {
     return true; // Return true if no validation errors
   };
 
-
   //? ADD NEW Product List Item
   const addNewProductItem = (e) => {
     e.preventDefault();
     if (productList.length === 20) {
       toast({
         variant: "destructive",
-        title: "Maximum number of products reached."
-      })
+        title: "Maximum number of products reached.",
+      });
       return;
     }
     setProductList((prevList) => [...prevList, { id: prevList.length + 1 }]);
@@ -122,7 +128,7 @@ export default function CreateRevenueDialog({ trigger, type }) {
   //? DELETE Product List Item
   const deleteProductItem = (index) => {
     if (productList.length === 1) {
-      setProductList(prevList => prevList);
+      setProductList((prevList) => prevList);
       return;
     }
     const updatedProductList = productList.filter((_, i) => i !== index);
@@ -130,11 +136,11 @@ export default function CreateRevenueDialog({ trigger, type }) {
     // Reset the form with the updated product list
     reset({
       ...getValues(),
-      products: updatedProductList
+      products: updatedProductList,
     });
   };
 
-  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false)
+  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
 
   //? Download PDF
   const downloadPDF = async () => {
@@ -146,30 +152,34 @@ export default function CreateRevenueDialog({ trigger, type }) {
         date: DateToUTCDate(data.date),
         customer: type === "revenue" ? data.customer : "",
       }));
-      console.log('TRANSFORMED-DATA: ', data)
+      console.log("TRANSFORMED-DATA: ", data);
       const url = `${import.meta.env.VITE_API_BASE_URL}/api/revenue/invoice`;
 
       setIsDownloadingPDF(true);
       const response = await axios.post(url, transformedData);
       // const { fileName } = response.data;
 
-      const res = await axios.get(`${url}/invoice.pdf`, { responseType: 'blob' });
-      const pdfBlob = new Blob([res.data], { type: 'application/pdf' });
+      const res = await axios.get(`${url}/invoice.pdf`, {
+        responseType: "blob",
+      });
+      const pdfBlob = new Blob([res.data], { type: "application/pdf" });
       // Get the customer name or use a default value if not available
-      const customerName = data.customer ? data.customer.toLowerCase().split(" ").join("-") : randomId;
+      const customerName = data.customer
+        ? data.customer.toLowerCase().split(" ").join("-")
+        : randomId;
 
       // Download as invoice.pdf with the customer name
       setIsDownloadingPDF(false);
       saveAs(pdfBlob, `invoice_${customerName}-${randomId}.pdf`);
     } catch (error) {
       setIsDownloadingPDF(false);
-      console.error('Error generating PDF:', error);
+      console.error("Error generating PDF:", error);
       toast({
         variant: "destructive",
         title: "Error generating PDF.",
         description: "Please try again later.",
         action: <ToastAction altText="Close">Close</ToastAction>,
-      })
+      });
     }
   };
 
@@ -201,7 +211,7 @@ export default function CreateRevenueDialog({ trigger, type }) {
       console.log("Revenue transformed data to submit: ", transformedData);
       console.log(
         "Revenue transformed data type: ",
-        JSON.stringify(transformedData)
+        JSON.stringify(transformedData),
       );
 
       //? Make API request
@@ -244,11 +254,20 @@ export default function CreateRevenueDialog({ trigger, type }) {
         });
       }
     },
-    [dispatch, type, currentUser, createExpense, createRevenue, reset, toast, deleteProductItem]
+    [
+      dispatch,
+      type,
+      currentUser,
+      createExpense,
+      createRevenue,
+      reset,
+      toast,
+      deleteProductItem,
+    ],
   );
 
   return (
-    <Dialog open={open} onOpenChange={setOpen} >
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       {/* <DialogContent className="md:min-w-fit md:max-w-[80%]"> */}
       <DialogContent className="md:min-w-fit md:max-w-full">
@@ -278,7 +297,7 @@ export default function CreateRevenueDialog({ trigger, type }) {
                         variant={"outline"}
                         className={cn(
                           "w-[164px] md:min-w-[220px] pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
+                          !field.value && "text-muted-foreground",
                         )}
                       >
                         {field.value ? (
@@ -315,7 +334,7 @@ export default function CreateRevenueDialog({ trigger, type }) {
                 <label>Customer</label>
                 <Input
                   type="text"
-                  placeholder="John Doe"
+                  placeholder="Saugat Joshi"
                   {...register("customer")}
                 />
               </div>
@@ -401,7 +420,7 @@ export default function CreateRevenueDialog({ trigger, type }) {
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog >
+    </Dialog>
   );
 }
 
@@ -416,7 +435,7 @@ const ProductListItem = ({
   handleCategoryChange,
   index,
   deleteProductItem,
-  productList
+  productList,
 }) => {
   return (
     <li className="min-w-[60rem] h-20 flex items-start gap-5">
