@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   ArrowRightLeft,
   Activity,
@@ -10,20 +10,38 @@ import { useWindowWidth } from "@react-hook/window-size";
 import { Nav } from "./Nav";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/Logo/Logo";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "@/hooks/storeHooks";
 import { useSidebar } from "@/context/useSidebar";
-
-const navLinks = [
-  { title: "Dashboard", href: "/", icon: Activity },
-  { title: "Transactions", href: "/transactions", icon: ArrowRightLeft },
-  { title: "Team", href: "/admin/users", icon: Users },
-];
 
 export default function Sidebar() {
   const { isCollapsed, toggleSidebar } = useSidebar();
-  const userInfo = useSelector((state) => state.auth.userInfo || {});
+  const { userInfo } = useAppSelector((state) => state.auth);
   const screenWidth = useWindowWidth();
   const isMobile = screenWidth < 768;
+
+  const orgSlug = userInfo?.organization?.slug;
+
+  const navLinks = [
+    {
+      title: "Dashboard",
+      href: `/${orgSlug}/dashboard`,
+      icon: Activity,
+    },
+    {
+      title: "Transactions",
+      href: `/${orgSlug}/transactions`,
+      icon: ArrowRightLeft,
+    },
+  ];
+
+  // Only show Manage Team to admins and owners
+  if (userInfo?.role === "admin" || userInfo?.role === "owner") {
+    navLinks.push({
+      title: "Team",
+      href: `/${orgSlug}/admin/users`,
+      icon: Users,
+    });
+  }
 
   return (
     <aside className="hidden border-r border-white dark:border-border shadow-md shadow-indigo-200 dark:shadow-none h-screen bg-background dark:bg-muted/10 md:flex flex-col">
@@ -48,11 +66,7 @@ export default function Sidebar() {
       <Nav
         className="h-full pt-2"
         isCollapsed={isMobile ? true : isCollapsed}
-        links={
-          userInfo.isAdmin === false
-            ? navLinks.filter((link) => link.href !== "/admin/users")
-            : navLinks
-        }
+        links={navLinks}
       />
     </aside>
   );
