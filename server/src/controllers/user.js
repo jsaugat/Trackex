@@ -4,7 +4,6 @@ import User from "../models/User.js";
 import Organization from "../models/Organization.js";
 import generateToken from "../utils/generateToken.js";
 import validator from "validator";
-import { throwError } from "../helpers/throwError.js";
 
 /**
  *  @desc    Auth user & get token
@@ -47,74 +46,37 @@ const loginUser = asyncHandler(async (req, res, next) => {
  * @route   POST /api/auth/register
  * @access  Public
  */
-const registerUser = asyncHandler(async (req, res, next) => {
-  const { name, email, password, orgName, orgSlug } = req.body;
+export const registerUser = asyncHandler(async (req, res) => {
+  const input = registerSchema.parse(req.body);
 
-  // Validate user inputs
-  if (!name || !email || !password || !orgName || !orgSlug)
-    throwError("Please fill in all fields.");
-  if (!validator.isEmail(email)) throwError("Invalid email.");
-  if (!validator.isStrongPassword(password))
-    throwError("Please enter a strong password.");
+  // Enforce either inviteToken OR org fields
+  const hasInvite = !!input.inviteToken;
+  const hasOrgFields = !!input.orgName && !!input.orgSlug;
 
-  //! If user already exists
-  const userExists = await User.findOne({ email });
-  if (userExists) {
-    res.status(400);
-    throw new Error("User already exists");
+  if (!hasInvite && !hasOrgFields) {
+    // Zod refinement could also do this, but keeping it explicit is fine
+    throw new Error("Provide inviteToken OR orgName+orgSlug.");
+  }
+  if (hasInvite && hasOrgFields) {
+    throw new Error("Provide either inviteToken OR orgName+orgSlug, not both.");
   }
 
-  //! If organization slug already exists
-  const orgExists = await Organization.findOne({ slug: orgSlug });
-  if (orgExists) {
-    res.status(400);
-    throw new Error("Workspace URL is already taken.");
-  }
+  const { user, organization } = await registerUserService(input);
 
-  // Pre-generate IDs to link User and Organization bidirectionally
-  const userId = new mongoose.Types.ObjectId();
-  const orgId = new mongoose.Types.ObjectId();
+  const token = generateToken(res, user._id);
 
-  const organization = new Organization({
-    _id: orgId,
-    name: orgName,
-    slug: orgSlug,
-    owner: userId,
+  res.status(201).json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    organization: {
+      _id: organization._id,
+      name: organization.name,
+      slug: organization.slug,
+    },
+    token,
   });
-
-  const user = new User({
-    _id: userId,
-    name,
-    email,
-    password,
-    role: "owner",
-    organization: orgId,
-  });
-
-  await organization.save();
-  await user.save();
-
-  //? if user and org are successfully created
-  if (user && organization) {
-    // generate jwt for the created user and set a cookie using it
-    const token = generateToken(res, user._id);
-    // send json response with user data
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      organization: {
-        _id: organization._id,
-        name: organization.name,
-        slug: organization.slug,
-      },
-      token,
-    });
-  } else {
-    res.status(400);
-    throw new Error("Invalid user data");
-  }
 });
 
 /**

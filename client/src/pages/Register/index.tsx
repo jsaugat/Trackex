@@ -125,7 +125,7 @@ export default function Register() {
           </div>
 
           <div className="mb-6 text-left w-full">
-            <h3 className="text-3xl font-bold">Create your workspace</h3>
+            <h3 className="text-3xl font-bold">Register Organization</h3>
             <p className="text-sm text-muted-foreground mt-2">
               Set up your organization and create your owner account.
             </p>

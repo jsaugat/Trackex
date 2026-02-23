@@ -60,7 +60,12 @@ function Invite() {
 
   const handleInviteSubmit = async (e) => {
     e.preventDefault();
-    if (fullName === "" || email === "" || password === "") {
+    if (
+      fullName === "" ||
+      email === "" ||
+      password === "" ||
+      confirmPassword === ""
+    ) {
       toast.error("Please fill in all the fields!");
     } else {
       // Implement the API call here when ready
