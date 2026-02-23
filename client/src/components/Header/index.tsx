@@ -1,6 +1,7 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Separator } from "@/components/ui/separator";
+
+// UI Components
 import PageTitle from "@/components/Header/PageTitle/PageTitle";
 import {
   Breadcrumb,
@@ -10,60 +11,53 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
+  DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useDispatch, useSelector } from "react-redux";
+import { Badge } from "@/components/ui/badge";
+
+// Icons
+import {
+  ChevronDown,
+  LogOut,
+  Clock3,
+  Crown,
+  ShieldCheck,
+  Building2,
+} from "lucide-react";
+
+// Hooks & State
+import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import { useLogoutMutation } from "@/slices/api/auth.api";
 import { clearCredentials } from "@/slices/authSlice";
-import GradientBorder from "../GradientBorder";
-import { ChevronDown } from "lucide-react";
-import { useTheme } from "@/components/theme-provider";
+
+// Utils & Constants
+import { ROUTES } from "@/constants/routes";
 import { getCurrentTime } from "@/utils/helpers";
-import { LogOut, Clock3 } from "lucide-react";
 
-export default function index() {
-  // States
-  const currentUser = useSelector((state) => state.auth.userInfo);
-  const [logout, { isLoading }] = useLogoutMutation();
-  const dispatch = useDispatch();
+export default function Header() {
+  const user = useAppSelector((state) => state.auth.userInfo);
+  const [logout] = useLogoutMutation();
+  const dispatch = useAppDispatch();
 
-  // Routes/*  */
   const navigate = useNavigate();
   const location = useLocation();
-  const isHome = location.pathname === "/";
-  const isTransactions = location.pathname === "/transactions";
 
-  // Utils
+  /** Returns greeting based on current hour */
   const greet = () => {
-    const now = new Date().getHours();
-    let greeting;
-    if (now >= 5 && now < 12) {
-      greeting = "Good Morning";
-    } else if (now >= 12 && now < 17) {
-      greeting = "Good Afternoon";
-    } else if (now >= 17 && now < 20) {
-      greeting = "Good Evening";
-    } else {
-      greeting = "Good Night";
-    }
-
-    return greeting;
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return "Good Morning";
+    if (hour >= 12 && hour < 17) return "Good Afternoon";
+    if (hour >= 17 && hour < 20) return "Good Evening";
+    return "Good Night";
   };
 
-  // Event Handlers
+  /** Logout handler */
   const handleLogout = async () => {
     try {
       await logout().unwrap();
@@ -74,110 +68,126 @@ export default function index() {
     }
   };
 
-  // Dynamically generate title based on pathname
+  /** Generate dynamic page title based on current route */
   const getTitle = () => {
     const { pathname } = location;
     switch (pathname) {
-      case "/":
-        return `${greet()}, ${currentUser?.name.split(" ")[0]}!`;
-      case "/transactions":
+      case ROUTES.DASHBOARD(user?.organization?.slug):
+        return `${greet()}, ${user?.name.split(" ")[0]}!`;
+      case ROUTES.TRANSACTIONS(user?.organization?.slug):
         return "Transactions";
       case "/admin/users":
-        return "Manage Team"; // Or any appropriate title for admin users
+        return "Manage Team";
       default:
         return "";
     }
   };
+
   return (
     <header className="mb-5 flex items-center justify-between">
+      {/* Page Title */}
       <section className="flex items-center gap-4">
-        {/* Display dynamically generated title */}
         <PageTitle title={getTitle()} className="hidden md:block" />
       </section>
+
+      {/* Right section: Time + Organization + Profile Dropdown */}
       <section className="flex items-center gap-3">
+        {/* Organization Name */}
+        {user?.organization?.name && (
+          <div className="hidden sm:flex p-2 px-3 text-sm dark:text-muted-foreground bg-background border rounded-full shadow-lg shadow-indigo-200 dark:shadow-none items-center gap-2">
+            <Building2 className="size-3 text-indigo-500" />
+            <span className="font-medium">{user.organization.name}</span>
+          </div>
+        )}
+
         {/* Current Time */}
         <div className="p-2 px-3 text-sm dark:text-muted-foreground bg-background border rounded-full shadow-lg shadow-indigo-200 dark:shadow-none flex items-center gap-2">
           <Clock3 className="size-3" />
           <span>{getCurrentTime()}</span>
         </div>
-        {/* Current User Profile */}
+
+        {/* Profile Dropdown */}
         <ProfileDropdown
           handleLogout={handleLogout}
           trigger={
-            // Gradient div
-            <div className="p-[0.05rem] rounded-full shadow-lg shadow-indigo-200 dark:shadow-none transition-all duration-300 dark:bg-gradient-to-r from-secondary via-primary/20 to-secondary hover:bg-indigo-300 dark:hover:bg-primary/40">
-              {/* Profile Button */}
+            <div className="p-[0.05rem] rounded-full shadow-lg shadow-indigo-200 dark:shadow-none transition-all duration-300 dark:bg-linear-to-r from-secondary via-primary/20 to-secondary hover:bg-indigo-300 dark:hover:bg-primary/40">
               <button className="relative p-1 px-1 pr-2.5 rounded-full bg-card cursor-default flex gap-2 justify-center items-center">
                 <mark className="size-8 bg-transparent flex items-center justify-center">
                   <img
                     width={30}
                     height={30}
-                    src={`https://api.dicebear.com/7.x/lorelei/svg?seed=${currentUser?.name}`}
+                    src={`https://api.dicebear.com/7.x/lorelei/svg?seed=${user?.name}`}
                     alt="avatar"
                     className="rounded-full bg-muted dark:bg-foreground"
                   />
                 </mark>
-                <div className="capitalize">{currentUser?.name}</div>
+                <div className="capitalize">{user?.name}</div>
+                {user?.role && user.role !== "standard" && (
+                  <Badge
+                    variant="secondary"
+                    className="ml-1 text-[10px] py-0 px-1.5 h-4 capitalize opacity-70 border-none bg-indigo-100 dark:bg-primary/20 text-indigo-700 dark:text-white flex items-center gap-1"
+                  >
+                    {user.role === "owner" ? (
+                      <Crown className="size-2.5" />
+                    ) : (
+                      <ShieldCheck className="size-2.5" />
+                    )}
+                    {user?.role}
+                  </Badge>
+                )}
                 <ChevronDown
                   size="12"
-                  strokeWidth={"3px"}
+                  strokeWidth="3px"
                   className="ml-2 text-muted-foreground"
                 />
               </button>
             </div>
           }
         />
-
-        {/* Logout Button */}
-        {/* <GradientBorder
-            radius="full"
-            className="dark:bg-gradient-to-b from-primary/30 via-secondary to-secondary dark:hover:via-primary/30"
-          >
-            <div
-              onClick={handleLogout}
-              className="group border rounded-full bg-card aspect-square p-3 dark:hover:bg-muted cursor-pointer"
-            >
-              <LogOut
-                strokeWidth="2px"
-                size="18px"
-                className="group-hover:text-muted-foreground"
-              />
-            </div>
-          </GradientBorder> */}
       </section>
-      {/* <Separator className="mt-4  bg-muted" /> */}
-      {/* <RenderBreadcrumb isHome={isHome} currentRoute={location.pathname} /> */}
     </header>
   );
 }
 
-const ProfileDropdown = ({ trigger, handleLogout }) => {
-  const userInfo = useSelector((state) => state.auth.userInfo || []);
-  console.log("userInfo", userInfo);
+/** Profile dropdown component */
+interface ProfileDropdownProps {
+  trigger: React.ReactNode;
+  handleLogout: () => void;
+}
+
+const ProfileDropdown = ({ trigger, handleLogout }: ProfileDropdownProps) => {
+  const userInfo = useAppSelector((state) => state.auth.userInfo || []);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
-      <DropdownMenuContent className="p-2 rounded-xl bg-background/30 dark:bg-transparent backdrop-blur-xl dark:backdrop-blur-lg shadow-lg ">
+      <DropdownMenuContent className="p-2 rounded-xl bg-background/30 dark:bg-transparent backdrop-blur-xl dark:backdrop-blur-lg shadow-lg">
         <DropdownMenuLabel>{userInfo?.email}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <div
             onClick={handleLogout}
-            className="group size-full flex items-center gap-6"
+            className="group flex items-center gap-6 w-full"
           >
             <LogOut strokeWidth="1.8px" size="16px" />
-            <div className="">Logout</div>
+            <div>Logout</div>
           </div>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 };
-const RenderBreadcrumb = ({ currentRoute, isHome }) => {
-  return isHome ? (
-    <></>
-  ) : (
+
+/** Breadcrumb renderer (optional) */
+interface RenderBreadcrumbProps {
+  currentRoute: string;
+  isHome: boolean;
+}
+
+const RenderBreadcrumb = ({ currentRoute, isHome }: RenderBreadcrumbProps) => {
+  if (isHome) return null;
+
+  return (
     <Breadcrumb className="mb-3">
       <BreadcrumbList>
         <BreadcrumbItem>
