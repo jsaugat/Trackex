@@ -11,25 +11,63 @@ import {
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Copy, Link2, Zap, Ban } from "lucide-react";
+import { Copy, Link2, Zap, Ban, Check, Loader } from "lucide-react";
+import { toast } from "sonner";
+import {
+  useCreateInvitationMutation,
+  useRevokeInvitationMutation,
+} from "@/slices/api/invite.api";
 
 export function GenerateInviteLink() {
   const [role, setRole] = useState<"member" | "manager">("member");
   const [inviteLink, setInviteLink] = useState<string | null>(null);
+  const [inviteToken, setInviteToken] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
-  function generateLink() {
-    // Fake link generator (replace with API call)
-    const token = Math.random().toString(36).slice(2);
-    setInviteLink(`https://orgdash.io/invite/${token}`);
+  const [createInvitation, { isLoading: isCreating }] =
+    useCreateInvitationMutation();
+  const [revokeInvitation, { isLoading: isRevoking }] =
+    useRevokeInvitationMutation();
+
+  async function generateLink() {
+    try {
+      const res = await createInvitation({ role }).unwrap();
+      setInviteLink(res.inviteLink);
+      setInviteToken(res.token);
+      setCopied(false);
+      toast.success("Invite link generated!");
+    } catch (err: any) {
+      const message =
+        err?.data?.message || err?.message || "Failed to generate invite link.";
+      toast.error(message);
+    }
   }
 
-  function copyLink() {
+  async function copyLink() {
     if (!inviteLink) return;
-    navigator.clipboard.writeText(inviteLink);
+    try {
+      await navigator.clipboard.writeText(inviteLink);
+      setCopied(true);
+      toast.success("Link copied to clipboard!");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Failed to copy link.");
+    }
   }
 
-  function revokeLink() {
-    setInviteLink(null);
+  async function handleRevoke() {
+    if (!inviteToken) return;
+    try {
+      await revokeInvitation(inviteToken).unwrap();
+      setInviteLink(null);
+      setInviteToken(null);
+      setCopied(false);
+      toast.success("Invitation revoked.");
+    } catch (err: any) {
+      const message =
+        err?.data?.message || err?.message || "Failed to revoke invitation.";
+      toast.error(message);
+    }
   }
 
   return (
@@ -108,30 +146,42 @@ export function GenerateInviteLink() {
 
         {/* Actions */}
         <div className="flex flex-wrap gap-2">
-          <Button onClick={generateLink} className="gap-2">
-            <Zap className="h-4 w-4" />
-            Generate Link
+          <Button
+            onClick={generateLink}
+            className="gap-2"
+            disabled={isCreating}
+          >
+            {isCreating ? (
+              <Loader className="h-4 w-4 animate-spin" />
+            ) : (
+              <Zap className="h-4 w-4" />
+            )}
+            {isCreating ? "Generating..." : "Generate Link"}
           </Button>
 
           {inviteLink && (
             <>
               <Button variant="secondary" onClick={copyLink} className="gap-2">
-                <Copy className="h-4 w-4" />
-                Copy Link
-              </Button>
-
-              <Button variant="secondary" className="gap-2">
-                <Link2 className="h-4 w-4" />
-                Preview
+                {copied ? (
+                  <Check className="h-4 w-4 text-green-400" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+                {copied ? "Copied!" : "Copy Link"}
               </Button>
 
               <Button
                 variant="destructive"
-                onClick={revokeLink}
+                onClick={handleRevoke}
                 className="gap-2"
+                disabled={isRevoking}
               >
-                <Ban className="h-4 w-4" />
-                Revoke
+                {isRevoking ? (
+                  <Loader className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Ban className="h-4 w-4" />
+                )}
+                {isRevoking ? "Revoking..." : "Revoke"}
               </Button>
             </>
           )}

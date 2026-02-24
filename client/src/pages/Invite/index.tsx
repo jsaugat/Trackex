@@ -1,7 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useAppSelector } from "@/hooks/storeHooks";
+import { useAppSelector, useAppDispatch } from "@/hooks/storeHooks";
+import { setCredentials } from "@/slices/authSlice";
+
+// API hooks
+import {
+  useValidateInvitationQuery,
+  useAcceptInvitationMutation,
+} from "@/slices/api/invite.api";
 
 // Components
 import FormContainer from "@/components/AuthForm";
@@ -12,90 +19,146 @@ import { Loader, Building2, Lock, ArrowRight, UserRound } from "lucide-react";
 import { LinkAlreadyUsed, LinkExpired } from "@/components/invitation";
 
 function Invite() {
-  const ref = useRef(null);
-  const { token } = useParams();
+  const ref = useRef<HTMLInputElement>(null);
+  const { token } = useParams<{ token: string }>();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [organizationId, setOrganizationId] = useState("");
-  const [organizationName, setOrganizationName] = useState(
-    "Global Innovations Ltd.",
-  ); // fallback
-  const [role, setRole] = useState("Member"); // fallback
 
   const { userInfo } = useAppSelector((state) => state.auth);
-  // Placeholder for mutation loading state
-  const isLoading = false;
-  const navigate = useNavigate();
 
+  // ── Validate the invite token on mount ──────────────────────────────
+  const {
+    data: inviteData,
+    isLoading: isValidating,
+    isError: isValidationError,
+    error: validationError,
+  } = useValidateInvitationQuery(token!, { skip: !token });
+
+  // ── Accept invitation mutation ──────────────────────────────────────
+  const [acceptInvitation, { isLoading: isAccepting }] =
+    useAcceptInvitationMutation();
+
+  // Focus the name input
   useEffect(() => {
     ref.current?.focus();
-  }, []);
+  }, [inviteData]);
 
+  // If already logged in, redirect to home
   useEffect(() => {
-    if (token) {
-      try {
-        // Assuming token is a JWT that contains organizationId
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        if (payload?.organizationId) {
-          setOrganizationId(payload.organizationId);
-        }
-        if (payload?.organizationName) {
-          setOrganizationName(payload.organizationName);
-        }
-        if (payload?.role) {
-          setRole(payload.role);
-        }
-      } catch (e) {
-        console.error("Could not parse token to derive organizationId");
-      }
-    }
-  }, [token]);
-
-  useEffect(() => {
-    // Navigate to the Dashboard if logged in already.
     if (userInfo) navigate("/");
   }, [navigate, userInfo]);
 
-  const handleInviteSubmit = async (e) => {
+  // Pre-fill email if the invite was sent to a specific address
+  useEffect(() => {
+    if (inviteData?.email) {
+      setEmail(inviteData.email);
+    }
+  }, [inviteData]);
+
+  // ── Derived state ──────────────────────────────────────────────────
+  const organizationName = inviteData?.orgName ?? "Organization";
+  const role = inviteData?.role ?? "member";
+  const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
+
+  // Check for used / expired status from the validation error
+  const errorData = (validationError as any)?.data;
+  const isAlreadyAccepted = errorData?.status === "used";
+  const isExpired = errorData?.status === "expired";
+
+  // ── Submit handler ──────────────────────────────────────────────────
+  const handleInviteSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (
-      fullName === "" ||
-      email === "" ||
-      password === "" ||
-      confirmPassword === ""
-    ) {
+
+    if (!fullName || !email || !password || !confirmPassword) {
       toast.error("Please fill in all the fields!");
-    } else {
-      // Implement the API call here when ready
-      console.log("Submit invite with:", {
-        token,
-        organizationId,
-        fullName,
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
+
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters.");
+      return;
+    }
+
+    try {
+      const res = await acceptInvitation({
+        token: token!,
+        name: fullName,
         email,
         password,
-        confirmPassword,
-      });
-      toast("Invite accepted! (Placeholder)");
+      }).unwrap();
+
+      // Store credentials and redirect
+      dispatch(setCredentials(res));
+      toast.success("Welcome! Your account has been created.");
+      navigate(`/${res.organization.slug}/dashboard`);
+    } catch (err: any) {
+      const message =
+        err?.data?.message || err?.message || "Failed to accept invitation.";
+      toast.error(message);
     }
   };
 
   const inputCSS =
     "rounded-lg px-3 py-2 bg-transparent border focus:ring-white/20 focus:border-white/10 w-full placeholder-muted-foreground/50 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2";
 
-  const isAlreadyAccepted = false;
-  const isExpired = true;
+  // ── Loading state ──────────────────────────────────────────────────
+  if (isValidating) {
+    return (
+      <ThemeProvider>
+        <main className="h-screen w-full flex items-center justify-center bg-secondary/20">
+          <Loader className="animate-spin size-8 text-muted-foreground" />
+        </main>
+      </ThemeProvider>
+    );
+  }
 
+  // ── Error states ──────────────────────────────────────────────────
   if (isAlreadyAccepted) {
-    return <LinkAlreadyUsed />;
+    return (
+      <ThemeProvider>
+        <main className="h-screen w-full flex items-center justify-center bg-secondary/20 p-4">
+          <LinkAlreadyUsed />
+        </main>
+      </ThemeProvider>
+    );
   }
 
   if (isExpired) {
-    return <LinkExpired />;
+    return (
+      <ThemeProvider>
+        <main className="h-screen w-full flex items-center justify-center bg-secondary/20 p-4">
+          <LinkExpired />
+        </main>
+      </ThemeProvider>
+    );
   }
 
+  if (isValidationError && !isAlreadyAccepted && !isExpired) {
+    return (
+      <ThemeProvider>
+        <main className="h-screen w-full flex flex-col items-center justify-center bg-secondary/20 p-4 gap-4">
+          <p className="text-muted-foreground text-sm">
+            Invalid or expired invitation link.
+          </p>
+          <Button variant="outline" onClick={() => navigate("/login")}>
+            Go to Login
+          </Button>
+        </main>
+      </ThemeProvider>
+    );
+  }
+
+  // ── Valid invite — render the registration form ─────────────────────
   return (
     <ThemeProvider>
       <main className="relative h-screen w-full bg-secondary/20 flex items-center justify-center p-4">
@@ -118,7 +181,7 @@ function Invite() {
             </div>
 
             <h3 className="text-2xl font-bold tracking-tight">
-              Join as {role}
+              Join as {displayRole}
             </h3>
             <p className="text-sm text-muted-foreground mt-1.5">
               You've been invited to collaborate on the {organizationName}{" "}
@@ -128,7 +191,6 @@ function Invite() {
           <div className="flex flex-col items-start gap-3  w-full">
             {/* Hidden fields */}
             <input type="hidden" name="token" value={token || ""} />
-            <input type="hidden" name="organizationId" value={organizationId} />
 
             <div className="w-full space-y-1">
               <label
@@ -161,7 +223,8 @@ function Invite() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="jsaugat@company.com"
-                className={`${inputCSS}`}
+                disabled={!!inviteData?.email} // Lock if invite was sent to specific email
+                className={`${inputCSS} ${inviteData?.email ? "opacity-60 cursor-not-allowed" : ""}`}
               />
             </div>
 
@@ -221,27 +284,17 @@ function Invite() {
               <div className="flex items-center px-3 py-2 bg-blue-500/10 border border-blue-500/20 rounded-lg w-full">
                 <UserRound className="size-4 text-blue-400 mr-2 shrink-0" />
                 <span className="text-sm italic text-blue-400 font-semibold flex-1 truncate text-left">
-                  {role}
+                  {displayRole}
                 </span>
                 <Lock className="size-4 text-blue-400 ml-2 shrink-0" />
               </div>
             </div>
 
-            {/* Role badge */}
-            {/* <p className="text-sm text-muted-foreground mt-1 flex gap-2">
-              You’re joining as a{" "}
-              <span className="font-semibold text-foreground flex items-center gap-0.5">
-                <UserRound size={14} /> {role}
-              </span>
-              .
-            </p> */}
-
             <Button
               className="mt-4 w-full font-semibold rounded-lg text-md py-5"
-              disabled={isLoading}
+              disabled={isAccepting}
             >
-              {isLoading && <Loader className="animate-spin size-4 mr-2" />}
-              {/* <SquareArrowRightEnter size={16} className="mr-2" /> */}
+              {isAccepting && <Loader className="animate-spin size-4 mr-2" />}
               <span>Create Account & Join</span>
               <ArrowRight size={16} className="ml-2" />
             </Button>
@@ -271,9 +324,3 @@ function Invite() {
 }
 
 export default Invite;
-
-/*  
-
-name, email, password, orgId, role
-
-*/
