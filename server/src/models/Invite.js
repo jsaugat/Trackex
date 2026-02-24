@@ -17,14 +17,14 @@ const inviteSchema = new mongoose.Schema(
 
     role: {
       type: String,
-      enum: ["standard", "admin"],
-      default: "standard",
+      enum: ["member", "manager"],
+      default: "member",
       required: true,
     },
 
+    // Optional — if set, only this email can accept the invite
     email: {
       type: String,
-      required: true,
       lowercase: true,
       trim: true,
     },

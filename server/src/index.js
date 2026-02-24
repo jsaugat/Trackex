@@ -6,6 +6,7 @@ import transactionRoutes from "./routes/transactions.js";
 import categoryRoutes from "./routes/category.js";
 import adminRoutes from "./routes/admin.js";
 import topStatsRoutes from "./routes/topStats.js";
+import invitationRoutes from "./routes/invitation.js";
 
 //? GLOBAL middleware
 app.use("/", (req, res, next) => {
@@ -17,7 +18,7 @@ app.use("/", (req, res, next) => {
   });
   console.log("\x1b[32m%s\x1b[0m", "Request Body :");
   console.log("Type -", typeof req.body);
-  console.log("Is Array -", Array.isArray(req.body))
+  console.log("Is Array -", Array.isArray(req.body));
   console.table(req.body);
   next();
 });
@@ -27,7 +28,8 @@ app.use("/api", transactionRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/revenue", topStatsRoutes)
+app.use("/api/revenue", topStatsRoutes);
+app.use("/api/invitations", invitationRoutes);
 
 //? 404 and error handler middlewares
 app.use(notFoundHandler);
@@ -38,7 +40,9 @@ const PORT = process.env.PORT || 8080;
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`👁️  WATCHING PORT : ${process.env.BASE_URL || `http://localhost:${PORT}`}`);
+      console.log(
+        `👁️  WATCHING PORT : ${process.env.BASE_URL || `http://localhost:${PORT}`}`,
+      );
     });
   })
   .catch((error) => {

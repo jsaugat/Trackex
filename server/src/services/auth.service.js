@@ -4,6 +4,7 @@ import AppError from "../utils/appError.js";
 import { verifyInviteToken } from "../utils/inviteToken.js";
 import User from "../models/User.js";
 import Organization from "../models/Organization.js";
+import Invite from "../models/Invite.js";
 
 export async function registerUserService(input) {
   const { name, email, password, inviteToken, orgName, orgSlug } = input;
@@ -51,6 +52,13 @@ export async function registerUserService(input) {
       );
 
       user = user[0];
+
+      // Mark the invite as used so the link can't be reused
+      await Invite.findOneAndUpdate(
+        { token: inviteToken, used: false },
+        { used: true },
+        { session },
+      );
     } else {
       // ----- OWNER CREATES ORG FLOW -----
       if (!orgName || !orgSlug) {
