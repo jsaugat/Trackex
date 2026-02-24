@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Icon from "@/components/Logo/Icon";
 import { toast } from "sonner";
 import { Loader, Building2, Lock, ArrowRight, UserRound } from "lucide-react";
+import { LinkAlreadyUsed, LinkExpired } from "@/components/invitation";
 
 function Invite() {
   const ref = useRef(null);
@@ -22,7 +23,7 @@ function Invite() {
   const [organizationName, setOrganizationName] = useState(
     "Global Innovations Ltd.",
   ); // fallback
-  const [role, setRole] = useState("Standard User"); // fallback
+  const [role, setRole] = useState("Member"); // fallback
 
   const { userInfo } = useAppSelector((state) => state.auth);
   // Placeholder for mutation loading state
@@ -84,6 +85,17 @@ function Invite() {
   const inputCSS =
     "rounded-lg px-3 py-2 bg-transparent border focus:ring-white/20 focus:border-white/10 w-full placeholder-muted-foreground/50 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2";
 
+  const isAlreadyAccepted = false;
+  const isExpired = true;
+
+  if (isAlreadyAccepted) {
+    return <LinkAlreadyUsed />;
+  }
+
+  if (isExpired) {
+    return <LinkExpired />;
+  }
+
   return (
     <ThemeProvider>
       <main className="relative h-screen w-full bg-secondary/20 flex items-center justify-center p-4">
@@ -100,11 +112,17 @@ function Invite() {
           className="py-8 px-6 sm:px-10 max-w-sm sm:max-w-md w-full mx-auto"
         >
           <div className="mb-6 flex flex-col items-start text-left w-full">
+            <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-3 py-1 text-xs text-blue-400 font-mono mb-5">
+              <div className="h-1.5 w-1.5 rounded-full bg-blue-500"></div>
+              <span>{organizationName}</span>
+            </div>
+
             <h3 className="text-2xl font-bold tracking-tight">
-              You're Invited
+              Join as {role}
             </h3>
             <p className="text-sm text-muted-foreground mt-1.5">
-              Complete your profile to join {organizationName}.
+              You've been invited to collaborate on the {organizationName}{" "}
+              dashboard. Create your account to get started.
             </p>
           </div>
           <div className="flex flex-col items-start gap-3  w-full">
@@ -195,14 +213,28 @@ function Invite() {
               </div>
             </div>
 
+            {/* Role */}
+            <div className="w-full space-y-1">
+              <label className="text-sm font-semibold mb-1.5 block text-left">
+                Assigned Role
+              </label>
+              <div className="flex items-center px-3 py-2 bg-blue-500/10 border border-blue-500/20 rounded-lg w-full">
+                <UserRound className="size-4 text-blue-400 mr-2 shrink-0" />
+                <span className="text-sm italic text-blue-400 font-semibold flex-1 truncate text-left">
+                  {role}
+                </span>
+                <Lock className="size-4 text-blue-400 ml-2 shrink-0" />
+              </div>
+            </div>
+
             {/* Role badge */}
-            <p className="text-sm text-muted-foreground mt-1 flex gap-2">
+            {/* <p className="text-sm text-muted-foreground mt-1 flex gap-2">
               You’re joining as a{" "}
               <span className="font-semibold text-foreground flex items-center gap-0.5">
                 <UserRound size={14} /> {role}
               </span>
               .
-            </p>
+            </p> */}
 
             <Button
               className="mt-4 w-full font-semibold rounded-lg text-md py-5"
@@ -210,7 +242,7 @@ function Invite() {
             >
               {isLoading && <Loader className="animate-spin size-4 mr-2" />}
               {/* <SquareArrowRightEnter size={16} className="mr-2" /> */}
-              <span>Get Started</span>
+              <span>Create Account & Join</span>
               <ArrowRight size={16} className="ml-2" />
             </Button>
           </div>

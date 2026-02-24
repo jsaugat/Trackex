@@ -1,9 +1,8 @@
-import mongoose from "mongoose";
 import asyncHandler from "express-async-handler";
 import User from "../models/User.js";
-import Organization from "../models/Organization.js";
 import generateToken from "../utils/generateToken.js";
-import validator from "validator";
+import { registerUserService } from "../services/auth.service.js";
+import { registerSchema } from "../schemas/auth.schema.js";
 
 /**
  *  @desc    Auth user & get token
@@ -53,12 +52,19 @@ export const registerUser = asyncHandler(async (req, res) => {
   const hasInvite = !!input.inviteToken;
   const hasOrgFields = !!input.orgName && !!input.orgSlug;
 
+  // User must register EITHER via invite OR by creating a new organization.
+  // If neither is provided, we cannot determine the registration flow.
   if (!hasInvite && !hasOrgFields) {
-    // Zod refinement could also do this, but keeping it explicit is fine
-    throw new Error("Provide inviteToken OR orgName+orgSlug.");
+    throw new AppError("Provide inviteToken OR orgName + orgSlug.", 400);
   }
+
+  // Prevent conflicting input: user cannot both accept an invite
+  // AND create a new organization in the same request.
   if (hasInvite && hasOrgFields) {
-    throw new Error("Provide either inviteToken OR orgName+orgSlug, not both.");
+    throw new AppError(
+      "Provide either inviteToken OR orgName + orgSlug, not both.",
+      400,
+    );
   }
 
   const { user, organization } = await registerUserService(input);
