@@ -1,6 +1,9 @@
 import { app } from "./app.js";
 import connectDB from "./db/conn.js";
-import { notFoundHandler, errorHandler } from "./middlewares/error.js";
+import {
+  notFoundHandler,
+  errorHandler,
+} from "./middlewares/error.middleware.js";
 import authRoutes from "./routes/auth.js";
 import transactionRoutes from "./routes/transactions.js";
 import categoryRoutes from "./routes/category.js";

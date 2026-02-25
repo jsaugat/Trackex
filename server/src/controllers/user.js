@@ -45,7 +45,7 @@ const loginUser = asyncHandler(async (req, res, next) => {
  * @route   POST /api/auth/register
  * @access  Public
  */
-export const registerUser = asyncHandler(async (req, res) => {
+const registerUser = asyncHandler(async (req, res) => {
   const input = registerSchema.parse(req.body);
 
   // Enforce either inviteToken OR org fields

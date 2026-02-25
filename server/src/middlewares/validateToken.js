@@ -35,7 +35,7 @@ const validateToken = asyncHandler(async function (req, res, next) {
 //? Admin Validator Middleware
 const verifyAdmin = asyncHandler(async function (req, res, next) {
   // Assumes validateToken middleware has already set req.user
-  if (req.user && req.user.isAdmin) {
+  if (req.user && (req.user.role === "owner" || req.user.role === "manager")) {
     next();
   } else {
     handleUnauthorized(res, "Admin access required");
