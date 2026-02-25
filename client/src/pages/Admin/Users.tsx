@@ -32,6 +32,7 @@ import {
   updateUserLocally,
 } from "@/slices/admin/usersSlice";
 import SearchBar from "@/components/SearchBar";
+import { GenerateInviteLink } from "@/components/invitation/generate-invite-link";
 
 export default function Users() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -66,11 +67,16 @@ export default function Users() {
   };
 
   const filteredUsers = usersData.filter((user) =>
-    user.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    user.name?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
     <main>
+      {/* Generate Invite Link */}
+      <section className="mb-6">
+        <GenerateInviteLink />
+      </section>
+
       {/* SearchBar */}
       <SearchBar
         searchQuery={searchQuery}
