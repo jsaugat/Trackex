@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 
 export default function SearchBar({ searchInputRef, searchQuery, handleSearchInputChange, className, placeholder }) {
   return (
-    <main className={cn("px-3 w-fit bg-background border rounded-full flex items-center", className)} >
+    <main className={cn("px-3 w-fit min-w-2xl bg-muted/50 border rounded-full flex items-center", className)} >
       <span>
         <Search className="size-4" />
       </span>

@@ -82,7 +82,7 @@ export default function Users() {
         searchQuery={searchQuery}
         handleSearchInputChange={handleSearchInputChange}
         placeholder={"Search members"}
-        className="mb-3"
+        className="mb-3 mx-auto mt-10"
       />
 
       {/* Users List */}

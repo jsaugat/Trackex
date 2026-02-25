@@ -74,8 +74,8 @@ export function GenerateInviteLink() {
   }
 
   return (
-    <div className="w-full max-w-6xl">
-      <div className="bg-[#0c0c0e] border rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl text-zinc-100">
+    <div className="w-full max-w-6xl mx-auto">
+      <div className="bg-gradient-to-t from-[#18181b] to-[#0c0c0e] border rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl text-zinc-100">
         {/* Shared Header */}
         <div className="p-4 md:p-6 md:pt-6 md:pb-6 border-b border-zinc-900 md:border-b-0">
           <div className="flex items-start justify-between gap-6">
