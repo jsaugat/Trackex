@@ -17,6 +17,9 @@ module.exports = {
       },
     },
     extend: {
+      fontFamily: {
+        dmSerif: ["DM Serif Display", "serif"],
+      },
       colors: {
         profit: "var(--profit)",
         border: "hsl(var(--border))",

@@ -41,6 +41,7 @@
   --animate-wiggle: wiggle 1s ease-in-out infinite;
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
+  --font-dmSerif: "DM Serif Display", serif;
 
   @keyframes border-spin {
     100% {
