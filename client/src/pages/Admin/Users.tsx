@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useAppSelector, useAppDispatch } from "@/hooks/storeHooks";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,8 +36,8 @@ import { GenerateInviteLink } from "@/components/invitation/generate-invite-link
 
 export default function Users() {
   const [searchQuery, setSearchQuery] = useState("");
-  const currentUser = useSelector((state) => state.auth.userInfo);
-  const usersData = useSelector((state) => state.users.data || []);
+  const currentUser = useAppSelector((state) => state.auth.userInfo);
+  const usersData = useAppSelector((state) => state.users.data || []);
   const {
     data: fetchedUsers,
     isLoading: isGettingUsers,
@@ -45,7 +45,7 @@ export default function Users() {
     refetch: refetchUsers,
   } = useGetUsersQuery();
   const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (fetchedUsers) {
@@ -127,8 +127,8 @@ const UserCard = ({
 }) => {
   // const [updateUser, { isLoading: isChangingRole, error: changeRoleError }] =
   //   useUpdateUserMutation();
-  const currentUser = useSelector((state) => state.auth.userInfo);
-  const dispatch = useDispatch();
+  const currentUser = useAppSelector((state) => state.auth.userInfo);
+  const dispatch = useAppDispatch();
   const [isChangingRole, setIsChangingRole] = useState(false);
 
   // const handleRoleChange = async (idToUpdate) => {
@@ -175,7 +175,7 @@ const UserCard = ({
         throw new Error("Network response was not ok " + response.statusText);
       }
 
-      const data = await responseon(); // Parse the JSON response
+      const data = await response.json(); // Parse the JSON response
       console.log("Success:", data); // Handle the response data
 
       // Dispatch the updateUserLocally action

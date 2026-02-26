@@ -1,9 +1,9 @@
 import User from "../models/User.js";
 import asyncHandler from "express-async-handler";
 
-//? GET all users
+//? GET all users in the same organization
 export const getAllUsers = asyncHandler(async (req, res) => {
-  const users = await User.find({});
+  const users = await User.find({ organization: req.user.organization });
   res.status(200).json(users);
 });
 
