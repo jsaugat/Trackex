@@ -196,7 +196,7 @@ export function GenerateInviteLink() {
           </div>
 
           {/* Right Side: Action & Link Result */}
-          <div className="flex-1 p-2 md:p-6 bg-zinc-900/10 flex flex-col">
+          <div className="flex-1 p-2 md:p-8 bg-zinc-900/10 flex flex-col">
             <div className="flex-1 flex flex-col justify-center max-w-xl mx-auto w-full py-4 md:py-0">
               {/* Ready State Graphic (Desktop Only) */}
               {!inviteLink && !isCreating && (

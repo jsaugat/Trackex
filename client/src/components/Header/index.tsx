@@ -73,45 +73,72 @@ export default function Header() {
     const { pathname } = location;
     switch (pathname) {
       case ROUTES.DASHBOARD(user?.organization?.slug):
-        return `${greet()}, ${user?.name.split(" ")[0]}!`;
+        return "";
       case ROUTES.TRANSACTIONS(user?.organization?.slug):
         return "Transactions";
-      case "/admin/users":
-        return "Manage Team";
-      default:
+      default: {
+        const slug = user?.organization?.slug;
+        if (slug && pathname === `/${slug}/admin/users`) return "Team";
         return "";
+      }
     }
   };
 
   return (
     <header className="mb-5 flex items-center justify-between">
       {/* Page Title */}
-      <section className="flex items-center gap-4">
+      {/* <section className="flex items-center gap-4">
         <PageTitle title={getTitle()} className="hidden md:block" />
-      </section>
+      </section> */}
+
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb>
+          <BreadcrumbList>
+            {user?.organization?.name && (
+              <BreadcrumbItem>
+                <BreadcrumbLink
+                  className="cursor-pointer hidden sm:flex p-1 px-1 pr-2.5 text-foreground text-sm bg-muted/40 rounded-full shadow-lg shadow-indigo-200 dark:shadow-none items-center gap-2 border border-transparent hover:border-border transition-all duration-300"
+                  onClick={() =>
+                    navigate(
+                      ROUTES.DASHBOARD(user.organization?.slug ?? "")
+                    )
+                  }
+                >
+                  <div className="size-7 rounded-full bg-muted text-sm font-semibold flex items-center justify-center text-stone-600 dark:text-stone-300">
+                    {user.organization.name
+                      .split(" ")
+                      .map((w: string) => w[0])
+                      .join("")
+                      .slice(0, 2)
+                      .toUpperCase()}
+                  </div>
+                  <span className="font-medium text-lg">
+                    {user.organization.name}
+                  </span>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+            )}
+            {getTitle() && (
+              <>
+                <BreadcrumbSeparator className="hidden sm:block" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{getTitle()}</BreadcrumbPage>
+                </BreadcrumbItem>
+              </>
+            )}
+          </BreadcrumbList>
+        </Breadcrumb>
 
       {/* Right section: Time + Organization + Profile Dropdown */}
       <section className="flex items-center gap-3">
-        {/* Organization Name */}
-        {user?.organization?.name && (
-          <div className="hidden sm:flex p-2 px-3 text-sm dark:text-muted-foreground bg-background border rounded-full shadow-lg shadow-indigo-200 dark:shadow-none items-center gap-2">
-            <Building2 className="size-3 text-indigo-500" />
-            <span className="font-medium">{user.organization.name}</span>
-          </div>
-        )}
-
-        {/* Current Time */}
-        <div className="p-2 px-3 text-sm dark:text-muted-foreground bg-background border rounded-full shadow-lg shadow-indigo-200 dark:shadow-none flex items-center gap-2">
-          <Clock3 className="size-3" />
-          <span>{getCurrentTime()}</span>
-        </div>
 
         {/* Profile Dropdown */}
         <ProfileDropdown
           handleLogout={handleLogout}
           trigger={
             <div className="p-[0.05rem] rounded-full shadow-lg shadow-indigo-200 dark:shadow-none transition-all duration-300 dark:bg-linear-to-r from-secondary via-primary/20 to-secondary hover:bg-indigo-300 dark:hover:bg-primary/40">
-              <button className="relative p-1 px-1 pr-2.5 rounded-full bg-card cursor-default flex gap-2 justify-center items-center">
+              <button className="relative p-1 px-1 pr-2.5 rounded-full bg-card cursor-default flex justify-center items-center">
+                {/* Avatar */}
                 <mark className="size-8 bg-transparent flex items-center justify-center">
                   <img
                     width={30}
@@ -121,20 +148,24 @@ export default function Header() {
                     className="rounded-full bg-muted dark:bg-foreground"
                   />
                 </mark>
-                <div className="capitalize">{user?.name}</div>
-                {user?.role && user.role !== "standard" && (
-                  <Badge
-                    variant="secondary"
-                    className="ml-1 text-[10px] py-0 px-1.5 h-4 capitalize opacity-70 border-none bg-indigo-100 dark:bg-primary/20 text-indigo-700 dark:text-white flex items-center gap-1"
-                  >
-                    {user.role === "owner" ? (
-                      <Crown className="size-2.5" />
-                    ) : (
-                      <ShieldCheck className="size-2.5" />
-                    )}
-                    {user?.role}
-                  </Badge>
-                )}
+                <div className="flex items-center ml-2">
+                  {/* Name */}
+                  <div className="capitalize">{user?.name}</div>
+                  {/* Role */}
+                  {user?.role && user.role !== "standard" && (
+                    <Badge
+                      variant="secondary"
+                      className="ml-1 text-xs py-1 px-1.5 h-4 capitalize opacity-70 border-none bg-indigo-100 dark:bg-primary/20 text-indigo-700 dark:text-white flex items-center gap-1"
+                    >
+                      {user.role === "owner" ? (
+                        <Crown className="size-2.5" />
+                      ) : (
+                        <ShieldCheck className="size-2.5" />
+                      )}
+                      {user?.role}
+                    </Badge>
+                  )}
+                </div>
                 <ChevronDown
                   size="12"
                   strokeWidth="3px"
