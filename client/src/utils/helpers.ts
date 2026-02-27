@@ -83,3 +83,41 @@ export function formatNumberWithSuffix(num) {
   }
   return shortValue + suffixes[suffixNum]; // Concatenate the number with suffix
 }
+
+// Throttle 
+export function throttle(fn, delay) {
+  let lastCall = 0;
+
+  return function (...args) {
+    const now = Date.now();
+
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      fn.apply(this, args);
+    }
+  };
+}
+
+// Async Throttle
+export function throttleAsync(fn, delay) {
+  let lastCall = 0;
+  let isRunning = false;
+
+  return async function (...args) {
+    const now = Date.now();
+
+    // Block if still running OR cooldown not finished
+    if (isRunning || now - lastCall < delay) {
+      return;
+    }
+
+    isRunning = true;
+    lastCall = now;
+
+    try {
+      await fn.apply(this, args);
+    } finally {
+      isRunning = false;
+    }
+  };
+}

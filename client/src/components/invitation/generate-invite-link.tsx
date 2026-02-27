@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Copy,
@@ -32,16 +32,43 @@ export function GenerateInviteLink() {
   const [revokeInvitation, { isLoading: isRevoking }] =
     useRevokeInvitationMutation();
 
+  const INVITE_COOLDOWN_SECONDS = 10;
+
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+
+    const interval = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [cooldown]);
+
   async function generateLink() {
+    if (cooldown > 0) return;
+
     try {
       const res = await createInvitation({ role }).unwrap();
+
       setInviteLink(res.inviteLink);
       setInviteToken(res.token);
       setCopied(false);
+
+      setCooldown(INVITE_COOLDOWN_SECONDS); // 👈 start cooldown
+
       toast.success("Invite link generated!");
     } catch (err: any) {
       const message =
         err?.data?.message || err?.message || "Failed to generate invite link.";
+
       toast.error(message);
     }
   }
@@ -279,17 +306,22 @@ export function GenerateInviteLink() {
               {/* Primary Action Button */}
               <Button
                 onClick={generateLink}
-                disabled={isCreating}
+                disabled={isCreating || cooldown > 0}
                 className="w-full bg-white hover:bg-zinc-200 text-black h-10 text-sm font-black flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-xl shadow-white/5 disabled:opacity-50"
               >
                 {isCreating ? (
                   <Loader className="w-5 h-5 animate-spin" />
+                ) : cooldown > 0 ? (
+                  <Shield className="w-5 h-5" />
                 ) : (
                   <Share2 className="w-5 h-5" />
                 )}
+
                 {isCreating
                   ? "Generating Link..."
-                  : "Generate Secure Invite Link"}
+                  : cooldown > 0
+                    ? `Cooldown (${cooldown}s)`
+                    : "Generate Secure Invite Link"}
               </Button>
             </div>
 
