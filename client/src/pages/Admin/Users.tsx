@@ -33,6 +33,8 @@ import {
 } from "@/slices/admin/usersSlice";
 import SearchBar from "@/components/SearchBar";
 import { GenerateInviteLink } from "@/components/invitation/generate-invite-link";
+import { LoadingState } from "@/components/ui/loading-state";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function Users() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -70,6 +72,12 @@ export default function Users() {
     user.name?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
+  const usersToDisplay = filteredUsers.filter(
+    (user) => user._id !== currentUser._id,
+  );
+
+  console.log("filteredUsers", filteredUsers);
+
   return (
     <main>
       {/* Generate Invite Link */}
@@ -88,28 +96,31 @@ export default function Users() {
       {/* Users List */}
       <article className="text-[0.9rem] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-start gap-3">
         {isGettingUsers ? (
-          <Loader />
+          <LoadingState message="Fetching Users" className="col-span-full" />
         ) : error ? (
-          <div>Error: {error.message}</div>
-        ) : !filteredUsers.length ? (
-          <NoUsersMessage />
+          <div className="col-span-full text-red-500">
+            Error: {error.message}
+          </div>
+        ) : !usersToDisplay.length ? (
+          <EmptyState
+            message="Zero users right now"
+            className="col-span-full"
+          />
         ) : (
-          filteredUsers
-            .filter((user) => user._id !== currentUser._id)
-            .map((user, idx) => (
-              <UserCard
-                key={idx}
-                name={user.name}
-                email={user.email}
-                userId={user._id}
-                isAdmin={user.isAdmin}
-                registeredOn={user.createdAt}
-                handleDeleteUser={handleDeleteUser}
-                isDeleting={isDeleting}
-                //
-                refetchUsers={refetchUsers}
-              />
-            ))
+          usersToDisplay.map((user, idx) => (
+            <UserCard
+              key={idx}
+              name={user.name}
+              email={user.email}
+              userId={user._id}
+              isAdmin={user.isAdmin}
+              registeredOn={user.createdAt}
+              handleDeleteUser={handleDeleteUser}
+              isDeleting={isDeleting}
+              //
+              refetchUsers={refetchUsers}
+            />
+          ))
         )}
       </article>
     </main>
@@ -324,23 +335,4 @@ const DeleteAlertDialog = ({
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>
-);
-
-const Loader = () => (
-  <div className="flex items-center gap-2 opacity-60">
-    <LoaderLucide className="animate-spin size-5" />
-    Fetching Users
-  </div>
-);
-
-const NoUsersMessage = () => (
-  <section className="border rounded-lg p-12 text-muted-foreground bg-muted/50 backdrop-blur-[1px] w-full flex flex-col items-center justify-center">
-    <div className="flex items-center gap-2 justify-center">
-      <CircleAlert
-        strokeWidth={"1.5px"}
-        className="text-muted-foreground size-5"
-      />
-      <div>Zero users right now</div>
-    </div>
-  </section>
 );
