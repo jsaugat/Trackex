@@ -10,6 +10,13 @@ export const authApiSlice = emptySplitApi.injectEndpoints({
         body: data,
       }),
     }),
+    verifyLoginOtp: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/verify-otp`,
+        method: "POST",
+        body: data,
+      }),
+    }),
     logout: builder.mutation({
       query: () => ({
         url: `${USERS_URL}/logout`,
@@ -55,6 +62,7 @@ export const authApiSlice = emptySplitApi.injectEndpoints({
 
 export const {
   useLoginMutation,
+  useVerifyLoginOtpMutation,
   useLogoutMutation,
   useRegisterMutation,
   useForgotPasswordMutation,

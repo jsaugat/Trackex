@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect, ChangeEvent, FormEvent } from "react";
-import { useRegisterMutation } from "@/slices/api/auth.api";
+import {
+  useRegisterMutation,
+  useVerifyLoginOtpMutation,
+} from "@/slices/api/auth.api";
 import { useDispatch, useSelector } from "react-redux";
 import { setCredentials } from "@/slices/authSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { TriangleAlert } from "lucide-react";
 import { generateSlugWithSuffix } from "@/utils/generateSlugWithSuffix";
 
 export function useRegisterForm() {
@@ -17,9 +19,13 @@ export function useRegisterForm() {
     password: "",
     confirmPassword: "",
   });
+  const [isOtpStep, setIsOtpStep] = useState(false);
+  const [otp, setOtp] = useState("");
 
   const { userInfo } = useSelector((state: any) => state.auth);
   const [register, { isLoading }] = useRegisterMutation();
+  const [verifyLoginOtp, { isLoading: isOtpLoading }] =
+    useVerifyLoginOtpMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -70,12 +76,55 @@ export function useRegisterForm() {
 
     try {
       const res = await register({ ...form }).unwrap();
-      dispatch(setCredentials({ ...res }));
-      navigate("/");
+      if (res?.otpRequired) {
+        setIsOtpStep(true);
+        toast.success("OTP sent. Check your email.", {
+          description: "For now OTP is logged on the server console.",
+        });
+      }
     } catch (error: any) {
       toast.error(error?.data?.message || error.error || "An error occurred");
     }
   };
 
-  return { form, handleChange, handleSubmit, isLoading, nameRef };
+  const handleVerifyOtp = async (e: FormEvent) => {
+    e.preventDefault();
+
+    if (!/^\d{6}$/.test(otp)) {
+      toast.error("Enter a valid 6-digit OTP.");
+      return;
+    }
+
+    try {
+      const res = await verifyLoginOtp({ email: form.email, otp }).unwrap();
+      dispatch(setCredentials({ ...res }));
+      navigate("/");
+    } catch (error: any) {
+      toast.error(error?.data?.message || error.error || "OTP verification failed");
+    }
+  };
+
+  const resendOtp = async () => {
+    try {
+      await register({ ...form }).unwrap();
+      toast.success("OTP resent.");
+    } catch (error: any) {
+      toast.error(error?.data?.message || error.error || "Failed to resend OTP");
+    }
+  };
+
+  return {
+    form,
+    handleChange,
+    handleSubmit,
+    isLoading,
+    nameRef,
+    isOtpStep,
+    otp,
+    setOtp,
+    handleVerifyOtp,
+    resendOtp,
+    isOtpLoading,
+    setIsOtpStep,
+  };
 }

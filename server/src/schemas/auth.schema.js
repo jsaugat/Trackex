@@ -38,6 +38,16 @@ export const registerSchema = z.object({
   orgSlug: slug.optional(),
 });
 
+export const loginSchema = z.object({
+  email,
+  password: z.string().min(1, "Password is required."),
+});
+
+export const verifyLoginOtpSchema = z.object({
+  email,
+  otp: z.string().trim().regex(/^\d{6}$/, "OTP must be a 6-digit code."),
+});
+
 export const forgotPasswordSchema = z.object({
   // Keep payload minimal to avoid leaking account state through variable inputs.
   email,

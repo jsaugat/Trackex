@@ -6,44 +6,92 @@ import AppError from "../utils/appError.js";
 import { registerUserService } from "../services/auth.service.js";
 import {
   forgotPasswordSchema,
+  loginSchema,
   registerSchema,
   resetPasswordSchema,
+  verifyLoginOtpSchema,
 } from "../schemas/auth.schema.js";
 
+const buildAuthPayload = (user, token) => {
+  const org = user.organization;
+
+  return {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    organization: org
+      ? {
+          _id: org._id,
+          name: org.name,
+          slug: org.slug,
+        }
+      : undefined,
+    token,
+  };
+};
+
 /**
- *  @desc    Auth user & get token
+ *  @desc    Validate credentials and start email OTP login verification
  *  @route   POST /api/auth/login
  *  @access  Public
  */
-const loginUser = asyncHandler(async (req, res, next) => {
-  const { email, password } = req.body;
-  //? Step 1: Find user and populate organization
+const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = loginSchema.parse(req.body);
+
+  const user = await User.findOne({ email });
+
+  if (!user || !(await user.passwordMatches(password))) {
+    res.status(401);
+    throw new Error("Invalid email or password");
+  }
+
+  const otp = user.generateLoginOtpToken();
+  await user.save({ validateBeforeSave: false });
+
+  // DEV NOTE: Replace this console log with email provider integration.
+  console.log(`[LOGIN_OTP] email=${user.email} otp=${otp}`);
+
+  res.status(200).json({
+    message: "OTP sent to your email.",
+    otpRequired: true,
+    email: user.email,
+  });
+});
+
+/**
+ *  @desc    Verify login OTP and issue authentication token
+ *  @route   POST /api/auth/verify-otp
+ *  @access  Public
+ */
+const verifyLoginOtp = asyncHandler(async (req, res) => {
+  const { email, otp } = verifyLoginOtpSchema.parse(req.body);
+
   const user = await User.findOne({ email }).populate("organization");
 
-  //? Step 2: If user is found and password matches.
-  if (user && (await user.passwordMatches(password))) {
-    const token = generateToken(res, user._id); // generate jwt using the _id and set a http cookie using it
-
-    const org = user.organization;
-
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      organization: org
-        ? {
-            _id: org._id,
-            name: org.name,
-            slug: org.slug,
-          }
-        : undefined,
-      token,
-    });
-  } else {
-    res.status(401);
-    throw Error("Invalid email or password");
+  if (!user || !user.loginOtpToken || !user.loginOtpExpires) {
+    throw new AppError("OTP not found. Please login again.", 400);
   }
+
+  if (user.loginOtpExpires.getTime() <= Date.now()) {
+    user.loginOtpToken = undefined;
+    user.loginOtpExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+    throw new AppError("OTP has expired. Please login again.", 400);
+  }
+
+  const hashedOtp = crypto.createHash("sha256").update(otp).digest("hex");
+  if (hashedOtp !== user.loginOtpToken) {
+    throw new AppError("Invalid OTP.", 400);
+  }
+
+  user.loginOtpToken = undefined;
+  user.loginOtpExpires = undefined;
+  await user.save({ validateBeforeSave: false });
+
+  const token = generateToken(res, user._id);
+
+  res.status(200).json(buildAuthPayload(user, token));
 });
 
 /**
@@ -74,20 +122,21 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   const { user, organization } = await registerUserService(input);
+  const otp = user.generateLoginOtpToken();
+  await user.save({ validateBeforeSave: false });
 
-  const token = generateToken(res, user._id);
+  // DEV NOTE: Replace this console log with email provider integration.
+  console.log(`[REGISTER_OTP] email=${user.email} otp=${otp}`);
 
   res.status(201).json({
-    _id: user._id,
-    name: user.name,
+    message: "OTP sent to your email.",
+    otpRequired: true,
     email: user.email,
-    role: user.role,
     organization: {
       _id: organization._id,
       name: organization.name,
       slug: organization.slug,
     },
-    token,
   });
 });
 
@@ -119,20 +168,7 @@ const getUserProfile = asyncHandler(async (req, res, next) => {
     throw new Error("User not found");
   }
 
-  const org = user.organization;
-  res.status(200).json({
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    organization: org
-      ? {
-          _id: org._id,
-          name: org.name,
-          slug: org.slug,
-        }
-      : undefined,
-  });
+  res.status(200).json(buildAuthPayload(user));
 });
 
 /**
@@ -154,20 +190,7 @@ const updateUserProfile = asyncHandler(async (req, res, next) => {
     }
     const updatedUser = await user.save();
 
-    const org = updatedUser.organization;
-    res.status(200).json({
-      _id: updatedUser._id,
-      name: updatedUser.name,
-      email: updatedUser.email,
-      role: updatedUser.role,
-      organization: org
-        ? {
-            _id: org._id,
-            name: org.name,
-            slug: org.slug,
-          }
-        : undefined,
-    });
+    res.status(200).json(buildAuthPayload(updatedUser));
   } else {
     res.status(404);
     throw new Error("User not found");
@@ -242,6 +265,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 
 export {
   loginUser,
+  verifyLoginOtp,
   registerUser,
   logoutUser,
   getUserProfile,

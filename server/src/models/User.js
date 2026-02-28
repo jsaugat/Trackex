@@ -25,6 +25,12 @@ const userSchema = new mongoose.Schema(
     resetPasswordExpires: {
       type: Date,
     },
+    loginOtpToken: {
+      type: String,
+    },
+    loginOtpExpires: {
+      type: Date,
+    },
     role: {
       type: String,
       enum: roles,
@@ -69,6 +75,20 @@ userSchema.methods.generatePasswordResetToken = function () {
   this.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
 
   return rawToken;
+};
+
+// Generates a one-time 6-digit OTP for login verification.
+// Raw OTP is returned for delivery (email/log), hashed version is stored in DB.
+userSchema.methods.generateLoginOtpToken = function () {
+  const rawOtp = String(crypto.randomInt(0, 1_000_000)).padStart(6, "0");
+
+  this.loginOtpToken = crypto
+    .createHash("sha256")
+    .update(rawOtp)
+    .digest("hex");
+  this.loginOtpExpires = Date.now() + 10 * 60 * 1000;
+
+  return rawOtp;
 };
 
 export default mongoose.model("User", userSchema);
