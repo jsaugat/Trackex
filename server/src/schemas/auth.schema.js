@@ -37,3 +37,20 @@ export const registerSchema = z.object({
   orgName: z.string().trim().min(1).max(80).optional(),
   orgSlug: slug.optional(),
 });
+
+export const forgotPasswordSchema = z.object({
+  // Keep payload minimal to avoid leaking account state through variable inputs.
+  email,
+});
+
+export const resetPasswordSchema = z
+  .object({
+    // Reuse strong password policy from registration.
+    password: strongPassword,
+    // Collected explicitly so mismatch can be handled at validation layer.
+    confirmPassword: z.string().min(1, "Confirm password is required."),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  });

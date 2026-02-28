@@ -7,12 +7,13 @@ import Icon from "@/components/Logo/Icon";
 import { Toaster } from "@/components/ui/toaster";
 import { toast as sonnerToast } from "sonner";
 import { Loader } from "lucide-react";
+import { useForgotPasswordMutation } from "@/slices/api/auth.api";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,15 +23,16 @@ function ForgotPassword() {
       return;
     }
 
-    setIsLoading(true);
     try {
-      // Logic will be added later
-      console.log("Forgot password for:", email);
-      sonnerToast.success("If an account exists, a reset link has been sent.");
+      const response = await forgotPassword({ email }).unwrap();
+      sonnerToast.success(
+        response?.message ||
+          "If an account exists, a reset link has been sent.",
+      );
     } catch (err: any) {
-      sonnerToast.error(err?.data?.message || "Something went wrong");
-    } finally {
-      setIsLoading(false);
+      sonnerToast.error(
+        err?.data?.message || err?.error || "Something went wrong",
+      );
     }
   };
 

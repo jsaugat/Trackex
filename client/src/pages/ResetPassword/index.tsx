@@ -7,13 +7,14 @@ import Icon from "@/components/Logo/Icon";
 import { Toaster } from "@/components/ui/toaster";
 import { toast as sonnerToast } from "sonner";
 import { Loader } from "lucide-react";
+import { useResetPasswordMutation } from "@/slices/api/auth.api";
 
 function ResetPassword() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const { token } = useParams();
   const navigate = useNavigate();
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,16 +29,24 @@ function ResetPassword() {
       return;
     }
 
-    setIsLoading(true);
+    if (!token) {
+      sonnerToast.error("Invalid or missing reset token!");
+      return;
+    }
+
     try {
-      // Logic will be added later
-      console.log("Resetting password with token:", token);
-      sonnerToast.success("Password has been reset successfully!");
-      setTimeout(() => navigate("/login"), 2000);
+      const response = await resetPassword({
+        token,
+        data: { password, confirmPassword },
+      }).unwrap();
+      sonnerToast.success(
+        response?.message || "Password has been reset successfully!",
+      );
+      setTimeout(() => navigate("/login"), 1500);
     } catch (err: any) {
-      sonnerToast.error(err?.data?.message || "Something went wrong");
-    } finally {
-      setIsLoading(false);
+      sonnerToast.error(
+        err?.data?.message || err?.error || "Something went wrong",
+      );
     }
   };
 

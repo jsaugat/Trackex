@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 const roles = ["owner", "manager", "member"]; // define allowed roles
 
@@ -17,6 +18,12 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+    },
+    resetPasswordToken: {
+      type: String,
+    },
+    resetPasswordExpires: {
+      type: Date,
     },
     role: {
       type: String,
@@ -47,6 +54,21 @@ userSchema.pre("save", async function (next) {
 //? Check if password entered for login matches with the one in db.
 userSchema.methods.passwordMatches = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Generates a one-time password-reset token.
+// Raw token is returned for transport (email URL), hashed version is stored in DB.
+// Expiry is intentionally short-lived to reduce replay risk.
+userSchema.methods.generatePasswordResetToken = function () {
+  const rawToken = crypto.randomBytes(32).toString("hex");
+
+  this.resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(rawToken)
+    .digest("hex");
+  this.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
+
+  return rawToken;
 };
 
 export default mongoose.model("User", userSchema);

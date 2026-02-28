@@ -1,8 +1,14 @@
 import asyncHandler from "express-async-handler";
+import crypto from "crypto";
 import User from "../models/User.js";
 import generateToken from "../utils/generateToken.js";
+import AppError from "../utils/appError.js";
 import { registerUserService } from "../services/auth.service.js";
-import { registerSchema } from "../schemas/auth.schema.js";
+import {
+  forgotPasswordSchema,
+  registerSchema,
+  resetPasswordSchema,
+} from "../schemas/auth.schema.js";
 
 /**
  *  @desc    Auth user & get token
@@ -168,10 +174,78 @@ const updateUserProfile = asyncHandler(async (req, res, next) => {
   }
 });
 
+/**
+ * @desc    Send forgot password reset link (generic response)
+ * @route   POST /api/auth/forgot-password
+ * @access  Public
+ */
+const forgotPassword = asyncHandler(async (req, res) => {
+  // Validate + normalize incoming payload before any DB operation.
+  const { email } = forgotPasswordSchema.parse(req.body);
+
+  const user = await User.findOne({ email });
+
+  if (user) {
+    // Returns a raw token for URL usage while storing only hashed token in DB.
+    const token = user.generatePasswordResetToken();
+    // Save only reset-token fields; skip unrelated validators in this interim step.
+    await user.save({ validateBeforeSave: false });
+
+    // Prefer explicit frontend URL, then CORS origin, then local dev fallback.
+    const clientUrl =
+      process.env.CLIENT_URL ||
+      process.env.CORS_ORIGIN ||
+      "http://localhost:5173";
+    const resetUrl = `${clientUrl}/reset-password/${token}`;
+
+    // DEV NOTE: replace this log with real email delivery in production.
+    console.log("[PASSWORD_RESET_URL]", resetUrl);
+  }
+
+  // Always return the same response to prevent account-enumeration attacks.
+  res.status(200).json({
+    message: "If an account exists, a reset link has been sent.",
+  });
+});
+
+/**
+ * @desc    Reset password using token
+ * @route   POST /api/auth/reset-password/:token
+ * @access  Public
+ */
+const resetPassword = asyncHandler(async (req, res) => {
+  const { password } = resetPasswordSchema.parse(req.body);
+  const token = req.params.token;
+
+  // Compare hashed token only; raw reset tokens are never persisted.
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  const user = await User.findOne({
+    resetPasswordToken: hashedToken,
+    // Token must still be valid at the time of reset request.
+    resetPasswordExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new AppError("Reset token is invalid or has expired.", 400);
+  }
+
+  // Setting password triggers pre-save hashing hook in User model.
+  user.password = password;
+  // Invalidate token immediately after successful password update (one-time use).
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  await user.save();
+
+  res.status(200).json({ message: "Password has been reset successfully." });
+});
+
 export {
   loginUser,
   registerUser,
   logoutUser,
   getUserProfile,
   updateUserProfile,
+  forgotPassword,
+  resetPassword,
 };
