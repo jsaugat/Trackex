@@ -36,6 +36,11 @@ const expenseSchema = new Schema(
       type: String,
       required: false,
     },
+    organization: {
+      type: Schema.Types.ObjectId,
+      ref: "Organization",
+      required: true,
+    },
   },
   { timestamps: true }
 );

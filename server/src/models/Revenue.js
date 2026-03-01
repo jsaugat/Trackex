@@ -37,6 +37,11 @@ const revenueSchema = new Schema(
       type: Date,
       required: true,
     },
+    organization: {
+      type: Schema.Types.ObjectId,
+      ref: "Organization",
+      required: true,
+    },
   },
   { timestamps: true }
 );

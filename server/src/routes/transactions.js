@@ -23,20 +23,20 @@ const router = express.Router();
 // Expense routes
 router.route("/expenses")
   .get(validateToken, getExpenses)
-  .post(createExpense);
+  .post(validateToken, createExpense);
 
 router.route("/expenses/:id")
-  .patch(updateExpense)
-  .delete(deleteExpense);
+  .patch(validateToken, updateExpense)
+  .delete(validateToken, deleteExpense);
 
 // Revenue routes
 router.route("/revenue")
   .get(validateToken, getRevenue)
-  .post(createRevenue);
+  .post(validateToken, createRevenue);
 
 router.route("/revenue/:id")
-  .patch(updateRevenue)
-  .delete(deleteRevenue);
+  .patch(validateToken, updateRevenue)
+  .delete(validateToken, deleteRevenue);
 
 // Invoice routes
 router.post('/revenue/invoice', createInvoicePDF);

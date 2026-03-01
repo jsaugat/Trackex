@@ -1,32 +1,34 @@
 import mongoose from "mongoose";
 import Revenue from "../models/Revenue.js";
 import asyncHandler from "express-async-handler";
+import AppError from "../utils/appError.js";
 
 /**
  *  @desc    Add a revenue transaction
  *  @route   POST /api/revenue/
  */
 const createRevenue = asyncHandler(async (req, res, next) => {
-  const { revenueEntries } = req.body;
-  console.log("Revenue controller req.body: ", req.body);
-  console.log("Revenue controller req.body.revenueEntries: ", revenueEntries);
-
-  if (!Array.isArray(revenueEntries)) {
-    //? If revenueEntries is not an array, treat it as a single entry
-    const createdRevenue = await Revenue.create({
-      ...req.body,
-      type: "revenue",
-    });
-    console.log("Created single revenue entry:", createdRevenue);
-    return res.status(201).json(createdRevenue);
+  const organizationId = req.user?.organization;
+  if (!organizationId) {
+    throw new AppError("Unable to determine organization context", 400);
   }
 
-  //? If revenueEntries is an array, treat it as multiple revenueEntries
-  const createdAllRevenue = await Revenue.insertMany(
-    revenueEntries.map((entry) => ({ ...entry, type: "revenue" }))
-  );
-  console.log("Created multiple revenue revenueEntries:", createdAllRevenue);
-  res.status(201).json(createdAllRevenue);
+  const { revenueEntries } = req.body;
+  const rawEntries = Array.isArray(revenueEntries) ? revenueEntries : [req.body];
+
+  const normalizedEntries = rawEntries.map((entry) => ({
+    ...entry,
+    type: "revenue",
+    organization: organizationId,
+  }));
+
+  if (Array.isArray(revenueEntries)) {
+    const createdAllRevenue = await Revenue.insertMany(normalizedEntries);
+    return res.status(201).json(createdAllRevenue);
+  }
+
+  const createdRevenue = await Revenue.create(normalizedEntries[0]);
+  res.status(201).json(createdRevenue);
 });
 
 /**
@@ -34,13 +36,15 @@ const createRevenue = asyncHandler(async (req, res, next) => {
  *  @route   GET /api/revenue/
  */
 const getRevenue = asyncHandler(async (req, res, next) => {
-  // const { _id: userId } = req.user;
-  // const { date } = req.body;
-  // console.log("req.user >> userId :: ", userId);
-  // Sort revenue transactions from latest to oldest
-  const revenue = await Revenue.find({}).sort({ createdAt: -1 });
+  const organizationId = req.user?.organization;
+  if (!organizationId) {
+    throw new AppError("Unable to determine organization context", 400);
+  }
+
+  const revenue = await Revenue.find({ organization: organizationId }).sort({
+    createdAt: -1,
+  });
   res.status(200).json(revenue);
-  // console.log(revenue);
 });
 
 /**
@@ -49,12 +53,24 @@ const getRevenue = asyncHandler(async (req, res, next) => {
  */
 const updateRevenue = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({ error: "Invalid Mongoose ObjectId" });
+  const organizationId = req.user?.organization;
+  if (!organizationId) {
+    throw new AppError("Unable to determine organization context", 400);
   }
-  const updatedRevenue = await Revenue.findByIdAndUpdate(id, req.body, {
-    new: true,
-  });
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new AppError("Invalid revenue identifier", 404);
+  }
+
+  const updatedRevenue = await Revenue.findOneAndUpdate(
+    { _id: id, organization: organizationId },
+    req.body,
+    { new: true }
+  );
+
+  if (!updatedRevenue) {
+    throw new AppError("Revenue not found", 404);
+  }
+
   res.status(200).json(updatedRevenue);
 });
 
@@ -64,15 +80,21 @@ const updateRevenue = asyncHandler(async (req, res, next) => {
  */
 const deleteRevenue = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
+  const organizationId = req.user?.organization;
+  if (!organizationId) {
+    throw new AppError("Unable to determine organization context", 400);
+  }
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({ error: "Invalid Mongoose ObjectId" });
+    throw new AppError("Invalid revenue identifier", 404);
   }
 
-  const deletedRevenue = await Revenue.findByIdAndDelete(id);
+  const deletedRevenue = await Revenue.findOneAndDelete({
+    _id: id,
+    organization: organizationId,
+  });
 
-  // Respond with 204 (No Content) if deletedRevenue is null (not found)
   if (!deletedRevenue) {
-    return res.status(204).json();
+    throw new AppError("Revenue not found", 404);
   }
 
   res.status(200).json(deletedRevenue);
@@ -83,11 +105,13 @@ const deleteRevenue = asyncHandler(async (req, res, next) => {
  *  @route   GET /api/revenue/sum
  */
 const getRevenueSum = asyncHandler(async (req, res, next) => {
-  // const { _id: userId } = req.user;
+  const organizationId = req.user?.organization;
+  if (!organizationId) {
+    throw new AppError("Unable to determine organization context", 400);
+  }
+
   const totalRevenue = await Revenue.aggregate([
-    // {
-    //   $match: { userId },
-    // },
+    { $match: { organization: organizationId } },
     {
       $group: {
         _id: null,
@@ -96,7 +120,6 @@ const getRevenueSum = asyncHandler(async (req, res, next) => {
     },
   ]);
 
-  // If there are no revenue transactions, return 0 as total revenue
   const sum = totalRevenue.length > 0 ? totalRevenue[0].total : 0;
 
   res.status(200).json({ totalRevenue: sum });

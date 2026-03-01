@@ -33,8 +33,9 @@ import { ListFilter, Check, ServerOff } from "lucide-react";
 import { useAppSelector } from "@/hooks/storeHooks";
 import TransactionTableRow from "./TransactionsTableRow";
 import DateRangePicker from "./DateRangePicker";
-import { addDays, subMonths, subYears } from "date-fns";
+import { subMonths } from "date-fns";
 
+// Ensures the dropdown behaves like a radio group by activating only one option.
 const reducer = (state, action) => {
   switch (action.type) {
     case "SELECT":
@@ -44,7 +45,7 @@ const reducer = (state, action) => {
           : { ...option, selected: false },
       );
     default:
-      state;
+      return state;
   }
 };
 
@@ -73,7 +74,7 @@ export default function RecentTransactions() {
 
   //? MAIN SIDE-EFFECT
   useEffect(() => {
-    // 'selectedFilter' (all, revenue, expenses) is the selected filter option.
+    // Determine which transaction set to render (all, expenses only, revenue only).
     const selectedFilter = filterOptions.find(
       (option) => option.selected,
     ).label;
@@ -89,7 +90,7 @@ export default function RecentTransactions() {
         mergedTransactions = [...allRevenue];
       }
 
-      //? Sort transactions by createdAt in descending order
+      //? Sort transactions by createdAt in descending order so the table always shows newest first
       mergedTransactions.sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
@@ -120,7 +121,7 @@ export default function RecentTransactions() {
       //   return true;
       // });
 
-      //? Filter based on Search Query
+      //? Filter based on Search Query across description/customer/category fields
       let transactions = mergedTransactions.filter((transaction) => {
         const searchedDescription = transaction.description
           ?.toLowerCase()
@@ -136,7 +137,7 @@ export default function RecentTransactions() {
         return searchedTransactions;
       });
 
-      //? Filter based on date range selection
+      //? Filter based on date range selection provided by the picker
       if (date?.from && date?.to) {
         transactions = transactions.filter((transaction) => {
           const transactionDate = new Date(transaction.date);
