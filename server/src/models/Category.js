@@ -22,6 +22,11 @@ const categorySchema = new Schema(
       enum: ["revenue", "expense"],
       required: true,
     },
+    organization: {
+      type: Schema.Types.ObjectId,
+      ref: "Organization",
+      required: true,
+    },
   },
   { timestamps: true }
 );

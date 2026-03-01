@@ -13,5 +13,5 @@ router
   .get(validateToken, getCategories) // GET all categories
   .post(validateToken, createCategory); // CREATE a new category
 
-router.route("/:categoryId").delete(deleteCategory); // DELETE a category
+router.route("/:categoryId").delete(validateToken, deleteCategory); // DELETE a category
 export default router;

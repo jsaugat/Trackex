@@ -1,26 +1,25 @@
 import asyncHandler from "express-async-handler";
 import Category from "../models/Category.js";
+import AppError from "../utils/appError.js";
 
 /**
  *  @desc    Get all categories or get categories by type.
  *  @route   GET /api/category
  */
 const getCategories = asyncHandler(async (req, res, next) => {
-  // const { _id: userId } = req.user;
   const { type } = req.query;
+  const organizationId = req.user?.organization;
   // console.log("CurrentUser: ", userId, "- getCategories ctrler");
   console.log("TransactionType: ", type, "- getCategories ctrler");
 
   //? Check if user is authenticated.
-  if (!req.user) {
-    const error = new Error("Unauthorized user");
-    error.statusCode = 401;
-    throw error;
+  if (!organizationId) {
+    throw new AppError("Unauthorized user", 401);
   }
 
   //? Create query with or without 'type' parameter.
   // const query = type ? { userId, type } : { userId };
-  const query = { type };
+  const query = { type, organization: organizationId };
 
   //? Find categories in order by name, based on query.
   const categories = await Category.find(query).sort({ name: "asc" });
@@ -38,13 +37,19 @@ const getCategories = asyncHandler(async (req, res, next) => {
  *  @route   POST /api/category?type=revenue
  */
 const createCategory = asyncHandler(async (req, res, next) => {
-  // const { _id: userId } = req.user;
+  const organizationId = req.user?.organization;
+  if (!organizationId) {
+    throw new AppError("Unauthorized user", 401);
+  }
   const categoryEntry = req.body.formData;
   //? If request data is an Array
   if (Array.isArray(categoryEntry)) {
     const createdCategories = await Category.insertMany(
-      categoryEntry.map(category => category)
-    )
+      categoryEntry.map((category) => ({
+        ...category,
+        organization: organizationId,
+      }))
+    );
     res.status(201).json(createdCategories);
     return;
   }
@@ -54,7 +59,11 @@ const createCategory = asyncHandler(async (req, res, next) => {
 
 
   // Check if a category with the same userId and type already exists
-  const existingCategory = await Category.findOne({ name, type });
+  const existingCategory = await Category.findOne({
+    name,
+    type,
+    organization: organizationId,
+  });
 
   if (existingCategory) {
     return res.status(400).json({
@@ -68,10 +77,10 @@ const createCategory = asyncHandler(async (req, res, next) => {
   console.log(req.body);
 
   const createdCategory = await Category.create({
-    // userId,
     name,
     icon,
     type,
+    organization: organizationId,
   });
   res.status(201).json(createdCategory);
 });
@@ -83,13 +92,19 @@ const createCategory = asyncHandler(async (req, res, next) => {
  */
 const deleteCategory = asyncHandler(async (req, res, next) => {
   const { categoryId } = req.params;
-  // const { _id: userId } = req.user;
+  const organizationId = req.user?.organization;
+  if (!organizationId) {
+    throw new AppError("Unauthorized user", 401);
+  }
 
   // Find and delete the category by ID and ensure it belongs to the authenticated user
-  const category = await Category.findOneAndDelete({ _id: categoryId });
+  const category = await Category.findOneAndDelete({
+    _id: categoryId,
+    organization: organizationId,
+  });
 
   if (!category) {
-    return res.status(404).json({ error: "Category not found." });
+    throw new AppError("Category not found.", 404);
   }
 
   res.status(200).json({ message: "Category deleted successfully." });
