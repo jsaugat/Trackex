@@ -45,7 +45,7 @@ export function Nav({ links, isCollapsed, className }) {
                         }),
                         "h-10 w-10",
                         isActive &&
-                        "dark:bg-muted dark:text-foreground dark:hover:bg-muted dark:hover:text-white"
+                          "dark:bg-muted dark:text-foreground dark:hover:bg-muted dark:hover:text-white",
                       )}
                     >
                       <link.icon className="h-4 w-4" />
@@ -65,8 +65,8 @@ export function Nav({ links, isCollapsed, className }) {
                     variant: isActive ? "default" : "ghost",
                   }),
                   isActive &&
-                  "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white border dark:border-muted",
-                  "flex justify-start gap-4 w-44"
+                    "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white border dark:border-muted",
+                  "flex justify-start gap-4 w-44",
                 )}
               >
                 <link.icon className="h-4 w-4" />
@@ -75,7 +75,7 @@ export function Nav({ links, isCollapsed, className }) {
             );
           })}
         </nav>
-        <ModeToggle isCollapsed={isCollapsed} className={navPadding} />
+        {/* <ModeToggle isCollapsed={isCollapsed} className={navPadding} /> */}
       </main>
     </TooltipProvider>
   );

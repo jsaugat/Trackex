@@ -5,6 +5,7 @@ import {
   ChevronsRight,
   ChevronsLeft,
   Users,
+  CircleGauge,
 } from "lucide-react";
 import { useWindowWidth } from "@react-hook/window-size";
 import { Nav } from "./Nav";
@@ -25,7 +26,7 @@ export default function Sidebar() {
     {
       title: "Dashboard",
       href: `/${orgSlug}/dashboard`,
-      icon: Activity,
+      icon: CircleGauge,
     },
     {
       title: "Transactions",

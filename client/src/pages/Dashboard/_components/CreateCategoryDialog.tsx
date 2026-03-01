@@ -31,6 +31,7 @@ import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
 import { toast } from "sonner";
 import { useCreateCategoryMutation } from "@/slices/api/categories.api";
+import { useTheme } from "@/components/theme-provider";
 
 export default function NewCategoryDialog({ type, successCallback }) {
   const [createCategory, { data, error, isLoading, isSuccess, isError }] =
@@ -38,7 +39,6 @@ export default function NewCategoryDialog({ type, successCallback }) {
   const [open, setOpen] = useState(false);
   const form = useForm();
   const { theme } = useTheme();
-  const dispatch = useDispatch();
 
   useEffect(() => {
     console.log("type :", type);
