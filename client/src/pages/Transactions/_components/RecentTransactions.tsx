@@ -30,9 +30,9 @@ import {
 import SearchBar from "@/components/SearchBar";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { ListFilter, Check, ServerOff } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "@/hooks/storeHooks";
 import TransactionTableRow from "./TransactionsTableRow";
-import DateRangePicker from "./DateRangePicker"
+import DateRangePicker from "./DateRangePicker";
 import { addDays, subMonths, subYears } from "date-fns";
 
 const reducer = (state, action) => {
@@ -41,7 +41,7 @@ const reducer = (state, action) => {
       return state.map((option) =>
         option.id === action.id
           ? { ...option, selected: true }
-          : { ...option, selected: false }
+          : { ...option, selected: false },
       );
     default:
       state;
@@ -63,8 +63,8 @@ export default function RecentTransactions() {
     { id: 2, label: "Expenses", selected: false },
     { id: 3, label: "Revenue", selected: false },
   ]);
-  const allExpenses = useSelector((state) => state.expenses.data || []);
-  const allRevenue = useSelector((state) => state.revenue.data || []);
+  const allExpenses = useAppSelector((state) => state.expenses.data || []);
+  const allRevenue = useAppSelector((state) => state.revenue.data || []);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [selectedTab, setSelectedTab] = useState("week");
 
@@ -75,7 +75,7 @@ export default function RecentTransactions() {
   useEffect(() => {
     // 'selectedFilter' (all, revenue, expenses) is the selected filter option.
     const selectedFilter = filterOptions.find(
-      (option) => option.selected
+      (option) => option.selected,
     ).label;
 
     // Logic to merge expenses and revenue according to the selected filter..
@@ -91,7 +91,7 @@ export default function RecentTransactions() {
 
       //? Sort transactions by createdAt in descending order
       mergedTransactions.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
       );
 
       // Filter transactions based on selected tab [ week | month | year ].
@@ -120,20 +120,27 @@ export default function RecentTransactions() {
       // });
 
       //? Filter based on Search Query
-      let transactions = mergedTransactions.filter(transaction => {
-        const searchedDescription = transaction.description?.toLowerCase().includes(searchQuery.toLowerCase());
-        const searchedCustomer = transaction.customer?.toLowerCase().includes(searchQuery.toLowerCase());
-        const searchedCategory = transaction.category?.toLowerCase().includes(searchQuery.toLowerCase());
-        const searchedTransactions = searchedDescription || searchedCustomer || searchedCategory;
+      let transactions = mergedTransactions.filter((transaction) => {
+        const searchedDescription = transaction.description
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        const searchedCustomer = transaction.customer
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        const searchedCategory = transaction.category
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        const searchedTransactions =
+          searchedDescription || searchedCustomer || searchedCategory;
         return searchedTransactions;
-      })
+      });
 
       //? Filter based on date range selection
       if (date?.from && date?.to) {
-        transactions = transactions.filter(transaction => {
+        transactions = transactions.filter((transaction) => {
           const transactionDate = new Date(transaction.date);
           return transactionDate >= date.from && transactionDate <= date.to;
-        })
+        });
       }
 
       setFilteredTransactions(transactions);
@@ -155,10 +162,9 @@ export default function RecentTransactions() {
     searchInputRef.current && searchInputRef.current.focus();
   }, []);
 
-
   return (
     <Tabs
-      defaultValue="week"
+      value={selectedTab}
       onValueChange={setSelectedTab}
       className="flex-1 h-full flex flex-col"
     >
@@ -177,14 +183,23 @@ export default function RecentTransactions() {
             handleSearchInputChange={handleSearchInputChange}
             placeholder="Search transactions"
             searchInputRef={searchInputRef}
+            className={undefined}
           />
           <section className="flex items-center gap-2">
             {/* Date picker */}
-            <DateRangePicker className="text-sm" date={date} setDate={setDate} />
+            <DateRangePicker
+              className="text-sm"
+              date={date}
+              setDate={setDate}
+            />
             {/* Filter transaction types */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="" className="p-3 gap-2 text-sm rounded-full">
+                <Button
+                  variant="outline"
+                  size=""
+                  className="p-3 gap-2 text-sm rounded-full"
+                >
                   <ListFilter className="size-4" />
                   <span className="sr-only sm:not-sr-only">Filter</span>
                 </Button>
