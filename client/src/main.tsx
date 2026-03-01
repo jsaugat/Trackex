@@ -25,6 +25,7 @@ import {
   ResetPassword,
   NotAuthorized,
 } from "@/pages";
+import ErrorFallback from "@/components/ErrorFallback";
 
 import AuthGuard from "@/routes/AuthGuard";
 import TimeAgo from "javascript-time-ago";
@@ -44,7 +45,7 @@ TimeAgo.addDefaultLocale(en);
 TimeAgo.addLocale(ru);
 
 const routes = createRoutesFromElements(
-  <Route errorElement={<div>Something went wrong</div>}>
+  <Route errorElement={<ErrorFallback />}>
     {/* Root Redirect to Dashboard if logged in */}
     <Route path="/" element={<RootRedirect />} />
 
