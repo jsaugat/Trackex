@@ -1,34 +1,37 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { cn } from "@/lib/utils";
 
-function NoRecords({ icon: Icon, missingThing, message, className }) {
-  return (
-    <main
-      className={cn(
-        "relative top-10 w-fit p-4 mx-auto text-sm text-center text-muted-foreground bg-muted/40 border rounded-xl gap-3",
-        "flex flex-col items-center",
-        className
-      )}
-    >
-      <Icon
-        strokeWidth={"1.3px"}
-        className="size-20 text-[hsl(0,0,70%)] dark:text-[hsl(0,0,30%)]"
-      />
-      <div className="gap-1 flex items-start">
-        No recorded {missingThing} <br /> currently.
-      </div>
-    </main>
-  );
+interface NoRecordsProps {
+  icon: React.ElementType;
+  missingThing: string;
+  message?: string;
+  className?: string;
 }
 
-NoRecords.propTypes = {
-  icon: PropTypes.elementType.isRequired,
-  missingThing: PropTypes.string.isRequired,
-};
-
-NoRecords.defaultProps = {
-  missingThing: "items",
-};
+function NoRecords({
+  icon: Icon,
+  missingThing,
+  message,
+  className,
+}: NoRecordsProps) {
+  return (
+    <div
+      className={cn(
+        "flex flex-col items-center p-6 mx-auto text-sm text-center text-muted-foreground bg-muted/5 border border-dashed rounded-2xl gap-3 w-full h-fit min-h-[120px] mt-4",
+        className,
+      )}
+    >
+      <div className="p-3 rounded-full bg-muted/10">
+        <Icon strokeWidth={1.5} className="size-8 text-muted-foreground/60" />
+      </div>
+      <div className="flex flex-col gap-1">
+        <p className="font-medium text-foreground">No {missingThing} found</p>
+        <p className="text-xs text-muted-foreground max-w-[200px]">
+          {message || `There are no recorded ${missingThing} at the moment.`}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export default NoRecords;
