@@ -91,7 +91,8 @@ export default function RecentTransactions() {
 
       //? Sort transactions by createdAt in descending order
       mergedTransactions.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
 
       // Filter transactions based on selected tab [ week | month | year ].
@@ -197,7 +198,6 @@ export default function RecentTransactions() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  size=""
                   className="p-3 gap-2 text-sm rounded-full"
                 >
                   <ListFilter className="size-4" />
@@ -238,8 +238,8 @@ export default function RecentTransactions() {
                   <span>No recorded transactions currently.</span>
                 </section>
               ) : (
-                <Table className="">
-                  <TableHeader className="">
+                <Table>
+                  <TableHeader>
                     <TableRow>
                       <TableHead className="hidden sm:table-cell">
                         Type
@@ -247,13 +247,13 @@ export default function RecentTransactions() {
                       <TableHead className="hidden md:table-cell">
                         Date
                       </TableHead>
-                      <TableHead className="">Description</TableHead>
+                      <TableHead>Description</TableHead>
                       <TableHead>Entity / Customer</TableHead>
-                      <TableHead className="">Amount (NPR)</TableHead>
+                      <TableHead>Amount (NPR)</TableHead>
                       <TableHead className="text-right"></TableHead>
                     </TableRow>
                   </TableHeader>
-                  <TableBody className="">
+                  <TableBody>
                     {/* //HOW TO DYNAMICALLY FILTER THE filteredTransactions
                       array for either last week, last month or last year based
                       on the TabsContent value  */}
