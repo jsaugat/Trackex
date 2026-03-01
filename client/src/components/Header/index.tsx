@@ -84,6 +84,9 @@ export default function Header() {
     }
   };
 
+  const isDashboard =
+    location.pathname === ROUTES.DASHBOARD(user?.organization?.slug);
+
   return (
     <header className="mb-5 flex items-center justify-between">
       {/* Page Title */}
@@ -91,33 +94,20 @@ export default function Header() {
         <PageTitle title={getTitle()} className="hidden md:block" />
       </section> */}
 
-        {/* Breadcrumb Navigation */}
+      {/* Breadcrumb Navigation */}
+      {!isDashboard ? (
         <Breadcrumb>
           <BreadcrumbList>
-            {user?.organization?.name && (
-              <BreadcrumbItem>
-                <BreadcrumbLink
-                  className="cursor-pointer hidden sm:flex p-1 px-1 pr-2.5 text-foreground text-sm bg-muted/40 rounded-full shadow-lg shadow-indigo-200 dark:shadow-none items-center gap-2 border border-transparent hover:border-border transition-all duration-300"
-                  onClick={() =>
-                    navigate(
-                      ROUTES.DASHBOARD(user.organization?.slug ?? "")
-                    )
-                  }
-                >
-                  <div className="size-7 rounded-full bg-muted text-sm font-semibold flex items-center justify-center text-stone-600 dark:text-stone-300">
-                    {user.organization.name
-                      .split(" ")
-                      .map((w: string) => w[0])
-                      .join("")
-                      .slice(0, 2)
-                      .toUpperCase()}
-                  </div>
-                  <span className="font-medium text-lg">
-                    {user.organization.name}
-                  </span>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            )}
+            <BreadcrumbItem>
+              <BreadcrumbLink
+                className="cursor-pointer"
+                onClick={() =>
+                  navigate(ROUTES.DASHBOARD(user?.organization?.slug ?? ""))
+                }
+              >
+                Dashboard
+              </BreadcrumbLink>
+            </BreadcrumbItem>
             {getTitle() && (
               <>
                 <BreadcrumbSeparator className="hidden sm:block" />
@@ -128,10 +118,12 @@ export default function Header() {
             )}
           </BreadcrumbList>
         </Breadcrumb>
+      ) : (
+        <div></div>
+      )}
 
       {/* Right section: Time + Organization + Profile Dropdown */}
       <section className="flex items-center gap-3">
-
         {/* Profile Dropdown */}
         <ProfileDropdown
           handleLogout={handleLogout}

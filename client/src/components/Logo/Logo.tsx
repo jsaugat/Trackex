@@ -4,9 +4,12 @@ import Icon from "./Icon";
 import { useTheme } from "@/components/theme-provider";
 import { Link } from "react-router-dom";
 import { cn } from "@/utils/cn";
+import { useAppSelector } from "@/hooks/storeHooks";
 
 export default function Logo({ isCollapsed, textClasses }) {
   const { theme } = useTheme();
+  const user = useAppSelector((state) => state.auth?.userInfo);
+
   return (
     <Link to="/">
       <div className="flex items-center justify-center gap-2 cursor-pointer">
@@ -18,10 +21,10 @@ export default function Logo({ isCollapsed, textClasses }) {
           <h2
             className={cn(
               "text-xl font-bold text-transparent bg-clip-text bg-black dark:bg-white",
-              textClasses
+              textClasses,
             )}
           >
-            TRACKEX
+            {user?.organization?.name || "Trackex"}
           </h2>
         )}
       </div>
