@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 import CardContainer from '@/components/Card/Container';
 import OverviewChart from '@/components/Charts/OverviewChart';
-import NoRecords from '@/components/NoRecords';
 import { Button } from '@/components/ui/button';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { BarChart3, LineChart, RouteOff } from "lucide-react";
+import { BarChart3, LineChart } from "lucide-react";
 import { Separator } from '@/components/ui/separator';
 import MyTooltip from '@/components/MyTooltip';
 import { cn } from '@/lib/utils';
@@ -74,11 +73,7 @@ export default function Overview({ salesData, expensesData }) {
           />
         </section>
       </section>
-      {salesData.length === 0 && expensesData.length === 0 ? (
-        <NoRecords missingThing="transactions" icon={RouteOff} />
-      ) : (
-        <OverviewChart daysCount={daysCount} chartType={chartType} />
-      )}
+      <OverviewChart daysCount={daysCount} chartType={chartType} />
       {/* <SimpleBarChart /> */}
     </CardContainer>
   )

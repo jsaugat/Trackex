@@ -83,43 +83,60 @@ export default function OverviewChart({ chartType, daysCount }) {
   const expensesData = useSelector((state) => state.expenses.data);
 
   let transformedData = [];
+  const daysCountNumber = parseInt(daysCount, 10);
 
   if (expensesData && revenueData) {
     const combinedData = {};
+    const today = new Date();
+
+    // Pre-seed last N days so the chart can render zero values when no data exists.
+    for (let i = daysCountNumber - 1; i >= 0; i -= 1) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      const formattedDate = formatDMY(date);
+      combinedData[formattedDate] = {
+        name: formattedDate,
+        day: date.toDateString().split(" ")[0],
+        Expense: 0,
+        Revenue: 0,
+        rawDate: date,
+      };
+    }
 
     expensesData.forEach((expense) => {
-      const date = formatDMY(expense.date);
-      if (!combinedData[date]) {
-        combinedData[date] = {
-          name: date,
-          day: new Date(date).toDateString().split(" ")[0],
+      const formattedDate = formatDMY(expense.date);
+      if (!combinedData[formattedDate]) {
+        const rawDate = new Date(expense.date);
+        combinedData[formattedDate] = {
+          name: formattedDate,
+          day: rawDate.toDateString().split(" ")[0],
           Expense: expense.amount,
           Revenue: 0,
+          rawDate,
         };
       } else {
-        combinedData[date].Expense += expense.amount;
+        combinedData[formattedDate].Expense += expense.amount;
       }
     });
 
     revenueData.forEach((revenue) => {
-      const date = formatDMY(revenue.date);
-      if (!combinedData[date]) {
-        combinedData[date] = {
-          name: date,
-          day: new Date(date).toDateString().split(" ")[0],
+      const formattedDate = formatDMY(revenue.date);
+      if (!combinedData[formattedDate]) {
+        const rawDate = new Date(revenue.date);
+        combinedData[formattedDate] = {
+          name: formattedDate,
+          day: rawDate.toDateString().split(" ")[0],
           Expense: 0,
           Revenue: revenue.amount,
+          rawDate,
         };
       } else {
-        combinedData[date].Revenue += revenue.amount;
+        combinedData[formattedDate].Revenue += revenue.amount;
       }
     });
 
     transformedData = Object.values(combinedData);
-    transformedData.sort((a, b) => new Date(a.name) - new Date(b.name));
-
-    const daysCountNumber = parseInt(daysCount);
-    transformedData = transformedData.slice(-daysCountNumber);
+    transformedData.sort((a, b) => new Date(a.rawDate) - new Date(b.rawDate));
 
     console.log("COMBINED_DATA for lineChart --> ", combinedData);
     console.log("TRANSFORMED_DATA for lineChart --> ", transformedData);
