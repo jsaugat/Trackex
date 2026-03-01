@@ -12,10 +12,21 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useTheme } from "@/components/theme-provider";
-import { useSelector } from "react-redux";
-import { formatDMY, formatNumberWithSuffix } from "@/utils/helpers";
+import { formatNumberWithSuffix } from "@/utils/helpers";
 import { Calendar } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { DateRange } from "react-day-picker";
+import {
+  AggregatedPoint,
+  useOverviewChartData,
+} from "@/hooks/useOverviewChartData";
+
+type ChartType = "line" | "bar";
+
+type OverviewChartProps = {
+  chartType: ChartType;
+  dateRange?: DateRange;
+};
 
 const InfoItem = ({ label, value, pillColor }) => (
   <section className="flex justify-between items-center">
@@ -29,32 +40,26 @@ const InfoItem = ({ label, value, pillColor }) => (
   </section>
 );
 
-// TOOLTIP
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
-    const revenue = payload[0].payload.Revenue;
-    const expense = payload[0].payload.Expense;
-    const date = payload[0].payload.name;
-    const profitOrLoss = revenue - expense >= 0 ? "Profit" : "Loss";
-    const isProfit = profitOrLoss === "Profit";
+    const row = payload[0].payload as AggregatedPoint;
+    const net = row.revenue - row.expenses;
 
     const infoItems = [
       {
         label: "Revenue",
-        value: formatNumberWithSuffix(revenue),
+        value: formatNumberWithSuffix(row.revenue),
         pillColor: "bg-blue-500",
       },
       {
-        label: "Expense",
-        value: formatNumberWithSuffix(expense),
+        label: "Expenses",
+        value: formatNumberWithSuffix(row.expenses),
         pillColor: "bg-rose-500",
       },
       {
-        label: profitOrLoss,
-        value: `${isProfit ? "+" : "-"}${formatNumberWithSuffix(
-          Math.abs(revenue - expense)
-        )}`,
-        pillColor: isProfit ? "bg-green-500" : "bg-red-500",
+        label: "Net",
+        value: `${net >= 0 ? "+" : "-"}${formatNumberWithSuffix(Math.abs(net))}`,
+        pillColor: net >= 0 ? "bg-green-500" : "bg-red-500",
       },
     ];
 
@@ -67,7 +72,7 @@ const CustomTooltip = ({ active, payload, label }) => {
         </section>
         <Separator />
         <section className="mx-auto text-sm text-muted-foreground flex items-center gap-1">
-          <Calendar className="size-3.5" /> {date}
+          <Calendar className="size-3.5" /> {row.period}
         </section>
       </main>
     );
@@ -75,74 +80,15 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-// THE LINE CHART
-export default function OverviewChart({ chartType, daysCount }) {
+export default function OverviewChart({
+  chartType,
+  dateRange,
+}: OverviewChartProps) {
   const { theme } = useTheme();
   const isLightMode = theme === "light";
-  const revenueData = useSelector((state) => state.revenue.data);
-  const expensesData = useSelector((state) => state.expenses.data);
+  const transformedData = useOverviewChartData(dateRange);
 
-  let transformedData = [];
-  const daysCountNumber = parseInt(daysCount, 10);
-
-  if (expensesData && revenueData) {
-    const combinedData = {};
-    const today = new Date();
-
-    // Pre-seed last N days so the chart can render zero values when no data exists.
-    for (let i = daysCountNumber - 1; i >= 0; i -= 1) {
-      const date = new Date(today);
-      date.setDate(today.getDate() - i);
-      const formattedDate = formatDMY(date);
-      combinedData[formattedDate] = {
-        name: formattedDate,
-        day: date.toDateString().split(" ")[0],
-        Expense: 0,
-        Revenue: 0,
-        rawDate: date,
-      };
-    }
-
-    expensesData.forEach((expense) => {
-      const formattedDate = formatDMY(expense.date);
-      if (!combinedData[formattedDate]) {
-        const rawDate = new Date(expense.date);
-        combinedData[formattedDate] = {
-          name: formattedDate,
-          day: rawDate.toDateString().split(" ")[0],
-          Expense: expense.amount,
-          Revenue: 0,
-          rawDate,
-        };
-      } else {
-        combinedData[formattedDate].Expense += expense.amount;
-      }
-    });
-
-    revenueData.forEach((revenue) => {
-      const formattedDate = formatDMY(revenue.date);
-      if (!combinedData[formattedDate]) {
-        const rawDate = new Date(revenue.date);
-        combinedData[formattedDate] = {
-          name: formattedDate,
-          day: rawDate.toDateString().split(" ")[0],
-          Expense: 0,
-          Revenue: revenue.amount,
-          rawDate,
-        };
-      } else {
-        combinedData[formattedDate].Revenue += revenue.amount;
-      }
-    });
-
-    transformedData = Object.values(combinedData);
-    transformedData.sort((a, b) => new Date(a.rawDate) - new Date(b.rawDate));
-
-    console.log("COMBINED_DATA for lineChart --> ", combinedData);
-    console.log("TRANSFORMED_DATA for lineChart --> ", transformedData);
-  }
-
-  //? Dynamic chart components
+  // Keep render logic simple: only switch chart primitives by mode.
   const ChartComponent = chartType === "bar" ? BarChart : LineChart;
   const DataComponent = chartType === "bar" ? Bar : Line;
 
@@ -154,24 +100,29 @@ export default function OverviewChart({ chartType, daysCount }) {
         data={transformedData}
         margin={{ top: 5, right: 35, left: 20, bottom: 0 }}
       >
-        <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255, 0.1)" }} />
+        <Tooltip
+          content={<CustomTooltip />}
+          cursor={{ fill: "rgba(255,255,255, 0.1)" }}
+        />
         <DataComponent
           type="monotone"
-          dataKey="Revenue"
+          dataKey="revenue"
+          name="Revenue"
           stroke="#6366f1"
           fill="#6366f1"
           strokeWidth="2px"
           activeDot={{
-            r: 8, // dot size - radius
-            style: { fill: "#6366f1", stroke: "#6366f1", opacity: 0.65 }, // line chart hover dot
+            r: 8,
+            style: { fill: "#6366f1", stroke: "#6366f1", opacity: 0.65 },
           }}
         />
         <DataComponent
           type="monotone"
-          dataKey="Expense"
+          dataKey="expenses"
+          name="Expenses"
           stroke={isLightMode ? "#383838" : "darkGray"}
           fill={isLightMode ? "#383838" : "darkGray"}
-          style={{ opacity: 0.55 }} // expense line color
+          style={{ opacity: 0.55 }}
           strokeWidth="2px"
           activeDot={{
             r: 6,
@@ -180,10 +131,12 @@ export default function OverviewChart({ chartType, daysCount }) {
         />
         <CartesianGrid strokeDasharray="4 4" stroke="transparent" />
         <XAxis
-          dataKey="day"
+          dataKey="period"
           className="text-sm font-medium mt-10"
           tickLine={false}
           axisLine={true}
+          interval="preserveStartEnd"
+          minTickGap={20}
         />
         <YAxis
           className="text-sm font-medium"
