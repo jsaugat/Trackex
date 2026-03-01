@@ -1,12 +1,12 @@
-import React, { useState } from 'react'
-import CardContainer from '@/components/Card/Container';
-import OverviewChart from '@/components/Charts/OverviewChart';
-import { Button } from '@/components/ui/button';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import React, { useState } from "react";
+import CardContainer from "@/components/Card/Container";
+import OverviewChart from "@/components/Charts/OverviewChart";
+import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { BarChart3, LineChart } from "lucide-react";
-import { Separator } from '@/components/ui/separator';
-import MyTooltip from '@/components/MyTooltip';
-import { cn } from '@/lib/utils';
+import { Separator } from "@/components/ui/separator";
+import MyTooltip from "@/components/MyTooltip";
+import { cn } from "@/lib/utils";
 
 export default function Overview({ salesData, expensesData }) {
   //? Toggle last days count in line chart
@@ -21,28 +21,33 @@ export default function Overview({ salesData, expensesData }) {
     } else {
       setChartType("line");
     }
-  }
-
+  };
 
   return (
     <CardContainer className="p-7">
       <section className="text-xl w-full flex items-center justify-between">
         <h3>
-          Overview{" "}
-          <span className="text-sm text-muted-foreground">
-          </span>
+          Overview <span className="text-sm text-muted-foreground"></span>
         </h3>
         <section className="text-sm flex items-center gap-3">
           {/* //? Last 7 days, 14 days, 30 days */}
-          <ToggleGroup type="single" variant="outline" size="sm" value={daysCount} className="p-1 border rounded-full"
+          <ToggleGroup
+            type="single"
+            variant="outline"
+            size="sm"
+            value={daysCount}
+            className="p-1 border rounded-full"
             onValueChange={(value) => {
               if (value) setDaysCount(value);
-            }}>
-            {daysCountOptions.map(count => (
+            }}
+          >
+            {daysCountOptions.map((count) => (
               <ToggleGroupItem
                 key={count}
                 value={count.toString()}
-                className={cn("h-[1.65rem] border-none rounded-full text-muted-foreground hover:bg-transparent")}
+                className={cn(
+                  "h-[1.65rem] border-none rounded-full text-muted-foreground hover:bg-transparent",
+                )}
               >
                 {count} days
               </ToggleGroupItem>
@@ -55,26 +60,29 @@ export default function Overview({ salesData, expensesData }) {
           {/* //? Chart Toggle */}
           <MyTooltip
             trigger={
-
               <Button
                 variant="outline"
                 size="icon"
                 onClick={chartToggleHandler}
                 className="rounded-full p-0.5"
               >
-                {chartType === "line" ?
+                {chartType === "line" ? (
                   <BarChart3 className="size-4" />
-                  :
+                ) : (
                   <LineChart className="size-4" />
-                }
+                )}
               </Button>
             }
-            content={chartType === "line" ? "Bar Chart" : chartType === "bar" && "Line chart"}
+            content={
+              chartType === "line"
+                ? "Bar Chart"
+                : chartType === "bar" && "Line chart"
+            }
           />
         </section>
       </section>
       <OverviewChart daysCount={daysCount} chartType={chartType} />
       {/* <SimpleBarChart /> */}
     </CardContainer>
-  )
+  );
 }
