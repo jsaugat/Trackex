@@ -11,6 +11,21 @@ import {
   resetPasswordSchema,
   verifyLoginOtpSchema,
 } from "../schemas/auth.schema.js";
+import {
+  sendLoginOtpEmail,
+  sendPasswordChangedEmail,
+  sendPasswordResetEmail,
+  sendRegisterOtpEmail,
+} from "../services/email/authEmails.js";
+
+const sendAuthEmailSafely = async (action, label) => {
+  try {
+    await action();
+  } catch (error) {
+    // Email delivery should not block auth flows.
+    console.warn(`[AUTH_EMAIL_${label}_ERROR]`, error?.message || error);
+  }
+};
 
 const buildAuthPayload = (user, token) => {
   const org = user.organization;
@@ -49,8 +64,10 @@ const loginUser = asyncHandler(async (req, res) => {
   const otp = user.generateLoginOtpToken();
   await user.save({ validateBeforeSave: false });
 
-  // DEV NOTE: Replace this console log with email provider integration.
-  console.log(`[LOGIN_OTP] email=${user.email} otp=${otp}`);
+  await sendAuthEmailSafely(
+    () => sendLoginOtpEmail({ to: user.email, otp }),
+    "LOGIN_OTP",
+  );
 
   res.status(200).json({
     message: "OTP sent to your email.",
@@ -67,12 +84,15 @@ const loginUser = asyncHandler(async (req, res) => {
 const verifyLoginOtp = asyncHandler(async (req, res) => {
   const { email, otp } = verifyLoginOtpSchema.parse(req.body);
 
+  // Find user
   const user = await User.findOne({ email }).populate("organization");
 
+  // OTP must exist to proceed with verification
   if (!user || !user.loginOtpToken || !user.loginOtpExpires) {
     throw new AppError("OTP not found. Please login again.", 400);
   }
 
+  // Check if OTP is expired
   if (user.loginOtpExpires.getTime() <= Date.now()) {
     user.loginOtpToken = undefined;
     user.loginOtpExpires = undefined;
@@ -80,6 +100,7 @@ const verifyLoginOtp = asyncHandler(async (req, res) => {
     throw new AppError("OTP has expired. Please login again.", 400);
   }
 
+  // Hash incoming OTP and compare with stored hash
   const hashedOtp = crypto.createHash("sha256").update(otp).digest("hex");
   if (hashedOtp !== user.loginOtpToken) {
     throw new AppError("Invalid OTP.", 400);
@@ -89,6 +110,7 @@ const verifyLoginOtp = asyncHandler(async (req, res) => {
   user.loginOtpExpires = undefined;
   await user.save({ validateBeforeSave: false });
 
+  // Successful OTP verification; issue JWT token for authenticated sessions.
   const token = generateToken(res, user._id);
 
   res.status(200).json(buildAuthPayload(user, token));
@@ -125,8 +147,10 @@ const registerUser = asyncHandler(async (req, res) => {
   const otp = user.generateLoginOtpToken();
   await user.save({ validateBeforeSave: false });
 
-  // DEV NOTE: Replace this console log with email provider integration.
-  console.log(`[REGISTER_OTP] email=${user.email} otp=${otp}`);
+  await sendAuthEmailSafely(
+    () => sendRegisterOtpEmail({ to: user.email, otp }),
+    "REGISTER_OTP",
+  );
 
   res.status(201).json({
     message: "OTP sent to your email.",
@@ -221,8 +245,10 @@ const forgotPassword = asyncHandler(async (req, res) => {
       "http://localhost:5173";
     const resetUrl = `${clientUrl}/reset-password/${token}`;
 
-    // DEV NOTE: replace this log with real email delivery in production.
-    console.log("[PASSWORD_RESET_URL]", resetUrl);
+    await sendAuthEmailSafely(
+      () => sendPasswordResetEmail({ to: user.email, resetUrl }),
+      "PASSWORD_RESET",
+    );
   }
 
   // Always return the same response to prevent account-enumeration attacks.
@@ -259,6 +285,10 @@ const resetPassword = asyncHandler(async (req, res) => {
   user.resetPasswordToken = undefined;
   user.resetPasswordExpires = undefined;
   await user.save();
+  await sendAuthEmailSafely(
+    () => sendPasswordChangedEmail({ to: user.email }),
+    "PASSWORD_CHANGED",
+  );
 
   res.status(200).json({ message: "Password has been reset successfully." });
 });
