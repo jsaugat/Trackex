@@ -34,6 +34,7 @@ import { useAppSelector } from "@/hooks/storeHooks";
 import TransactionTableRow from "./TransactionsTableRow";
 import DateRangePicker from "./DateRangePicker";
 import { subMonths } from "date-fns";
+import NoRecords from "@/components/NoRecords";
 
 // Ensures the dropdown behaves like a radio group by activating only one option.
 const reducer = (state, action) => {
@@ -234,10 +235,7 @@ export default function RecentTransactions() {
           <CardContent className="h-[64.11dvh]">
             <ScrollArea className="h-full overflow-scroll overflow-x-hidden">
               {allRevenue.length === 0 && allExpenses.length === 0 ? (
-                <section className="mx-auto mt-2 w-full p-5 text-muted-foreground bg-muted/50 border rounded-md flex items-center justify-center gap-4">
-                  <ServerOff strokeWidth="1px" className="size-7" />
-                  <span>No recorded transactions currently.</span>
-                </section>
+                <NoRecords icon={ServerOff} missingThing="transactions" />
               ) : (
                 <Table>
                   <TableHeader>

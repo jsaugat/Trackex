@@ -35,6 +35,7 @@ import SearchBar from "@/components/SearchBar";
 import { GenerateInviteLink } from "@/components/invitation/generate-invite-link";
 import { LoadingState } from "@/components/ui/loading-state";
 import { EmptyState } from "@/components/ui/empty-state";
+import NoRecords from "@/components/NoRecords";
 
 export default function Users() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -102,8 +103,9 @@ export default function Users() {
             Error: {error.message}
           </div>
         ) : !usersToDisplay.length ? (
-          <EmptyState
-            message="Zero users right now"
+          <NoRecords
+            icon={ShieldX}
+            missingThing="users"
             className="col-span-full"
           />
         ) : (

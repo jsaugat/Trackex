@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import crypto from "crypto";
+import crypto, { hash } from "crypto";
+import { hashToken } from "../utils/hashToken";
 
 const roles = ["owner", "manager", "member"]; // define allowed roles
 
@@ -82,10 +83,7 @@ userSchema.methods.generatePasswordResetToken = function () {
 userSchema.methods.generateLoginOtpToken = function () {
   const rawOtp = String(crypto.randomInt(0, 1_000_000)).padStart(6, "0");
 
-  this.loginOtpToken = crypto
-    .createHash("sha256")
-    .update(rawOtp)
-    .digest("hex");
+  this.loginOtpToken = hashToken(rawOtp);
   this.loginOtpExpires = Date.now() + 10 * 60 * 1000;
 
   return rawOtp;

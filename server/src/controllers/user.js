@@ -17,6 +17,7 @@ import {
   sendPasswordResetEmail,
   sendRegisterOtpEmail,
 } from "../services/email/authEmails.js";
+import { hashToken } from "../utils/hashToken.js";
 
 const sendAuthEmailSafely = async (action, label) => {
   try {
@@ -101,13 +102,16 @@ const verifyLoginOtp = asyncHandler(async (req, res) => {
   }
 
   // Hash incoming OTP and compare with stored hash
-  const hashedOtp = crypto.createHash("sha256").update(otp).digest("hex");
+  const hashedOtp = hashToken(otp);
   if (hashedOtp !== user.loginOtpToken) {
     throw new AppError("Invalid OTP.", 400);
   }
 
+  // OTP is valid; clear OTP fields to prevent reuse.
   user.loginOtpToken = undefined;
   user.loginOtpExpires = undefined;
+
+  // Save user to persist cleared OTP fields before issuing token.
   await user.save({ validateBeforeSave: false });
 
   // Successful OTP verification; issue JWT token for authenticated sessions.

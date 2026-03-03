@@ -17,7 +17,7 @@ function NoRecords({
   return (
     <div
       className={cn(
-        "flex flex-col items-center p-6 mx-auto text-sm text-center text-muted-foreground bg-muted/5 border border-dashed rounded-2xl gap-3 w-full h-fit min-h-[120px] mt-4",
+        "flex flex-col items-center p-6 mx-auto text-sm text-center text-muted-foreground bg-muted/10 border border-dashed rounded-2xl gap-3 w-full h-fit min-h-[120px] mt-4",
         className,
       )}
     >
