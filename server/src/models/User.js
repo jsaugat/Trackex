@@ -89,4 +89,11 @@ userSchema.methods.generateLoginOtpToken = function () {
   return rawOtp;
 };
 
+// Clears the login OTP fields after successful verification or expiration.
+userSchema.methods.clearLoginOtp = async function () {
+  this.loginOtpToken = undefined;
+  this.loginOtpExpires = undefined;
+  await this.save({ validateBeforeSave: false });
+};
+
 export default mongoose.model("User", userSchema);

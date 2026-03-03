@@ -95,9 +95,8 @@ const verifyLoginOtp = asyncHandler(async (req, res) => {
 
   // Check if OTP is expired
   if (user.loginOtpExpires.getTime() <= Date.now()) {
-    user.loginOtpToken = undefined;
-    user.loginOtpExpires = undefined;
-    await user.save({ validateBeforeSave: false });
+    // Clear expired OTP fields to prevent reuse and reduce confusion for users.
+    await user.clearLoginOtp();
     throw new AppError("OTP has expired. Please login again.", 400);
   }
 
@@ -107,12 +106,8 @@ const verifyLoginOtp = asyncHandler(async (req, res) => {
     throw new AppError("Invalid OTP.", 400);
   }
 
-  // OTP is valid; clear OTP fields to prevent reuse.
-  user.loginOtpToken = undefined;
-  user.loginOtpExpires = undefined;
-
-  // Save user to persist cleared OTP fields before issuing token.
-  await user.save({ validateBeforeSave: false });
+  // OTP is valid; clear it from the user record to prevent reuse.
+  await user.clearLoginOtp();
 
   // Successful OTP verification; issue JWT token for authenticated sessions.
   const token = generateToken(res, user._id);
