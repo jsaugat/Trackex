@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import crypto, { hash } from "crypto";
-import { hashToken } from "../utils/hashToken";
+import { hashToken } from "../utils/hashToken.js";
 
 const roles = ["owner", "manager", "member"]; // define allowed roles
 

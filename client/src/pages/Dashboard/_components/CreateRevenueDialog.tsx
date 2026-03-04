@@ -70,9 +70,9 @@ export default function CreateRevenueDialog({ trigger, type }) {
 
   //! VALIDATE Amount
   const validateAmount = (value) => {
-    const maxDigits = 5; // Maximum number of digits allowed
+    const maxDigits = 7; // Maximum number of digits allowed
     const minAmount = 50; // Minimum allowed amount
-    const regex = /^\d{1,5}$/; // Regex to match up to 5 digits
+    const regex = new RegExp(`^\\d{1,${maxDigits}}$`); // Regex to match up to maxDigits digits
 
     // Check if the value is a valid number with up to maxDigits digits
     if (!regex.test(value)) {

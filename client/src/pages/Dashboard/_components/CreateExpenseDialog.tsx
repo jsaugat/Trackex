@@ -36,9 +36,8 @@ import { DateToUTCDate } from "@/utils/helpers";
 import { useCreateExpenseMutation } from "@/slices/api/expenses.api";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastAction } from "@/components/ui/toast";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { Separator } from "@/components/ui/separator";
-
 
 // export default function CreateExpenseDialog({ trigger, type }) {
 //   const [open, setOpen] = useState(false);
@@ -360,14 +359,14 @@ export default function CreateExpenseDialog({ trigger, type }) {
     (index, value) => {
       setValue(`expenses[${index}].category`, value);
     },
-    [setValue]
+    [setValue],
   );
 
   //! VALIDATE Amount
   const validateAmount = (value) => {
-    const maxDigits = 5; // Maximum number of digits allowed
+    const maxDigits = 7; // Maximum number of digits allowed
     const minAmount = 50; // Minimum allowed amount
-    const regex = /^\d{1,5}$/; // Regex to match up to 5 digits
+    const regex = new RegExp(`^\\d{1,${maxDigits}}$`); // Regex to match up to maxDigits digits
 
     // Check if the value is a valid number with up to maxDigits digits
     if (!regex.test(value)) {
@@ -388,7 +387,7 @@ export default function CreateExpenseDialog({ trigger, type }) {
 
   //! VALIDATE Quantity
   const validateQuantity = (value) => {
-    const minQuantity = 1;   // Minimum quantity
+    const minQuantity = 1; // Minimum quantity
     const maxQuantity = 100; // Maximum quantity
 
     // Convert value to an integer
@@ -413,8 +412,8 @@ export default function CreateExpenseDialog({ trigger, type }) {
     if (expenseList.length === 20) {
       toast({
         variant: "destructive",
-        title: "Maximum number of expense entries reached."
-      })
+        title: "Maximum number of expense entries reached.",
+      });
       return;
     }
     setExpenseList((prevList) => [...prevList, { id: prevList.length + 1 }]);
@@ -423,7 +422,7 @@ export default function CreateExpenseDialog({ trigger, type }) {
   //? DELETE Expense List Item
   const deleteExpenseItem = (index) => {
     if (expenseList.length === 1) {
-      setExpenseList(prevList => prevList);
+      setExpenseList((prevList) => prevList);
       return;
     }
     const updatedExpenseList = expenseList.filter((_, i) => i !== index);
@@ -431,7 +430,7 @@ export default function CreateExpenseDialog({ trigger, type }) {
     // Reset the form with the updated expense list
     reset({
       ...getValues(),
-      expenses: updatedExpenseList
+      expenses: updatedExpenseList,
     });
   };
 
@@ -461,7 +460,7 @@ export default function CreateExpenseDialog({ trigger, type }) {
       console.log("Expense transformed data to submit: ", transformedData);
       console.log(
         "Expense transformed data type: ",
-        JSON.stringify(transformedData)
+        JSON.stringify(transformedData),
       );
 
       //? Make API request
@@ -498,7 +497,15 @@ export default function CreateExpenseDialog({ trigger, type }) {
         });
       }
     },
-    [dispatch, type, currentUser, createExpense, reset, toast, deleteExpenseItem]
+    [
+      dispatch,
+      type,
+      currentUser,
+      createExpense,
+      reset,
+      toast,
+      deleteExpenseItem,
+    ],
   );
 
   return (
@@ -531,7 +538,7 @@ export default function CreateExpenseDialog({ trigger, type }) {
                         variant={"outline"}
                         className={cn(
                           "w-[164px] md:min-w-[220px] pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
+                          !field.value && "text-muted-foreground",
                         )}
                       >
                         {field.value ? (
@@ -610,7 +617,7 @@ export default function CreateExpenseDialog({ trigger, type }) {
                     Cancel
                   </Button>
                 </DialogClose>
-                <Button type="submit" >
+                <Button type="submit">
                   {!loading ? (
                     <span className="flex items-center gap-2">
                       <p>Create</p>
@@ -624,7 +631,7 @@ export default function CreateExpenseDialog({ trigger, type }) {
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog >
+    </Dialog>
   );
 }
 
@@ -639,7 +646,7 @@ const ExpenseListItem = ({
   handleCategoryChange,
   index,
   deleteExpenseItem,
-  expenseList
+  expenseList,
 }) => {
   return (
     <li className="min-w-[60rem] h-20 flex items-start gap-5">
