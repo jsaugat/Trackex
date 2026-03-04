@@ -93,7 +93,7 @@ export default function OverviewChart({
   const DataComponent = chartType === "bar" ? Bar : Line;
 
   return (
-    <ResponsiveContainer width="100%" height="80%">
+    <ResponsiveContainer width="100%" height="72%" className={"mt-4"}>
       <ChartComponent
         width={500}
         height={290}
