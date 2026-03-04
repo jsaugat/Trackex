@@ -35,6 +35,8 @@ import Users from "./pages/Admin/Users";
 import AdminGuard from "./routes/AdminGuard";
 import OrgGuard from "./routes/OrgGuard";
 import { RootRedirect } from "./routes/RootRedirect";
+import OwnerGuard from "./routes/OwnerGuard";
+import OrganizationSettings from "./pages/Organization";
 
 import { PersistGate } from "redux-persist/integration/react";
 import AuthInitializer from "./components/AuthInitializer";
@@ -61,6 +63,9 @@ const routes = createRoutesFromElements(
           {/* Admin-only routes */}
           <Route path="admin/*" element={<AdminGuard />}>
             <Route path="users" element={<Users />} />
+            <Route element={<OwnerGuard />}>
+              <Route path="organization" element={<OrganizationSettings />} />
+            </Route>
           </Route>
         </Route>
       </Route>

@@ -10,6 +10,7 @@ import categoryRoutes from "./routes/category.js";
 import adminRoutes from "./routes/admin.js";
 import topStatsRoutes from "./routes/topStats.js";
 import invitationRoutes from "./routes/invitation.js";
+import organizationRoutes from "./routes/organization.js";
 
 //? GLOBAL middleware
 app.use("/", (req, res, next) => {
@@ -33,6 +34,7 @@ app.use("/api/category", categoryRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/revenue", topStatsRoutes);
 app.use("/api/invitations", invitationRoutes);
+app.use("/api/organization", organizationRoutes);
 
 //? 404 and error handler middlewares
 app.use(notFoundHandler);

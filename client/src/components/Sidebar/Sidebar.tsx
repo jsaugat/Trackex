@@ -6,6 +6,7 @@ import {
   ChevronsLeft,
   Users,
   CircleGauge,
+  Building2,
 } from "lucide-react";
 import { useWindowWidth } from "@react-hook/window-size";
 import { Nav } from "./Nav";
@@ -41,6 +42,14 @@ export default function Sidebar() {
       title: "Team",
       href: `/${orgSlug}/admin/users`,
       icon: Users,
+    });
+  }
+
+  if (userInfo?.role === "owner") {
+    navLinks.push({
+      title: "Organization",
+      href: `/${orgSlug}/admin/organization`,
+      icon: Building2,
     });
   }
 

@@ -20,6 +20,14 @@ export const emptySplitApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Auth", "Category", "Revenue", "Expense", "User", "TopStats"],
+  tagTypes: [
+    "Auth",
+    "Category",
+    "Revenue",
+    "Expense",
+    "User",
+    "TopStats",
+    "Organization",
+  ],
   endpoints: () => ({}),
 });

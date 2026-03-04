@@ -38,7 +38,17 @@ const verifyAdmin = asyncHandler(async function (req, res, next) {
   if (req.user && (req.user.role === "owner" || req.user.role === "manager")) {
     next();
   } else {
-    handleUnauthorized(res, "Admin access required");
+    handleForbidden(res, "Admin access required");
+  }
+});
+
+//? Owner Validator Middleware
+const verifyOwner = asyncHandler(async function (req, res, next) {
+  // Assumes validateToken middleware has already set req.user
+  if (req.user && req.user.role === "owner") {
+    next();
+  } else {
+    handleForbidden(res, "Owner access required");
   }
 });
 
@@ -47,4 +57,9 @@ function handleUnauthorized(res, errorMessage) {
   throw new Error(`Unauthorized: ${errorMessage}`);
 }
 
-export { validateToken, verifyAdmin };
+function handleForbidden(res, errorMessage) {
+  res.status(403);
+  throw new Error(`Forbidden: ${errorMessage}`);
+}
+
+export { validateToken, verifyAdmin, verifyOwner };

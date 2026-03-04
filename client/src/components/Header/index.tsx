@@ -79,6 +79,8 @@ export default function Header() {
       default: {
         const slug = user?.organization?.slug;
         if (slug && pathname === `/${slug}/admin/users`) return "Team";
+        if (slug && pathname === ROUTES.ORG_SETTINGS(slug))
+          return "Organization";
         return "";
       }
     }
