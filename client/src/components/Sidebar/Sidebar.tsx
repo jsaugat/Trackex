@@ -7,6 +7,7 @@ import {
   Users,
   CircleGauge,
   Building2,
+  UsersRound,
 } from "lucide-react";
 import { useWindowWidth } from "@react-hook/window-size";
 import { Nav } from "./Nav";
@@ -23,7 +24,7 @@ export default function Sidebar() {
 
   const orgSlug = userInfo?.organization?.slug;
 
-  const navLinks = [
+  const mainLinks = [
     {
       title: "Dashboard",
       href: `/${orgSlug}/dashboard`,
@@ -36,22 +37,29 @@ export default function Sidebar() {
     },
   ];
 
-  // Only show Manage Team to admins and owners
+  const managementLinks = [];
   if (userInfo?.role === "admin" || userInfo?.role === "owner") {
-    navLinks.push({
+    managementLinks.push({
       title: "Team",
       href: `/${orgSlug}/admin/users`,
-      icon: Users,
+      icon: UsersRound,
     });
   }
 
   if (userInfo?.role === "owner") {
-    navLinks.push({
+    managementLinks.push({
       title: "Organization",
       href: `/${orgSlug}/admin/organization`,
       icon: Building2,
     });
   }
+
+  const navGroups = [
+    { title: "General", links: mainLinks },
+    ...(managementLinks.length > 0
+      ? [{ title: "Management", links: managementLinks }]
+      : []),
+  ];
 
   return (
     <aside className="hidden border-r border-white dark:border-border shadow-md shadow-indigo-200 dark:shadow-none h-screen bg-background dark:bg-muted/10 md:flex flex-col">
@@ -76,7 +84,7 @@ export default function Sidebar() {
       <Nav
         className="h-full pt-2"
         isCollapsed={isMobile ? true : isCollapsed}
-        links={navLinks}
+        navGroups={navGroups}
       />
     </aside>
   );
