@@ -69,7 +69,7 @@ const getPresetRange = (presetId: string) => {
 
 export default function Overview({ salesData, expensesData }: OverviewProps) {
   const [selectedPreset, setSelectedPreset] = useState(DEFAULT_PRESET);
-  const [dateRange, setDateRange] = useState<DateRange>({
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: addDays(new Date(), -6),
     to: new Date(),
   });
@@ -124,9 +124,9 @@ export default function Overview({ salesData, expensesData }: OverviewProps) {
   };
 
   const handleCustomRangeSelect = (selectedRange: DateRange | undefined) => {
-    // Ignore partial selections to avoid unstable intermediate chart states.
-    if (selectedRange?.from && selectedRange?.to) {
-      setDateRange(selectedRange);
+    // Keep partial selections so users can clear/reselect from/to by clicking.
+    setDateRange(selectedRange);
+    if (selectedRange?.from || selectedRange?.to) {
       setSelectedPreset("custom");
     }
   };
@@ -194,6 +194,10 @@ export default function Overview({ salesData, expensesData }: OverviewProps) {
                 <span className="truncate">
                   {format(dateRange.from, "LLL dd, y")} -{" "}
                   {format(dateRange.to, "LLL dd, y")}
+                </span>
+              ) : dateRange?.from ? (
+                <span className="truncate">
+                  {format(dateRange.from, "LLL dd, y")} - ...
                 </span>
               ) : (
                 <span className="truncate">Pick a date range</span>
