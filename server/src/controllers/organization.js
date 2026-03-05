@@ -1,7 +1,12 @@
 import asyncHandler from "express-async-handler";
+import mongoose from "mongoose";
 import AppError from "../utils/appError.js";
 import Organization from "../models/Organization.js";
 import User from "../models/User.js";
+import Category from "../models/Category.js";
+import Revenue from "../models/Revenue.js";
+import Expense from "../models/Expense.js";
+import Invite from "../models/Invite.js";
 import { updateOrganizationSchema } from "../schemas/organization.schema.js";
 
 const getMyOrganization = asyncHandler(async (req, res) => {
@@ -75,4 +80,46 @@ const updateMyOrganization = asyncHandler(async (req, res) => {
   });
 });
 
-export { getMyOrganization, updateMyOrganization };
+const deleteMyOrganization = asyncHandler(async (req, res) => {
+  const organizationId = req.user.organization;
+  const requesterId = req.user._id;
+
+  const session = await mongoose.startSession();
+
+  try {
+    await session.withTransaction(async () => {
+      const org = await Organization.findById(organizationId).session(session);
+      if (!org) {
+        throw new AppError("Organization not found.", 404);
+      }
+
+      if (org.owner.toString() !== requesterId.toString()) {
+        throw new AppError(
+          "Only the organization owner can delete this workspace.",
+          403,
+        );
+      }
+
+      await Promise.all([
+        Category.deleteMany({ organization: organizationId }).session(session),
+        Revenue.deleteMany({ organization: organizationId }).session(session),
+        Expense.deleteMany({ organization: organizationId }).session(session),
+        Invite.deleteMany({ organization: organizationId }).session(session),
+        User.deleteMany({ organization: organizationId }).session(session),
+      ]);
+
+      await Organization.deleteOne({ _id: organizationId }).session(session);
+    });
+
+    res.cookie("jwt", "", {
+      httpOnly: true,
+      expires: new Date(),
+    });
+
+    res.status(200).json({ message: "Workspace deleted successfully." });
+  } finally {
+    session.endSession();
+  }
+});
+
+export { getMyOrganization, updateMyOrganization, deleteMyOrganization };

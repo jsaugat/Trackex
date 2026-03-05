@@ -5,10 +5,11 @@ import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import {
   useGetMyOrganizationQuery,
+  useDeleteMyOrganizationMutation,
   useUpdateMyOrganizationMutation,
 } from "@/slices/api/organization.api";
 import { useUpdateUserMutation } from "@/slices/api/auth.api";
-import { setCredentials } from "@/slices/authSlice";
+import { clearCredentials, setCredentials } from "@/slices/authSlice";
 import { ROUTES } from "@/constants/routes";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { emptySplitApi } from "@/slices/api/emptySplitApi";
 
 const slugPattern = /^[a-z0-9-]+$/;
 
@@ -47,6 +49,8 @@ export default function OrganizationSettings() {
   } = useGetMyOrganizationQuery();
   const [updateOrganization, { isLoading: isUpdatingOrganization }] =
     useUpdateMyOrganizationMutation();
+  const [deleteOrganization, { isLoading: isDeletingOrganization }] =
+    useDeleteMyOrganizationMutation();
   const [updateProfile, { isLoading: isUpdatingProfile }] =
     useUpdateUserMutation();
 
@@ -118,7 +122,9 @@ export default function OrganizationSettings() {
       }
     } catch (error: any) {
       const message =
-        error?.data?.message || error?.message || "Failed to update organization.";
+        error?.data?.message ||
+        error?.message ||
+        "Failed to update organization.";
       toast.error(message);
     }
   };
@@ -150,13 +156,25 @@ export default function OrganizationSettings() {
       refetch();
     } catch (error: any) {
       const message =
-        error?.data?.message || error?.message || "Failed to update owner profile.";
+        error?.data?.message ||
+        error?.message ||
+        "Failed to update owner profile.";
       toast.error(message);
     }
   };
 
-  const handleDangerousAction = () => {
-    toast.error("Workspace deletion is not enabled yet.");
+  const handleDangerousAction = async () => {
+    try {
+      const response = await deleteOrganization().unwrap();
+      dispatch(clearCredentials());
+      dispatch(emptySplitApi.util.resetApiState());
+      toast.success(response?.message || "Workspace deleted successfully.");
+      navigate(ROUTES.LOGIN, { replace: true });
+    } catch (error: any) {
+      const message =
+        error?.data?.message || error?.message || "Failed to delete workspace.";
+      toast.error(message);
+    }
   };
 
   if (isGettingOrganization) {
@@ -171,100 +189,112 @@ export default function OrganizationSettings() {
     <main className="mx-auto w-full max-w-5xl space-y-4">
       <section className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <Card>
-        <CardHeader className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Building2 className="size-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Organization Details</CardTitle>
-          </div>
-          <CardDescription>Public-facing workspace info</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-4" onSubmit={handleOrganizationSubmit}>
-            <div className="space-y-2">
-              <Label htmlFor="orgName">Organization Name</Label>
-              <Input
-                id="orgName"
-                value={orgName}
-                onChange={(e) => setOrgName(e.target.value)}
-                placeholder="Acme Inc."
-              />
+          <CardHeader className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="border p-2 rounded-xl">
+                <Building2 className="size-5 text-muted-foreground" />
+              </div>
+              <div className="flex flex-col ">
+                <CardTitle className="text-lg">Organization Details</CardTitle>
+                <CardDescription className="text-xs">
+                  Public-facing workspace info
+                </CardDescription>
+              </div>
             </div>
+          </CardHeader>
+          <CardContent>
+            <form className="space-y-4" onSubmit={handleOrganizationSubmit}>
+              <div className="space-y-2">
+                <Label htmlFor="orgName">Organization Name</Label>
+                <Input
+                  id="orgName"
+                  value={orgName}
+                  onChange={(e) => setOrgName(e.target.value)}
+                  placeholder="Acme Inc."
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="orgSlug">Workspace URL</Label>
-              <Input
-                id="orgSlug"
-                value={orgSlug}
-                onChange={(e) => setOrgSlug(e.target.value)}
-                placeholder="acme-inc"
-              />
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="orgSlug">Workspace URL</Label>
+                <Input
+                  id="orgSlug"
+                  value={orgSlug}
+                  onChange={(e) => setOrgSlug(e.target.value)}
+                  placeholder="acme-inc"
+                />
+              </div>
 
-            <Button
-              type="submit"
-              disabled={isUpdatingOrganization}
-              className="w-full sm:w-auto"
-            >
-              {isUpdatingOrganization ? (
-                <>
-                  <Loader2 className="mr-2 size-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                "Save Organization"
-              )}
-            </Button>
-          </form>
-        </CardContent>
+              <Button
+                type="submit"
+                disabled={isUpdatingOrganization}
+                className="w-full sm:w-auto"
+              >
+                {isUpdatingOrganization ? (
+                  <>
+                    <Loader2 className="mr-2 size-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save Organization"
+                )}
+              </Button>
+            </form>
+          </CardContent>
         </Card>
 
         <Card>
-        <CardHeader className="space-y-3">
-          <div className="flex items-center gap-2">
-            <UserCircle2 className="size-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Owner Profile</CardTitle>
-          </div>
-          <CardDescription>Your personal account settings</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-4" onSubmit={handleOwnerProfileSubmit}>
-            <div className="space-y-2">
-              <Label htmlFor="ownerName">Name</Label>
-              <Input
-                id="ownerName"
-                value={ownerName}
-                onChange={(e) => setOwnerName(e.target.value)}
-                placeholder="Your name"
-              />
+          <CardHeader className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="p-2 border rounded-xl">
+                <UserCircle2 className="size-5 text-muted-foreground" />
+              </div>
+              <div className="flex flex-col">
+                <CardTitle className="text-lg">Owner Profile</CardTitle>
+                <CardDescription className="text-xs">
+                  Your personal account settings
+                </CardDescription>
+              </div>
             </div>
+          </CardHeader>
+          <CardContent>
+            <form className="space-y-4" onSubmit={handleOwnerProfileSubmit}>
+              <div className="space-y-2">
+                <Label htmlFor="ownerName">Name</Label>
+                <Input
+                  id="ownerName"
+                  value={ownerName}
+                  onChange={(e) => setOwnerName(e.target.value)}
+                  placeholder="Your name"
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="ownerEmail">Email</Label>
-              <Input
-                id="ownerEmail"
-                type="email"
-                value={ownerEmail}
-                onChange={(e) => setOwnerEmail(e.target.value)}
-                placeholder="owner@company.com"
-              />
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="ownerEmail">Email</Label>
+                <Input
+                  id="ownerEmail"
+                  type="email"
+                  value={ownerEmail}
+                  onChange={(e) => setOwnerEmail(e.target.value)}
+                  placeholder="owner@company.com"
+                />
+              </div>
 
-            <Button
-              type="submit"
-              disabled={isUpdatingProfile}
-              className="w-full sm:w-auto"
-            >
-              {isUpdatingProfile ? (
-                <>
-                  <Loader2 className="mr-2 size-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                "Save Profile"
-              )}
-            </Button>
-          </form>
-        </CardContent>
+              <Button
+                type="submit"
+                disabled={isUpdatingProfile}
+                className="w-full sm:w-auto"
+              >
+                {isUpdatingProfile ? (
+                  <>
+                    <Loader2 className="mr-2 size-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save Profile"
+                )}
+              </Button>
+            </form>
+          </CardContent>
         </Card>
       </section>
 
@@ -272,10 +302,13 @@ export default function OrganizationSettings() {
         <CardHeader className="space-y-3">
           <div className="flex items-center gap-2">
             <AlertTriangle className="size-5 text-destructive" />
-            <CardTitle className="text-lg text-destructive">Danger Zone</CardTitle>
+            <CardTitle className="text-lg text-destructive">
+              Danger Zone
+            </CardTitle>
           </div>
           <CardDescription>
-            Destructive actions for this workspace. These changes cannot be undone.
+            Destructive actions for this workspace. These changes cannot be
+            undone.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -285,8 +318,20 @@ export default function OrganizationSettings() {
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button type="button" variant="destructive" className="w-full sm:w-auto">
-                Delete Workspace
+              <Button
+                type="button"
+                variant="destructive"
+                className="w-full sm:w-auto"
+                disabled={isDeletingOrganization}
+              >
+                {isDeletingOrganization ? (
+                  <>
+                    <Loader2 className="mr-2 size-4 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  "Delete Workspace"
+                )}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
@@ -298,7 +343,11 @@ export default function OrganizationSettings() {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDangerousAction}>
+                <AlertDialogAction
+                  onClick={handleDangerousAction}
+                  disabled={isDeletingOrganization}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
                   Confirm Delete
                 </AlertDialogAction>
               </AlertDialogFooter>

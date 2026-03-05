@@ -34,8 +34,18 @@ export const organizationApiSlice = emptySplitApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Organization", id: "ME" }],
     }),
+    deleteMyOrganization: builder.mutation<{ message: string }, void>({
+      query: () => ({
+        url: `${ORGANIZATION_URL}/me`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "Organization", id: "ME" }],
+    }),
   }),
 });
 
-export const { useGetMyOrganizationQuery, useUpdateMyOrganizationMutation } =
-  organizationApiSlice;
+export const {
+  useGetMyOrganizationQuery,
+  useUpdateMyOrganizationMutation,
+  useDeleteMyOrganizationMutation,
+} = organizationApiSlice;
