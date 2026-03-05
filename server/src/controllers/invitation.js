@@ -5,6 +5,7 @@ import Organization from "../models/Organization.js";
 import { signInviteToken, verifyInviteToken } from "../utils/inviteToken.js";
 import generateToken from "../utils/generateToken.js";
 import AppError from "../utils/appError.js";
+import { logActivity } from "../utils/logActivity.js";
 
 /**
  * @desc    Create an invitation link
@@ -51,7 +52,7 @@ export const createInvitation = asyncHandler(async (req, res) => {
   const token = signInviteToken(payload, "7d");
 
   // Persist in DB for one-time-use enforcement & revocation
-  await Invite.create({
+  const inviteDoc = await Invite.create({
     token,
     organization: org._id,
     role,
@@ -62,6 +63,17 @@ export const createInvitation = asyncHandler(async (req, res) => {
   // Build the invite link
   const clientOrigin = process.env.CORS_ORIGIN || "http://localhost:5173";
   const inviteLink = `${clientOrigin}/invite/${token}`;
+
+  await logActivity({
+    req,
+    action: "invite.sent",
+    entity: "invite",
+    entityId: inviteDoc._id,
+    meta: {
+      role,
+      email: email ? email.toLowerCase().trim() : undefined,
+    },
+  });
 
   res.status(201).json({ token, inviteLink });
 });
@@ -82,12 +94,10 @@ export const validateInvitation = asyncHandler(async (req, res) => {
 
   // Check if already used
   if (doc.used) {
-    return res
-      .status(410)
-      .json({
-        status: "used",
-        message: "This invitation has already been used.",
-      });
+    return res.status(410).json({
+      status: "used",
+      message: "This invitation has already been used.",
+    });
   }
 
   // Check if revoked
@@ -107,12 +117,10 @@ export const validateInvitation = asyncHandler(async (req, res) => {
   try {
     payload = verifyInviteToken(token);
   } catch {
-    return res
-      .status(410)
-      .json({
-        status: "expired",
-        message: "This invitation has expired or is invalid.",
-      });
+    return res.status(410).json({
+      status: "expired",
+      message: "This invitation has expired or is invalid.",
+    });
   }
 
   res.json({
@@ -191,6 +199,17 @@ export const acceptInvitation = asyncHandler(async (req, res) => {
   // Issue auth token
   const authToken = generateToken(res, user._id);
 
+  await logActivity({
+    req: { user },
+    action: "invite.accepted",
+    entity: "invite",
+    entityId: doc._id,
+    meta: {
+      invitedUserId: user._id,
+      role: user.role,
+    },
+  });
+
   res.status(201).json({
     _id: user._id,
     name: user.name,
@@ -225,6 +244,16 @@ export const revokeInvitation = asyncHandler(async (req, res) => {
 
   doc.revoked = true;
   await doc.save();
+
+  await logActivity({
+    req,
+    action: "invite.revoked",
+    entity: "invite",
+    entityId: doc._id,
+    meta: {
+      tokenPrefixMasked: `${token.slice(0, 6)}***`,
+    },
+  });
 
   res.json({ message: "Invitation revoked." });
 });

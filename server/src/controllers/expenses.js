@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Expense from "../models/Expense.js";
 import asyncHandler from "express-async-handler";
 import AppError from "../utils/appError.js";
+import { logActivity } from "../utils/logActivity.js";
 
 /**
  *  @desc    Get all expenses
@@ -43,11 +44,37 @@ const createExpense = asyncHandler(async (req, res, next) => {
 
   if (Array.isArray(expensesEntries)) {
     const createdExpenses = await Expense.insertMany(normalizedEntries);
+    await Promise.all(
+      createdExpenses.map((entry) =>
+        logActivity({
+          req,
+          action: "transaction.created",
+          entity: "expense",
+          entityId: entry._id,
+          meta: {
+            amount: entry.amount,
+            category: entry.category,
+            type: entry.type,
+          },
+        }),
+      ),
+    );
     res.status(201).json(createdExpenses);
     return;
   }
 
   const createdExpense = await Expense.create(normalizedEntries[0]);
+  await logActivity({
+    req,
+    action: "transaction.created",
+    entity: "expense",
+    entityId: createdExpense._id,
+    meta: {
+      amount: createdExpense.amount,
+      category: createdExpense.category,
+      type: createdExpense.type,
+    },
+  });
   res.status(201).json(createdExpense);
 });
 
@@ -76,6 +103,16 @@ const updateExpense = asyncHandler(async (req, res, next) => {
     throw new AppError("Expense not found", 404);
   }
 
+  await logActivity({
+    req,
+    action: "transaction.updated",
+    entity: "expense",
+    entityId: updatedExpense._id,
+    meta: {
+      changedFields: Object.keys(req.body || {}),
+    },
+  });
+
   res.status(200).json(updatedExpense);
 });
 
@@ -98,6 +135,18 @@ const deleteExpense = asyncHandler(async (req, res, next) => {
   if (!deletedExpense) {
     throw new AppError("Expense not found", 404);
   }
+
+  await logActivity({
+    req,
+    action: "transaction.deleted",
+    entity: "expense",
+    entityId: deletedExpense._id,
+    meta: {
+      amount: deletedExpense.amount,
+      category: deletedExpense.category,
+      type: deletedExpense.type,
+    },
+  });
 
   res.status(200).json(deletedExpense);
 });
