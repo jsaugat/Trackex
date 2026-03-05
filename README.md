@@ -60,7 +60,7 @@ Trackex is a MERN stack expense and revenue tracking application designed for or
 
 ## Tech Stack
 
-- **Frontend:** React, Redux Toolkit, RTK Query, shadcn UI components, Framer Motion
+- **Frontend:** React, Redux Toolkit, RTK Query, shadcn UI components
 - **Backend:** Node.js, Express, MongoDB Atlas
 - **Authentication:** JWT
 - **Export/Reports:** jsPDF, html2canvas

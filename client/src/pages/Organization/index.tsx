@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Building2, Loader2, UserCircle2 } from "lucide-react";
+import { AlertTriangle, Building2, Loader2, UserCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import {
@@ -13,6 +13,24 @@ import { ROUTES } from "@/constants/routes";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const slugPattern = /^[a-z0-9-]+$/;
 
@@ -137,6 +155,10 @@ export default function OrganizationSettings() {
     }
   };
 
+  const handleDangerousAction = () => {
+    toast.error("Workspace deletion is not enabled yet.");
+  };
+
   if (isGettingOrganization) {
     return (
       <main className="h-full flex items-center justify-center">
@@ -146,95 +168,144 @@ export default function OrganizationSettings() {
   }
 
   return (
-    <main className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-      <section className="rounded-2xl border bg-background p-6 shadow-sm">
-        <div className="mb-5 flex items-center gap-2">
-          <Building2 className="size-5 text-indigo-500" />
-          <h2 className="text-lg font-semibold">Organization Details</h2>
-        </div>
-
-        <form className="space-y-4" onSubmit={handleOrganizationSubmit}>
-          <div className="space-y-2">
-            <Label htmlFor="orgName">Organization Name</Label>
-            <Input
-              id="orgName"
-              value={orgName}
-              onChange={(e) => setOrgName(e.target.value)}
-              placeholder="Acme Inc."
-            />
+    <main className="mx-auto w-full max-w-5xl space-y-4">
+      <section className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <Card>
+        <CardHeader className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Building2 className="size-5 text-muted-foreground" />
+            <CardTitle className="text-lg">Organization Details</CardTitle>
           </div>
+          <CardDescription>Public-facing workspace info</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form className="space-y-4" onSubmit={handleOrganizationSubmit}>
+            <div className="space-y-2">
+              <Label htmlFor="orgName">Organization Name</Label>
+              <Input
+                id="orgName"
+                value={orgName}
+                onChange={(e) => setOrgName(e.target.value)}
+                placeholder="Acme Inc."
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="orgSlug">Workspace URL</Label>
-            <Input
-              id="orgSlug"
-              value={orgSlug}
-              onChange={(e) => setOrgSlug(e.target.value)}
-              placeholder="acme-inc"
-            />
+            <div className="space-y-2">
+              <Label htmlFor="orgSlug">Workspace URL</Label>
+              <Input
+                id="orgSlug"
+                value={orgSlug}
+                onChange={(e) => setOrgSlug(e.target.value)}
+                placeholder="acme-inc"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              disabled={isUpdatingOrganization}
+              className="w-full sm:w-auto"
+            >
+              {isUpdatingOrganization ? (
+                <>
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save Organization"
+              )}
+            </Button>
+          </form>
+        </CardContent>
+        </Card>
+
+        <Card>
+        <CardHeader className="space-y-3">
+          <div className="flex items-center gap-2">
+            <UserCircle2 className="size-5 text-muted-foreground" />
+            <CardTitle className="text-lg">Owner Profile</CardTitle>
           </div>
+          <CardDescription>Your personal account settings</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form className="space-y-4" onSubmit={handleOwnerProfileSubmit}>
+            <div className="space-y-2">
+              <Label htmlFor="ownerName">Name</Label>
+              <Input
+                id="ownerName"
+                value={ownerName}
+                onChange={(e) => setOwnerName(e.target.value)}
+                placeholder="Your name"
+              />
+            </div>
 
-          <Button
-            type="submit"
-            disabled={isUpdatingOrganization}
-            className="w-full sm:w-auto"
-          >
-            {isUpdatingOrganization ? (
-              <>
-                <Loader2 className="mr-2 size-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              "Save Organization"
-            )}
-          </Button>
-        </form>
+            <div className="space-y-2">
+              <Label htmlFor="ownerEmail">Email</Label>
+              <Input
+                id="ownerEmail"
+                type="email"
+                value={ownerEmail}
+                onChange={(e) => setOwnerEmail(e.target.value)}
+                placeholder="owner@company.com"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              disabled={isUpdatingProfile}
+              className="w-full sm:w-auto"
+            >
+              {isUpdatingProfile ? (
+                <>
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save Profile"
+              )}
+            </Button>
+          </form>
+        </CardContent>
+        </Card>
       </section>
 
-      <section className="rounded-2xl border bg-background p-6 shadow-sm">
-        <div className="mb-5 flex items-center gap-2">
-          <UserCircle2 className="size-5 text-indigo-500" />
-          <h2 className="text-lg font-semibold">Owner Profile</h2>
-        </div>
-
-        <form className="space-y-4" onSubmit={handleOwnerProfileSubmit}>
-          <div className="space-y-2">
-            <Label htmlFor="ownerName">Name</Label>
-            <Input
-              id="ownerName"
-              value={ownerName}
-              onChange={(e) => setOwnerName(e.target.value)}
-              placeholder="Your name"
-            />
+      <Card className="border-destructive/30">
+        <CardHeader className="space-y-3">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="size-5 text-destructive" />
+            <CardTitle className="text-lg text-destructive">Danger Zone</CardTitle>
           </div>
+          <CardDescription>
+            Destructive actions for this workspace. These changes cannot be undone.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted-foreground">
+            Delete this workspace and permanently remove associated data.
+          </p>
 
-          <div className="space-y-2">
-            <Label htmlFor="ownerEmail">Email</Label>
-            <Input
-              id="ownerEmail"
-              type="email"
-              value={ownerEmail}
-              onChange={(e) => setOwnerEmail(e.target.value)}
-              placeholder="owner@company.com"
-            />
-          </div>
-
-          <Button
-            type="submit"
-            disabled={isUpdatingProfile}
-            className="w-full sm:w-auto"
-          >
-            {isUpdatingProfile ? (
-              <>
-                <Loader2 className="mr-2 size-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              "Save Profile"
-            )}
-          </Button>
-        </form>
-      </section>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button type="button" variant="destructive" className="w-full sm:w-auto">
+                Delete Workspace
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete workspace?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This is a permanent action and cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDangerousAction}>
+                  Confirm Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </CardContent>
+      </Card>
     </main>
   );
 }
