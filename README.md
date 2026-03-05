@@ -93,3 +93,10 @@ Trackex is a MERN stack expense and revenue tracking application designed for or
 **Guest login:** `guest@trackex.com` / `guest123`
 
 Guest users access pre-seeded realistic 90-day transaction data across categories, allowing exploration of charts, budgets, and audit logs without creating an account.
+
+## Miscelleanous
+
+### My learnings:
+
+- MongoDB Transaction Session
+- DB Indexing
