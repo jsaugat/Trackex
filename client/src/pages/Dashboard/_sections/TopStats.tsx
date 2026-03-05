@@ -8,15 +8,7 @@ import {
   UserCheck,
   AlignStartVertical,
   BarChart2,
-  Repeat,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import NoRecords from "@/components/NoRecords";
 import { useDispatch, useSelector } from "react-redux";
@@ -34,7 +26,6 @@ import {
 } from "@/slices/topStats";
 import GradientBorder from "@/components/GradientBorder";
 import CardContainer from "@/components/Card/Container";
-import MyTooltip from "@/components/MyTooltip";
 
 export default function TopStats() {
   //? Local States
@@ -94,12 +85,6 @@ export default function TopStats() {
     fetchedTopSellingCategoriesByRevenue,
   ]);
 
-  //? Mode Cycle Handler
-  const cycleMode = () => {
-    const currentIndex = modes.indexOf(mode);
-    const nextIndex = (currentIndex + 1) % modes.length;
-    setMode(modes[nextIndex]);
-  };
   //? Array of modes
   const modes = ["products", "customers", "categories"];
   const productsFilterOptions = [
@@ -116,38 +101,70 @@ export default function TopStats() {
         {/* blur bottom */}
         <div className="absolute left-[1%] bottom-0 rounded-b-full mx-auto w-[98%] h-9 bg-gradient-to-b from-transparent via-background to-background" />
         {/* Header */}
-        <header className="flex justify-between items-center mb-1">
-          {/* Title and Cycle Button */}
+        <header className="flex justify-between items-start">
+          {/* Title and Mode Toggle */}
           <div className="flex items-center gap-2">
             <h3 className="text-xl flex items-center gap-2">
-              {mode === "products" && <Package className="size-5" />}
+              {/* {mode === "products" && <Package className="size-5" />}
               {mode === "customers" && <Users className="size-5" />}
               {mode === "categories" && (
                 <AlignStartVertical className="size-5" />
-              )}
+              )} */}
+              {/* Mode Toggle */}
+              <ToggleGroup
+                type="single"
+                variant="outline"
+                size="sm"
+                value={mode}
+                onValueChange={(value) => {
+                  if (value) setMode(value);
+                }}
+                className="p-1 border rounded-full"
+              >
+                <ToggleGroupItem
+                  value="products"
+                  className={cn(
+                    "h-7 w-7 p-1 border-none rounded-full space-x-2",
+                    mode !== "products" &&
+                      "text-muted-foreground hover:bg-transparent",
+                  )}
+                >
+                  <Package className="size-4" />
+                  {/* <span>Products</span> */}
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="customers"
+                  className={cn(
+                    "h-7 w-7 p-1 border-none rounded-full space-x-2",
+                    mode !== "customers" &&
+                      "text-muted-foreground hover:bg-transparent",
+                  )}
+                >
+                  <Users className="size-4" />
+                  {/* <span>Customers</span> */}
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="categories"
+                  className={cn(
+                    "h-7 w-7 p-1 border-none rounded-full space-x-2",
+                    mode !== "categories" &&
+                      "text-muted-foreground hover:bg-transparent",
+                  )}
+                >
+                  <AlignStartVertical className="size-4" />
+                  {/* <span>Categories</span> */}
+                </ToggleGroupItem>
+              </ToggleGroup>
+
               <span>
                 {mode === "products" && "Top selling products"}
                 {mode === "customers" && "Top spending customers"}
                 {mode === "categories" && "Top selling categories"}
               </span>
             </h3>
-            <MyTooltip
-              trigger={
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="rounded-full size-8"
-                  onClick={cycleMode}
-                >
-                  <Repeat className="size-4" />
-                </Button>
-              }
-              content="Switch view"
-              side="top"
-            />
           </div>
 
-          {/* //? Filters (Revenue/Quantity) */}
+          {/* Revenue/Quantity Toggle */}
           <section className="w-fit flex items-center gap-3">
             {mode === "products" && (
               <ToggleGroup
@@ -171,7 +188,7 @@ export default function TopStats() {
                     )}
                   >
                     <option.icon className="size-4" />
-                    <span className="capitalize">{option.id}</span>
+                    <span className="capitalize">By {option.id}</span>
                   </ToggleGroupItem>
                 ))}
               </ToggleGroup>
