@@ -28,6 +28,7 @@ export const emptySplitApi = createApi({
     "User",
     "TopStats",
     "Organization",
+    "AuditLog",
   ],
   endpoints: () => ({}),
 });
