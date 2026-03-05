@@ -6,7 +6,7 @@ import { useEffect } from "react";
 
 export default function AdminGuard() {
   const { userInfo } = useAppSelector((state) => state.auth);
-  const isAdmin = userInfo?.role === "owner" || userInfo?.role === "admin";
+  const isAdmin = userInfo?.role === "owner" || userInfo?.role === "manager";
 
   useEffect(() => {
     if (!isAdmin) {
@@ -14,7 +14,7 @@ export default function AdminGuard() {
         description: "You are not authorized to access this page.",
       });
     }
-  }, []);
+  }, [isAdmin]);
 
   return isAdmin ? <Outlet /> : <Navigate to={ROUTES.NOT_AUTHORIZED} replace />;
 }

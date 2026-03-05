@@ -8,6 +8,7 @@ import {
   CircleGauge,
   Building2,
   UsersRound,
+  ScrollText,
 } from "lucide-react";
 import { useWindowWidth } from "@react-hook/window-size";
 import { Nav } from "./Nav";
@@ -38,11 +39,17 @@ export default function Sidebar() {
   ];
 
   const managementLinks = [];
-  if (userInfo?.role === "admin" || userInfo?.role === "owner") {
+  if (userInfo?.role === "manager" || userInfo?.role === "owner") {
     managementLinks.push({
       title: "Team",
       href: `/${orgSlug}/admin/users`,
       icon: UsersRound,
+    });
+
+    managementLinks.push({
+      title: "Audit Logs",
+      href: `/${orgSlug}/admin/audit-logs`,
+      icon: ScrollText,
     });
   }
 

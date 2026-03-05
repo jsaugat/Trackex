@@ -115,7 +115,7 @@ export default function Users() {
               name={user.name}
               email={user.email}
               userId={user._id}
-              isAdmin={user.isAdmin}
+              role={user.role}
               registeredOn={user.createdAt}
               handleDeleteUser={handleDeleteUser}
               isDeleting={isDeleting}
@@ -133,71 +133,33 @@ const UserCard = ({
   name,
   email,
   userId,
-  isAdmin,
+  role,
   handleDeleteUser,
   isDeleting,
   refetchUsers,
 }) => {
-  // const [updateUser, { isLoading: isChangingRole, error: changeRoleError }] =
-  //   useUpdateUserMutation();
-  const currentUser = useAppSelector((state) => state.auth.userInfo);
+  const [updateUser, { isLoading: isChangingRole }] = useUpdateUserMutation();
   const dispatch = useAppDispatch();
-  const [isChangingRole, setIsChangingRole] = useState(false);
-
-  // const handleRoleChange = async (idToUpdate) => {
-  //   try {
-  //     console.log("ID To Update ", idToUpdate);
-  //     const update = { isAdmin: !isAdmin };
-  //     await updateUser({
-  //       id: idToUpdate,
-  //       update,
-  //     });
-  //     // dispatch(updateUserLocally());
-  //     console.log("Success");
-  //   } catch (error) {
-  //     console.log("Error changing role:", error);
-  //   }
-  // };
+  const canChangeRole = role !== "owner";
+  const nextRole = role === "manager" ? "member" : "manager";
 
   const handleRoleChange = async (idToUpdate) => {
-    console.log("ID to update:", idToUpdate);
-    const url = `${import.meta.env.VITE_API_BASE_URL}/api/admin/users/${idToUpdate}`;
-
-    // Define the data to send
-    const dataToSend = {
-      isAdmin: !isAdmin,
-    };
-
-    // Define the bearer token
-    const token = currentUser.token;
-    // console.log("token: " + token);
-
     try {
-      setIsChangingRole(true);
-      // Send the PUT request
-      const response = await fetch(url, {
-        method: "PUT", // Specify the HTTP method
-        headers: {
-          "Content-Type": "application/json", // Set the content type to JSON
-          authorization: `Bearer ${token}`, // Add the authorization header with the bearer token
-        },
-        body: JSON.stringify(dataToSend), // Convert the data to a JSON string
-      });
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok " + response.statusText);
+      if (!canChangeRole) {
+        return;
       }
 
-      const data = await response.json(); // Parse the JSON response
-      console.log("Success:", data); // Handle the response data
+      const data = await updateUser({
+        id: idToUpdate,
+        role: nextRole,
+      });
+      const updated = await data.unwrap();
 
       // Dispatch the updateUserLocally action
-      dispatch(updateUserLocally(data));
+      dispatch(updateUserLocally(updated));
       refetchUsers();
     } catch (error) {
       console.error("Error:", error); // Handle any errors
-    } finally {
-      setIsChangingRole(false);
     }
   };
 
@@ -216,7 +178,10 @@ const UserCard = ({
           <div className="flex flex-col items-start">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <p>{name}</p>
-              {isAdmin && (
+              {role === "owner" && (
+                <Crown className="size-5 text-amber-500" strokeWidth={"2.5px"} />
+              )}
+              {role === "manager" && (
                 <ShieldCheck
                   className="size-5 text-emerald-500"
                   strokeWidth={"2.5px"}
@@ -230,25 +195,28 @@ const UserCard = ({
           <ChangeRoleAlertDialog
             trigger={
               <Button
-                variant={isAdmin ? "secondary" : "default"}
+                variant={role === "manager" ? "secondary" : "default"}
                 size="sm"
                 className="flex items-center gap-2"
+                disabled={!canChangeRole}
               >
-                {isAdmin ? (
+                {role === "manager" ? (
                   <>
                     <ShieldX className="size-4" strokeWidth={"2px"} />
-                    <span>Revoke Admin</span>
+                    <span>Set Member</span>
                   </>
                 ) : (
                   <>
                     <ShieldCheck className="size-4" strokeWidth={"2px"} />
-                    <span>Make Admin</span>
+                    <span>Set Manager</span>
                   </>
                 )}
               </Button>
             }
             userId={userId}
-            makeAdmin={isAdmin ? false : true}
+            makeManager={role === "manager" ? false : true}
+            canChangeRole={canChangeRole}
+            nextRole={nextRole}
             isChangingRole={isChangingRole}
             handleRoleChange={handleRoleChange}
           />
@@ -275,7 +243,9 @@ const UserCard = ({
 
 const ChangeRoleAlertDialog = ({
   trigger,
-  makeAdmin,
+  makeManager,
+  canChangeRole,
+  nextRole,
   userId,
   handleRoleChange,
   isChangingRole,
@@ -285,22 +255,28 @@ const ChangeRoleAlertDialog = ({
     <AlertDialogContent>
       <AlertDialogHeader>
         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-        {makeAdmin ? (
+        {!canChangeRole ? (
           <AlertDialogDescription>
-            Granting admin access to this user. This action cannot be undone.
+            Owner role cannot be changed.
+          </AlertDialogDescription>
+        ) : makeManager ? (
+          <AlertDialogDescription>
+            This user will be promoted to manager.
           </AlertDialogDescription>
         ) : (
           <AlertDialogDescription>
-            Revoking all admin privileges from this user. This action cannot be
-            undone.
+            This user will be moved back to member role.
           </AlertDialogDescription>
         )}
       </AlertDialogHeader>
       <AlertDialogFooter>
         <AlertDialogCancel>Cancel</AlertDialogCancel>
-        <AlertDialogAction onClick={() => handleRoleChange(userId)}>
+        <AlertDialogAction
+          onClick={() => handleRoleChange(userId)}
+          disabled={!canChangeRole}
+        >
           {isChangingRole && <LoaderLucide className="size-4 animate-spin" />}
-          {!isChangingRole && <span>Confirm</span>}
+          {!isChangingRole && <span>{`Confirm (${nextRole})`}</span>}
         </AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>

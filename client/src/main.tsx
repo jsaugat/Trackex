@@ -32,6 +32,7 @@ import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import ru from "javascript-time-ago/locale/ru";
 import Users from "./pages/Admin/Users";
+import AuditLogs from "./pages/Admin/AuditLogs";
 import AdminGuard from "./routes/AdminGuard";
 import OrgGuard from "./routes/OrgGuard";
 import { RootRedirect } from "./routes/RootRedirect";
@@ -63,6 +64,7 @@ const routes = createRoutesFromElements(
           {/* Admin-only routes */}
           <Route path="admin/*" element={<AdminGuard />}>
             <Route path="users" element={<Users />} />
+            <Route path="audit-logs" element={<AuditLogs />} />
             <Route element={<OwnerGuard />}>
               <Route path="organization" element={<OrganizationSettings />} />
             </Route>

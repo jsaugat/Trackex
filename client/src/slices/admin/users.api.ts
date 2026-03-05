@@ -12,7 +12,7 @@ export const usersApiSlice = emptySplitApi.injectEndpoints({
       providesTags: (result, error, arg) =>
         result
           ? [
-              ...result.map(({ id }) => ({ type: "User", id })),
+              ...result.map(({ _id }) => ({ type: "User", id: _id })),
               { type: "User", id: "LIST" },
             ]
           : [{ type: "User", id: "LIST" }],
