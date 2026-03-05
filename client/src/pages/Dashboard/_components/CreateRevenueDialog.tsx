@@ -140,54 +140,54 @@ export default function CreateRevenueDialog({ trigger, type }) {
     });
   };
 
-  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
+  // const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
 
-  //? Download PDF
-  const downloadPDF = async () => {
-    try {
-      const data = getValues(); // Get the current form data
-      const transformedData = data.products.map((product) => ({
-        ...product,
-        type: type,
-        date: DateToUTCDate(data.date),
-        customer: type === "revenue" ? data.customer : "",
-      }));
-      console.log("TRANSFORMED-DATA: ", data);
-      const url = `${import.meta.env.VITE_API_BASE_URL}/api/revenue/invoice`;
-
-      setIsDownloadingPDF(true);
-      const response = await axios.post(url, transformedData);
-      // const { fileName } = response.data;
-
-      const res = await axios.get(`${url}/invoice.pdf`, {
-        responseType: "blob",
-      });
-      const pdfBlob = new Blob([res.data], { type: "application/pdf" });
-      // Get the customer name or use a default value if not available
-      const customerName = data.customer
-        ? data.customer.toLowerCase().split(" ").join("-")
-        : randomId;
-
-      // Download as invoice.pdf with the customer name
-      setIsDownloadingPDF(false);
-      saveAs(pdfBlob, `invoice_${customerName}-${randomId}.pdf`);
-    } catch (error) {
-      setIsDownloadingPDF(false);
-      console.error("Error generating PDF:", error);
-      toast({
-        variant: "destructive",
-        title: "Error generating PDF.",
-        description: "Please try again later.",
-        action: <ToastAction altText="Close">Close</ToastAction>,
-      });
-    }
-  };
+  //? Download PDF (temporarily disabled)
+  // const downloadPDF = async () => {
+  //   try {
+  //     const data = getValues(); // Get the current form data
+  //     const transformedData = data.products.map((product) => ({
+  //       ...product,
+  //       type: type,
+  //       date: DateToUTCDate(data.date),
+  //       customer: type === "revenue" ? data.customer : "",
+  //     }));
+  //     console.log("TRANSFORMED-DATA: ", data);
+  //     const url = `${import.meta.env.VITE_API_BASE_URL}/api/revenue/invoice`;
+  //
+  //     setIsDownloadingPDF(true);
+  //     const response = await axios.post(url, transformedData);
+  //     // const { fileName } = response.data;
+  //
+  //     const res = await axios.get(`${url}/invoice.pdf`, {
+  //       responseType: "blob",
+  //     });
+  //     const pdfBlob = new Blob([res.data], { type: "application/pdf" });
+  //     // Get the customer name or use a default value if not available
+  //     const customerName = data.customer
+  //       ? data.customer.toLowerCase().split(" ").join("-")
+  //       : randomId;
+  //
+  //     // Download as invoice.pdf with the customer name
+  //     setIsDownloadingPDF(false);
+  //     saveAs(pdfBlob, `invoice_${customerName}-${randomId}.pdf`);
+  //   } catch (error) {
+  //     setIsDownloadingPDF(false);
+  //     console.error("Error generating PDF:", error);
+  //     toast({
+  //       variant: "destructive",
+  //       title: "Error generating PDF.",
+  //       description: "Please try again later.",
+  //       action: <ToastAction altText="Close">Close</ToastAction>,
+  //     });
+  //   }
+  // };
 
   //? FORM SUBMISSION Handler
   const onSubmit = useCallback(
     async (data) => {
       console.log("Submitted Form data: ", data);
-      await downloadPDF();
+      // await downloadPDF();
       //! Check if date field is empty
       if (!data.date) {
         toast({
@@ -400,7 +400,8 @@ export default function CreateRevenueDialog({ trigger, type }) {
                     Cancel
                   </Button>
                 </DialogClose>
-                <Button type="submit" disabled={loading || isDownloadingPDF}>
+                {/* PDF state handling disabled for now */}
+                {/* <Button type="submit" disabled={loading || isDownloadingPDF}>
                   {!loading && !isDownloadingPDF ? (
                     <span className="flex items-center gap-2">
                       <Download className="size-4" />
@@ -410,6 +411,16 @@ export default function CreateRevenueDialog({ trigger, type }) {
                     <span className="flex items-center gap-2">
                       <Loader className="animate-spin size-4" />
                       <span>Generating Invoice</span>
+                    </span>
+                  ) : (
+                    <Loader className="animate-spin size-4" />
+                  )}
+                </Button> */}
+                <Button type="submit" disabled={loading}>
+                  {!loading ? (
+                    <span className="flex items-center gap-2">
+                      <Download className="size-4" />
+                      <p>Create</p>
                     </span>
                   ) : (
                     <Loader className="animate-spin size-4" />
