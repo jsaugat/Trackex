@@ -1,24 +1,20 @@
-import React, { useEffect, useReducer, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -29,158 +25,129 @@ import {
 } from "@/components/ui/table";
 import SearchBar from "@/components/SearchBar";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
-import { ListFilter, Check, ServerOff } from "lucide-react";
+import { ListFilter, ServerOff } from "lucide-react";
 import { useAppSelector } from "@/hooks/storeHooks";
 import TransactionTableRow from "./TransactionsTableRow";
 import DateRangePicker from "./DateRangePicker";
 import { subMonths } from "date-fns";
 import NoRecords from "@/components/NoRecords";
 
-// Ensures the dropdown behaves like a radio group by activating only one option.
-const reducer = (state, action) => {
-  switch (action.type) {
-    case "SELECT":
-      return state.map((option) =>
-        option.id === action.id
-          ? { ...option, selected: true }
-          : { ...option, selected: false },
-      );
-    default:
-      return state;
-  }
+type TransactionFilter = "All" | "Expenses" | "Revenue";
+
+type TransactionItem = {
+  _id: string;
+  type: string;
+  description?: string;
+  category?: string;
+  amount: number;
+  customer?: string;
+  entity?: string;
+  date: string;
+  createdAt: string;
+};
+
+const FILTER_OPTIONS: { id: number; label: TransactionFilter }[] = [
+  { id: 1, label: "All" },
+  { id: 2, label: "Expenses" },
+  { id: 3, label: "Revenue" },
+];
+
+const getTransactionsByFilter = ({
+  selectedFilter,
+  expenses,
+  revenue,
+}: {
+  selectedFilter: TransactionFilter;
+  expenses: TransactionItem[];
+  revenue: TransactionItem[];
+}) => {
+  if (selectedFilter === "Expenses") return [...expenses];
+  if (selectedFilter === "Revenue") return [...revenue];
+  return [...expenses, ...revenue];
+};
+
+const sortByCreatedAtDesc = (transactions: TransactionItem[]) =>
+  [...transactions].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+
+const matchesSearchQuery = (transaction: TransactionItem, query: string) => {
+  const normalizedQuery = query.toLowerCase();
+  const descriptionMatch = transaction.description
+    ?.toLowerCase()
+    .includes(normalizedQuery);
+  const customerMatch = transaction.customer
+    ?.toLowerCase()
+    .includes(normalizedQuery);
+  const categoryMatch = transaction.category
+    ?.toLowerCase()
+    .includes(normalizedQuery);
+
+  return descriptionMatch || customerMatch || categoryMatch;
+};
+
+const isWithinDateRange = (
+  transaction: TransactionItem,
+  dateRange: { from?: Date; to?: Date },
+) => {
+  if (!dateRange.from || !dateRange.to) return true;
+  const transactionDate = new Date(transaction.date);
+  return transactionDate >= dateRange.from && transactionDate <= dateRange.to;
 };
 
 export default function RecentTransactions() {
-  //? Local States
+  // Auto-focuses search input when this view opens.
   const searchInputRef = useRef(null);
-  // SEARCH
+
+  // Search keyword entered by user.
   const [searchQuery, setSearchQuery] = useState("");
-  // DATE
+
+  // Date range used to narrow down transactions.
   const [date, setDate] = useState({
     from: subMonths(new Date(), 3),
     to: new Date(),
   });
-  const [filterOptions, dispatch] = useReducer(reducer, [
-    { id: 1, label: "All", selected: true },
-    { id: 2, label: "Expenses", selected: false },
-    { id: 3, label: "Revenue", selected: false },
-  ]);
-  const allExpenses = useAppSelector((state) => state.expenses.data || []);
-  const allRevenue = useAppSelector((state) => state.revenue.data || []);
-  const [filteredTransactions, setFilteredTransactions] = useState([]);
-  const [selectedTab, setSelectedTab] = useState("week");
 
-  console.log("filterOptions: ", filterOptions);
-  console.log("filteredTransactions: ", filteredTransactions);
+  // Single-select transaction type filter.
+  const [selectedFilter, setSelectedFilter] = useState<TransactionFilter>("All");
 
-  //? MAIN SIDE-EFFECT
-  useEffect(() => {
-    // Determine which transaction set to render (all, expenses only, revenue only).
-    const selectedFilter = filterOptions.find(
-      (option) => option.selected,
-    ).label;
+  const allExpenses = useAppSelector(
+    (state) => (state.expenses.data || []) as TransactionItem[],
+  );
+  const allRevenue = useAppSelector(
+    (state) => (state.revenue.data || []) as TransactionItem[],
+  );
 
-    // Logic to merge expenses and revenue according to the selected filter..
-    let mergedTransactions = [];
-    if (allExpenses && allRevenue) {
-      if (selectedFilter === "All") {
-        mergedTransactions = [...allExpenses, ...allRevenue];
-      } else if (selectedFilter === "Expenses") {
-        mergedTransactions = [...allExpenses];
-      } else if (selectedFilter === "Revenue") {
-        mergedTransactions = [...allRevenue];
-      }
+  // Transactions are derived from source data and UI filters, so use memoization instead of syncing via useEffect.
+  const filteredTransactions = useMemo(() => {
+    const mergedTransactions = getTransactionsByFilter({
+      selectedFilter,
+      expenses: allExpenses,
+      revenue: allRevenue,
+    });
 
-      //? Sort transactions by createdAt in descending order so the table always shows newest first
-      mergedTransactions.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
+    return sortByCreatedAtDesc(mergedTransactions)
+      .filter((transaction) => matchesSearchQuery(transaction, searchQuery))
+      .filter((transaction) => isWithinDateRange(transaction, date));
+  }, [selectedFilter, allExpenses, allRevenue, searchQuery, date]);
 
-      // Filter transactions based on selected tab [ week | month | year ].
-      // const now = new Date();
-      // let filteredByTime = mergedTransactions.filter((transaction) => {
-      //   const transactionDate = new Date(transaction.createdAt);
-      //   if (selectedTab === "week") {
-      //     // Week
-      //     const oneWeekAgo = new Date();
-      //     oneWeekAgo.setDate(now.getDate() - 7);
-      //     console.log("transaction date: ", transactionDate);
-      //     console.log("oneWeekAgo: ", oneWeekAgo);
-      //     return transactionDate >= oneWeekAgo;
-      //   } else if (selectedTab === "month") {
-      //     // Month
-      //     const oneMonthAgo = new Date();
-      //     oneMonthAgo.setMonth(now.getMonth() - 1);
-      //     return transactionDate >= oneMonthAgo;
-      //   } else if (selectedTab === "year") {
-      //     // Year
-      //     const oneYearAgo = new Date();
-      //     oneYearAgo.setFullYear(now.getFullYear() - 1);
-      //     return transactionDate >= oneYearAgo;
-      //   }
-      //   return true;
-      // });
-
-      //? Filter based on Search Query across description/customer/category fields
-      let transactions = mergedTransactions.filter((transaction) => {
-        const searchedDescription = transaction.description
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase());
-        const searchedCustomer = transaction.customer
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase());
-        const searchedCategory = transaction.category
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase());
-        const searchedTransactions =
-          searchedDescription || searchedCustomer || searchedCategory;
-        return searchedTransactions;
-      });
-
-      //? Filter based on date range selection provided by the picker
-      if (date?.from && date?.to) {
-        transactions = transactions.filter((transaction) => {
-          const transactionDate = new Date(transaction.date);
-          return transactionDate >= date.from && transactionDate <= date.to;
-        });
-      }
-
-      setFilteredTransactions(transactions);
-    }
-  }, [allExpenses, allRevenue, filterOptions, searchQuery, date]);
-
-  //? Handle filter options selections
-  const handleSelect = (id) => {
-    dispatch({ type: "SELECT", id });
-  };
-
-  //? Handle search input
-  const handleSearchInputChange = (e) => {
+  const handleSearchInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setSearchQuery(e.target.value);
   };
 
-  //? Activate search on component mount
+  // Focus search on initial mount for faster keyboard-driven filtering.
   useEffect(() => {
     searchInputRef.current && searchInputRef.current.focus();
   }, []);
 
   return (
-    <Tabs
-      value={selectedTab}
-      onValueChange={setSelectedTab}
-      className="flex-1 h-full flex flex-col"
-    >
-      {/* //? Filter Section */}
+    <Tabs value="transactions" className="flex-1 h-full flex flex-col">
+      {/* Top controls: search + date range + type filter. */}
       <section className="flex items-center">
-        {/* <TabsList>
-          <TabsTrigger value="week">Activity</TabsTrigger>
-          <TabsTrigger value="month">Month</TabsTrigger>
-          <TabsTrigger value="year">Year</TabsTrigger>
-        </TabsList> */}
-        {/* //? Filter */}
         <section className="w-full flex items-center justify-between gap-2">
-          {/* Search bar */}
+          {/* Text search across description/customer/category. */}
           <SearchBar
             searchQuery={searchQuery}
             handleSearchInputChange={handleSearchInputChange}
@@ -189,13 +156,13 @@ export default function RecentTransactions() {
             className={undefined}
           />
           <section className="flex items-center gap-2">
-            {/* Date picker */}
+            {/* Date interval selector. */}
             <DateRangePicker
               className="text-sm"
               date={date}
               setDate={setDate}
             />
-            {/* Filter transaction types */}
+            {/* Single-select transaction type dropdown. */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -209,14 +176,13 @@ export default function RecentTransactions() {
               <DropdownMenuContent align="start">
                 <DropdownMenuLabel>Filter by</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                {filterOptions.map(({ id, label, selected }) => (
+                {FILTER_OPTIONS.map(({ id, label }) => (
                   <DropdownMenuCheckboxItem
                     key={id}
-                    checked={selected}
-                    onClick={() => handleSelect(id)}
+                    checked={selectedFilter === label}
+                    onClick={() => setSelectedFilter(label)}
                     className="flex"
                   >
-                    {/* {selected && <Check className="size-4" />} */}
                     <span>{label}</span>
                   </DropdownMenuCheckboxItem>
                 ))}
@@ -225,12 +191,11 @@ export default function RecentTransactions() {
           </section>
         </section>
       </section>
-      {/* //? Table */}
-      <TabsContent value={selectedTab} className="flex-auto">
+      {/* Transactions table. */}
+      <TabsContent value="transactions" className="flex-auto">
         <Card className="relative rounded-3xl h-full shadow-lg shadow-indigo-200 dark:shadow-none">
           <CardHeader className="px-7">
             <CardTitle className="font-medium">Recent Activities</CardTitle>
-            {/* <CardDescription>Your recent activities.</CardDescription> */}
           </CardHeader>
           <CardContent className="h-[64.11dvh]">
             <ScrollArea className="h-full overflow-scroll overflow-x-hidden">
@@ -249,31 +214,24 @@ export default function RecentTransactions() {
                       <TableHead>Description</TableHead>
                       <TableHead>Entity / Customer</TableHead>
                       <TableHead>Amount (NPR)</TableHead>
-                      <TableHead className="text-right"></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {/* //HOW TO DYNAMICALLY FILTER THE filteredTransactions
-                      array for either last week, last month or last year based
-                      on the TabsContent value  */}
-                    {filteredTransactions?.map((transaction) => {
-                      console.log("PRINT TABS CONTENT VALUE HERE !!!");
-                      return (
-                        //? Table Row Component ⬇️
-                        <TransactionTableRow
-                          key={transaction._id}
-                          _id={transaction._id}
-                          type={transaction.type}
-                          description={transaction.description}
-                          category={transaction.category}
-                          amount={transaction.amount}
-                          customer={transaction.customer}
-                          entity={transaction.entity}
-                          date={transaction.date}
-                        />
-                      );
-                    })}
-                  </TableBody>
+                    <TableHead className="text-right"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredTransactions.map((transaction) => (
+                    <TransactionTableRow
+                      key={transaction._id}
+                      _id={transaction._id}
+                      type={transaction.type}
+                      description={transaction.description}
+                      category={transaction.category}
+                      amount={transaction.amount}
+                      customer={transaction.customer}
+                      entity={transaction.entity}
+                      date={transaction.date}
+                    />
+                  ))}
+                </TableBody>
                 </Table>
               )}
             </ScrollArea>
