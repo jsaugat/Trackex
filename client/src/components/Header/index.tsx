@@ -95,6 +95,11 @@ export default function Header() {
       {/* <section className="flex items-center gap-4">
         <PageTitle title={getTitle()} className="hidden md:block" />
       </section> */}
+      {isDashboard && (
+        <h3 className="text-2xl font-semibold">
+          {greet()}, {user?.name}
+        </h3>
+      )}
 
       {/* Breadcrumb Navigation */}
       {!isDashboard ? (

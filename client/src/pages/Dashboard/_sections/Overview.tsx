@@ -180,14 +180,14 @@ export default function Overview({ salesData, expensesData }: OverviewProps) {
       </div>
 
       {/* <section className="text-xl w-full flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"> */}
-      <section className="flex w-full flex-wrap items-center gap-1 sm:gap-3 lg:w-auto">
+      <section className="flex flex-wrap items-center gap-1 ml-auto p-1 rounded-full border w-fit">
         {/* Date range picker */}
         <Popover>
           <PopoverTrigger asChild>
             <Button
               id="overview-date-range"
               variant="outline"
-              className="max-w-[210px] sm:max-w-[260px] md:max-w-[320px] lg:max-w-none justify-start text-left font-normal rounded-full text-xs"
+              className="max-w-[210px] sm:max-w-[260px] bg-muted/40 border-none md:max-w-[320px] lg:max-w-none justify-start text-left font-normal rounded-full text-xs"
             >
               <CalendarIcon className="mr-2 h-3 w-3" />
               {dateRange?.from && dateRange?.to ? (
@@ -230,7 +230,7 @@ export default function Overview({ salesData, expensesData }: OverviewProps) {
               key={preset.id}
               value={preset.id}
               className={cn(
-                "h-[1.65rem] text-xs border-none rounded-full text-muted-foreground hover:bg-transparent whitespace-nowrap",
+                "h-[1.65rem] text-xs border-none rounded-full font-mono text-muted-foreground hover:bg-transparent whitespace-nowrap",
               )}
             >
               {preset.label}
