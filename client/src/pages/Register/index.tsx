@@ -55,11 +55,11 @@ const InputField: React.FC<InputFieldProps> = ({
   const inputType = type === "password" && showPassword ? "text" : type;
 
   return (
-    <div className={cn("flex flex-col items-start w-full", className)}>
+    <div className={cn("flex flex-col items-start w-full min-w-0", className)}>
       <label className="mb-1 mt-3 text-sm font-medium">{label}</label>
-      <div className="flex w-full relative">
+      <div className="flex w-full min-w-0 relative">
         {prefix && (
-          <span className="flex items-center px-3 rounded-l-lg border border-r-0 bg-muted/20 text-muted-foreground text-xs">
+          <span className="flex items-center px-2 rounded-l-lg border border-r-0 bg-muted/20 text-muted-foreground text-xs whitespace-nowrap">
             {prefix}
           </span>
         )}
@@ -69,7 +69,7 @@ const InputField: React.FC<InputFieldProps> = ({
           onChange={onChange}
           placeholder={placeholder}
           ref={refProp}
-          className={`rounded-lg px-3 py-1 bg-transparent border focus:ring-white/20 focus:border-white/10 flex-1 placeholder-muted-foreground/50 transition-all duration-200 ${
+          className={`rounded-lg px-3 py-1 bg-transparent border focus:ring-white/20 focus:border-white/10 flex-1 min-w-0 placeholder-muted-foreground/50 transition-all duration-200 ${
             prefix ? "rounded-l-none" : ""
           } ${type === "password" ? "pr-10" : ""}`}
         />
@@ -159,59 +159,62 @@ export default function Register() {
 
           {!isOtpStep && (
             <>
-              <InputField
-                label="Full Name"
-                type="text"
-                value={form.name}
-                onChange={handleChange("name")}
-                placeholder="Saugat Joshi"
-                refProp={nameRef}
-              />
-
-              <InputField
-                label="Email Address"
-                type="email"
-                value={form.email}
-                onChange={handleChange("email")}
-                placeholder="john@example.com"
-              />
-
-              <InputField
-                label="Organization Name"
-                type="text"
-                value={form.orgName}
-                onChange={handleChange("orgName")}
-                placeholder="Acme Corp"
-              />
-
-              <div className="flex flex-col w-full">
+              <section className="grid grid-cols-2 gap-x-6 gap-y-1 w-full">
                 <InputField
-                  label="Workspace URL"
+                  label="Full Name"
                   type="text"
-                  value={form.orgSlug}
-                  onChange={handleChange("orgSlug")}
-                  placeholder="acme-corp"
-                  prefix="trackex1.com/"
+                  value={form.name}
+                  onChange={handleChange("name")}
+                  placeholder="Saugat Joshi"
+                  refProp={nameRef}
                 />
-                <p className="text-xs text-muted-foreground/60 ml-1 mt-1">
-                  This will be your unique organization identifier.
-                </p>
-              </div>
 
-              <InputField
-                label="Password"
-                type="password"
-                value={form.password}
-                onChange={handleChange("password")}
-                placeholder="••••••••"
-              />
-              <InputField
-                label="Confirm Password"
-                type="password"
-                value={form.confirmPassword}
-                onChange={handleChange("confirmPassword")}
-                placeholder="••••••••"
-              />
+                <InputField
+                  label="Email Address"
+                  type="email"
+                  value={form.email}
+                  onChange={handleChange("email")}
+                  placeholder="john@example.com"
+                />
+
+                <InputField
+                  label="Organization Name"
+                  type="text"
+                  value={form.orgName}
+                  onChange={handleChange("orgName")}
+                  placeholder="Acme Corp"
+                />
+
+                <div className="flex flex-col w-full min-w-0">
+                  <InputField
+                    label="Workspace URL"
+                    type="text"
+                    value={form.orgSlug}
+                    onChange={handleChange("orgSlug")}
+                    placeholder="acme-corp"
+                    prefix="trackex1.com/"
+                  />
+                  <p className="text-xs text-muted-foreground/60 ml-1 mt-1">
+                    This will be your unique organization identifier.
+                  </p>
+                </div>
+
+                <InputField
+                  label="Password"
+                  type="password"
+                  value={form.password}
+                  onChange={handleChange("password")}
+                  placeholder="••••••••"
+                />
+
+                <InputField
+                  label="Confirm Password"
+                  type="password"
+                  value={form.confirmPassword}
+                  onChange={handleChange("confirmPassword")}
+                  placeholder="••••••••"
+                />
+              </section>
 
               <div className="flex items-start space-x-2 bg-blue-500/10 p-3 rounded-lg border border-blue-500/20 mb-4 w-full mt-4">
                 <ShieldCheck className="text-blue-400" />
