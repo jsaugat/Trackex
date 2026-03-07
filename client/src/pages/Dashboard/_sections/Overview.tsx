@@ -139,14 +139,14 @@ export default function Overview({ salesData, expensesData }: OverviewProps) {
         <div className="flex items-center gap-2">
           {/* Totals for selected date range */}
           <section className="flex justify-center gap-2 text-muted-foreground/50 text-xs">
-            <div className="flex gap-1.5 items-center border border-border/70 p-1 px-2 rounded-lg">
+            <div className="flex gap-1.5 items-center border border-border/70 p-1 px-2 rounded-lg bg-muted/30">
               <div className="h-1.5 w-1.5 bg-emerald-500 rounded-full"></div>
               Revenue{" "}
               <span className="font-medium text-white">
                 NPR {filteredTotals.revenue.toLocaleString()}
               </span>
             </div>
-            <div className="flex gap-1.5 items-center border border-border/70 p-1 px-2 rounded-lg">
+            <div className="flex gap-1.5 items-center border border-border/70 p-1 px-2 rounded-lg bg-muted/30">
               <div className="h-1.5 w-1.5 bg-rose-500 rounded-full"></div>
               Expense{" "}
               <span className="font-medium text-white">
@@ -180,14 +180,14 @@ export default function Overview({ salesData, expensesData }: OverviewProps) {
       </div>
 
       {/* <section className="text-xl w-full flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"> */}
-      <section className="flex flex-wrap items-center gap-1 ml-auto p-1 rounded-full border w-fit">
+      <section className="flex flex-wrap items-center gap-2 p-1 rounded-full w-fit">
         {/* Date range picker */}
         <Popover>
           <PopoverTrigger asChild>
             <Button
               id="overview-date-range"
               variant="outline"
-              className="max-w-[210px] sm:max-w-[260px] bg-muted/40 border-none md:max-w-[320px] lg:max-w-none justify-start text-left font-normal rounded-full text-xs"
+              className="max-w-52.5 sm:max-w-65 bg-muted/40 md:max-w-[320px] lg:max-w-none justify-start text-left font-normal rounded-full text-xs"
             >
               <CalendarIcon className="mr-2 h-3 w-3" />
               {dateRange?.from && dateRange?.to ? (
@@ -222,7 +222,7 @@ export default function Overview({ salesData, expensesData }: OverviewProps) {
           variant="outline"
           size="sm"
           value={selectedPreset}
-          className="flex-wrap p-1 border rounded-full"
+          className="flex-wrap p-1 border rounded-full bg-muted/40"
           onValueChange={handlePresetChange}
         >
           {PRESET_OPTIONS.map((preset) => (
@@ -230,7 +230,7 @@ export default function Overview({ salesData, expensesData }: OverviewProps) {
               key={preset.id}
               value={preset.id}
               className={cn(
-                "h-[1.65rem] text-xs border-none rounded-full font-mono text-muted-foreground hover:bg-transparent whitespace-nowrap",
+                "h-[1.65rem] text-xs border-none rounded-full text-muted-foreground hover:bg-transparent whitespace-nowrap",
               )}
             >
               {preset.label}

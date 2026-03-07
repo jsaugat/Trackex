@@ -164,37 +164,39 @@ export default function TopStats() {
             </h3>
           </div>
 
-          {/* Revenue/Quantity Toggle */}
-          <section className="w-fit flex items-center gap-3">
-            {mode === "products" && (
-              <ToggleGroup
-                type="single"
-                variant="outline"
-                size="sm"
-                value={toggleType}
-                onValueChange={(value) => {
-                  if (value) setToggleType(value);
-                }}
-                className="p-1 border rounded-full"
-              >
-                {productsFilterOptions.map((option) => (
-                  <ToggleGroupItem
-                    key={option.id}
-                    value={option.id}
-                    className={cn(
-                      "h-[1.65rem] border-none rounded-full space-x-2",
-                      toggleType !== option.id &&
-                        "text-muted-foreground hover:bg-transparent",
-                    )}
-                  >
-                    <option.icon className="size-4" />
-                    <span className="capitalize">By {option.id}</span>
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
-            )}
-          </section>
         </header>
+
+          {/* Revenue/Quantity Toggle */}
+        <section className="w-fit flex items-center gap-3 ml-auto">
+          {mode === "products" && (
+            <ToggleGroup
+              type="single"
+              variant="outline"
+              size="sm"
+              value={toggleType}
+              onValueChange={(value) => {
+                if (value) setToggleType(value);
+              }}
+              className="p-1 border rounded-full"
+            >
+              {productsFilterOptions.map((option) => (
+                <ToggleGroupItem
+                  key={option.id}
+                  value={option.id}
+                  className={cn(
+                    "h-[1.65rem] border-none rounded-full space-x-2",
+                    toggleType !== option.id &&
+                      "text-muted-foreground hover:bg-transparent",
+                  )}
+                >
+                  <option.icon className="size-4" />
+                  <span className="capitalize">By {option.id}</span>
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
+          )}
+        </section>
+
         {mode === "products" && (
           <TopSellingProducts
             topProductsByQuantity={topProductsByQuantity}
