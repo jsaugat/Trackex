@@ -72,8 +72,6 @@ export function useRegisterForm() {
       return;
     }
 
-    console.log("registerform", form);
-
     try {
       const res = await register({ ...form }).unwrap();
       if (res?.otpRequired) {
@@ -83,7 +81,12 @@ export function useRegisterForm() {
         });
       }
     } catch (error: any) {
-      toast.error(error?.data?.message || error.error || "An error occurred");
+      const message =
+        error?.data?.errors?.[0]?.message ||
+        error?.data?.message ||
+        error?.error ||
+        "An error occurred";
+      toast.warning(message);
     }
   };
 
@@ -100,7 +103,9 @@ export function useRegisterForm() {
       dispatch(setCredentials({ ...res }));
       navigate("/");
     } catch (error: any) {
-      toast.error(error?.data?.message || error.error || "OTP verification failed");
+      toast.error(
+        error?.data?.message || error.error || "OTP verification failed",
+      );
     }
   };
 
@@ -109,7 +114,9 @@ export function useRegisterForm() {
       await register({ ...form }).unwrap();
       toast.success("OTP resent.");
     } catch (error: any) {
-      toast.error(error?.data?.message || error.error || "Failed to resend OTP");
+      toast.error(
+        error?.data?.message || error.error || "Failed to resend OTP",
+      );
     }
   };
 

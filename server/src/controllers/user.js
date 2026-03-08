@@ -122,6 +122,7 @@ const verifyLoginOtp = asyncHandler(async (req, res) => {
  */
 const registerUser = asyncHandler(async (req, res) => {
   const input = registerSchema.parse(req.body);
+  console.log("inputtt", input);
 
   // Enforce either inviteToken OR org fields
   const hasInvite = !!input.inviteToken;

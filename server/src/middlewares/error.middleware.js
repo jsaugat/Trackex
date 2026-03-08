@@ -10,8 +10,10 @@ export const notFoundHandler = (req, res, next) => {
 export const errorHandler = (err, req, res, next) => {
   // Zod validation errors
   if (err instanceof ZodError) {
+    const firstIssueMessage = err.issues?.[0]?.message || "Validation error";
+
     return res.status(400).json({
-      message: "Validation error",
+      message: firstIssueMessage,
       status_code: 400,
       errors: err.issues.map((i) => ({
         path: i.path.join("."),
