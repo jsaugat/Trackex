@@ -11,7 +11,8 @@ import { toast } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import FormContainer from "@/components/AuthForm";
 import Icon from "@/components/Logo/Icon";
-import { Loader, Eye, EyeOff, RefreshCw } from "lucide-react";
+import { Loader, RefreshCw } from "lucide-react";
+import { InputField } from "@/components/InputField";
 import {
   InputOTP,
   InputOTPGroup,
@@ -21,7 +22,6 @@ import {
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [isOtpStep, setIsOtpStep] = useState(false);
   const [otp, setOtp] = useState("");
   const emailInputRef = useRef<HTMLInputElement | null>(null);
@@ -105,12 +105,9 @@ function Login() {
     }
   };
 
-  const inputCSS =
-    "rounded-lg px-3 py-1 bg-transparent border focus:ring-white/20 focus:border-white/20 w-[20rem] placeholder-muted-foreground/50";
-
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <main className="h-screen w-full flex items-center justify-center bg-secondary/20">
+      <main className="h-screen w-full flex items-center justify-center bg-background">
         <Icon className="absolute top-6 left-6 size-8" />
         <Button
           variant="outline"
@@ -121,9 +118,9 @@ function Login() {
         </Button>
         <FormContainer
           submitHandler={isOtpStep ? handleOtpSubmit : handleCredentialSubmit}
-          className=""
+          className="border-none"
         >
-          <div className="mb-6 text-left w-full">
+          <div className="mb-6 text-center w-full">
             {!isOtpStep ? (
               <h3 className="text-3xl font-bold">Welcome back</h3>
             ) : (
@@ -145,38 +142,26 @@ function Login() {
           </div>
 
           {!isOtpStep && (
-            <div className="flex flex-col items-start">
-              <label htmlFor="email" className="mb-1 mt-3 font-medium">
-                Email
-              </label>
-              <input
+            <div className="flex flex-col items-start w-full">
+              <InputField
                 id="email"
+                label="Email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                ref={emailInputRef}
-                className={inputCSS}
+                placeholder="john@example.com"
+                refProp={emailInputRef}
+                className="w-full sm:w-[20rem]"
               />
-              <label htmlFor="password" className="mb-1 mt-3 font-medium">
-                Password
-              </label>
-              <div className="relative w-full sm:w-[20rem]">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={`${inputCSS} w-full pr-10`}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white hover:bg-transparent transition-colors h-auto w-auto p-2"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </Button>
-              </div>
+              <InputField
+                id="password"
+                label="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full sm:w-[20rem]"
+              />
               <div className="w-full flex justify-end mt-2">
                 <Link
                   to="/forgot-password"
