@@ -1,6 +1,12 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { AlertTriangle, Building2, Loader2, UserCircle2 } from "lucide-react";
+import {
+  AlertTriangle,
+  Building2,
+  Loader2,
+  Save,
+  UserCircle2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/hooks/storeHooks";
 import {
@@ -235,7 +241,10 @@ export default function OrganizationSettings() {
                     Saving...
                   </>
                 ) : (
-                  "Save Organization"
+                  <div className="flex gap-1 items-center font-semibold">
+                    <Save size={14} />
+                    Save Organization
+                  </div>
                 )}
               </Button>
             </form>
@@ -290,7 +299,10 @@ export default function OrganizationSettings() {
                     Saving...
                   </>
                 ) : (
-                  "Save Profile"
+                  <div className="flex gap-1 items-center font-semibold">
+                    <Save size={14} />
+                    Save Profile
+                  </div>
                 )}
               </Button>
             </form>
@@ -298,13 +310,11 @@ export default function OrganizationSettings() {
         </Card>
       </section>
 
-      <Card className="border-destructive/30">
+      <Card className="border-destructive/30 bg-destructive/10">
         <CardHeader className="space-y-3">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="size-5 text-destructive" />
-            <CardTitle className="text-lg text-destructive">
-              Danger Zone
-            </CardTitle>
+            <AlertTriangle className="size-5 text-red-700" />
+            <CardTitle className="text-lg text-red-700">Danger Zone</CardTitle>
           </div>
           <CardDescription>
             Destructive actions for this workspace. These changes cannot be
