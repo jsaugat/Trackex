@@ -5,14 +5,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LoadingState } from "@/components/ui/loading-state";
 import { EmptyState } from "@/components/ui/empty-state";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useManualInfiniteList } from "@/hooks/useManualInfiniteList";
 import {
   useLazyGetAuditLogsQuery,
   type AuditLogFilters,
 } from "@/slices/api/auditLogs.api";
 
+const ALL_OPTION_VALUE = "__all__";
+
 const ACTION_OPTIONS = [
-  { label: "All actions", value: "" },
+  { label: "All actions", value: ALL_OPTION_VALUE },
   { label: "Transaction Created", value: "transaction.created" },
   { label: "Transaction Updated", value: "transaction.updated" },
   { label: "Transaction Deleted", value: "transaction.deleted" },
@@ -23,7 +32,7 @@ const ACTION_OPTIONS = [
 ];
 
 const ENTITY_OPTIONS = [
-  { label: "All entities", value: "" },
+  { label: "All entities", value: ALL_OPTION_VALUE },
   { label: "Expense", value: "expense" },
   { label: "Revenue", value: "revenue" },
   { label: "User", value: "user" },
@@ -93,29 +102,41 @@ export default function AuditLogs() {
       </section>
 
       <section className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <select
-          value={action}
-          onChange={(event) => setAction(event.target.value)}
-          className="h-10 rounded-md border bg-background px-3 text-sm"
+        <Select
+          value={action || ALL_OPTION_VALUE}
+          onValueChange={(value) =>
+            setAction(value === ALL_OPTION_VALUE ? "" : value)
+          }
         >
-          {ACTION_OPTIONS.map((option) => (
-            <option key={option.value || "all-actions"} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className="h-10">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {ACTION_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-        <select
-          value={entity}
-          onChange={(event) => setEntity(event.target.value)}
-          className="h-10 rounded-md border bg-background px-3 text-sm"
+        <Select
+          value={entity || ALL_OPTION_VALUE}
+          onValueChange={(value) =>
+            setEntity(value === ALL_OPTION_VALUE ? "" : value)
+          }
         >
-          {ENTITY_OPTIONS.map((option) => (
-            <option key={option.value || "all-entities"} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className="h-10">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {ENTITY_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
         <Input
           type="date"
