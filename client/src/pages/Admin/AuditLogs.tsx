@@ -1,10 +1,9 @@
 import { useMemo, useState } from "react";
-import { formatDistanceToNow } from "date-fns";
+import { endOfDay, formatDistanceToNow, startOfDay } from "date-fns";
 import { Activity, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { LoadingState } from "@/components/ui/loading-state";
-import { EmptyState } from "@/components/ui/empty-state";
+import NoRecords from "@/components/NoRecords";
 import {
   Select,
   SelectContent,
@@ -13,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useManualInfiniteList } from "@/hooks/useManualInfiniteList";
+import DateRangePicker from "@/pages/Transactions/_components/DateRangePicker";
 import {
   useLazyGetAuditLogsQuery,
   type AuditLogFilters,
@@ -48,8 +48,7 @@ function prettifyAction(action: string) {
 export default function AuditLogs() {
   const [action, setAction] = useState("");
   const [entity, setEntity] = useState("");
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
+  const [dateRange, setDateRange] = useState<any>();
 
   // Using lazy query to have more control over when it executes (e.g., on filter change)
   const [triggerGetAuditLogs] = useLazyGetAuditLogsQuery();
@@ -59,10 +58,18 @@ export default function AuditLogs() {
     const nextFilters: AuditLogFilters = {};
     if (action) nextFilters.action = action;
     if (entity) nextFilters.entity = entity;
-    if (from) nextFilters.from = from;
-    if (to) nextFilters.to = to;
+
+    if (dateRange?.from) {
+      const fromDate = startOfDay(dateRange.from);
+      const toDate = dateRange?.to
+        ? endOfDay(dateRange.to)
+        : endOfDay(dateRange.from);
+      nextFilters.from = fromDate.toISOString();
+      nextFilters.to = toDate.toISOString();
+    }
+
     return nextFilters;
-  }, [action, entity, from, to]);
+  }, [action, entity, dateRange]);
 
   // Infinite list hook for paginated audit logs
   const {
@@ -92,7 +99,7 @@ export default function AuditLogs() {
   });
 
   return (
-    <main className="space-y-6">
+    <main className="space-y-4">
       <section className="space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight">Audit Logs</h1>
         <p className="text-sm text-muted-foreground">
@@ -101,14 +108,14 @@ export default function AuditLogs() {
         </p>
       </section>
 
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-3">
+      <section className="flex gap-2 justify-end">
         <Select
           value={action || ALL_OPTION_VALUE}
           onValueChange={(value) =>
             setAction(value === ALL_OPTION_VALUE ? "" : value)
           }
         >
-          <SelectTrigger className="h-10">
+          <SelectTrigger className="h-8 w-fit bg-background justify-self-start rounded-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -126,7 +133,7 @@ export default function AuditLogs() {
             setEntity(value === ALL_OPTION_VALUE ? "" : value)
           }
         >
-          <SelectTrigger className="h-10">
+          <SelectTrigger className="h-8 w-fit bg-background justify-self-start rounded-full">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -138,18 +145,11 @@ export default function AuditLogs() {
           </SelectContent>
         </Select>
 
-        <Input
-          type="date"
-          value={from}
-          onChange={(event) => setFrom(event.target.value)}
-          placeholder="From"
-        />
-
-        <Input
-          type="date"
-          value={to}
-          onChange={(event) => setTo(event.target.value)}
-          placeholder="To"
+        <DateRangePicker
+          date={dateRange}
+          setDate={setDateRange}
+          className="md:col-span-2 w-fit justify-self-start"
+          buttonClassName="h-8 w-fit rounded-full bg-background"
         />
       </section>
 
@@ -157,10 +157,10 @@ export default function AuditLogs() {
         <LoadingState message="Loading activity log" />
       ) : error ? (
         <section className="space-y-3">
-          <EmptyState
-            icon={<RefreshCw className="size-7 text-muted-foreground" />}
-            message="Could not load audit logs"
-            description="Try refreshing the timeline."
+          <NoRecords
+            icon={RefreshCw}
+            missingThing="audit logs"
+            message="Could not load audit logs. Try refreshing the timeline."
           />
           <div className="flex justify-center">
             <Button size="sm" variant="outline" onClick={retry}>
@@ -169,10 +169,10 @@ export default function AuditLogs() {
           </div>
         </section>
       ) : items.length === 0 ? (
-        <EmptyState
-          icon={<Activity className="size-7 text-muted-foreground" />}
-          message="No activity found"
-          description="Try adjusting the filters to see more results."
+        <NoRecords
+          icon={Activity}
+          missingThing="activity"
+          message="Try adjusting the filters to see more results."
         />
       ) : (
         <section className="space-y-3">

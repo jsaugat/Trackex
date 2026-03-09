@@ -10,7 +10,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-export default function DateRangePicker({ date, setDate, className }) {
+export default function DateRangePicker({
+  date,
+  setDate,
+  className,
+  buttonClassName,
+}) {
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover>
@@ -20,7 +25,8 @@ export default function DateRangePicker({ date, setDate, className }) {
             variant={"outline"}
             className={cn(
               "min-w-fit text-left font-normal rounded-full justify-start",
-              !date && "text-muted-foreground"
+              !date && "text-muted-foreground",
+              buttonClassName
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
