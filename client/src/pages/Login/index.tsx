@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import FormContainer from "@/components/AuthForm";
 import Icon from "@/components/Logo/Icon";
-import { Loader, RefreshCw } from "lucide-react";
+import { LogIn, Loader, RefreshCw } from "lucide-react";
 import { InputField } from "@/components/InputField";
 import {
   InputOTP,
@@ -121,6 +121,9 @@ function Login() {
           className="border-none"
         >
           <div className="mb-6 text-center w-full">
+            <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400 w-fit  mb-2 mx-auto">
+              <LogIn />
+            </div>
             {!isOtpStep ? (
               <h3 className="text-3xl font-bold">Welcome back</h3>
             ) : (

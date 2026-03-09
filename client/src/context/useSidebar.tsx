@@ -6,7 +6,7 @@ const SidebarContext = createContext();
 //? Create a custom provider component
 export const SidebarProvider = ({ children }) => {
   // State
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   // Toggle handler
   const toggleSidebar = () => setIsCollapsed((prevState) => !prevState);
