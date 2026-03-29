@@ -30,24 +30,11 @@ Trackex is a MERN stack expense and revenue tracking application designed for or
 - Charts respond to filters, date ranges, and category selection
 - Skeleton loaders and empty/error states for better UX
 
-### Budgets
-
-- Per-category monthly budgets per organization
-- Progress bars indicate usage with color thresholds (green → amber → red)
-- Remaining amount and % used shown alongside each category
-- Subtle prompts to set budgets if none exist
-
 ### Audit Log
 
 - Tracks create/edit/delete actions for transactions, budgets, and user roles
 - Admin-only timeline view of recent activities
 - Reusable logging system integrated into backend controllers
-
-### Export & Reports
-
-- CSV export respecting active filters
-- PDF report captures KPI cards and chart snapshots
-- Provides quick offline summaries for any date range
 
 ### Mobile & Responsive Design
 
