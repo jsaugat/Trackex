@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "@/hooks/storeHooks";
 import {
   useLoginMutation,
+  useGuestLoginMutation,
   useVerifyLoginOtpMutation,
 } from "@/slices/api/auth.api";
 import { setCredentials } from "@/slices/authSlice";
@@ -34,6 +35,8 @@ function Login() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [login, { isLoading: isLoginLoading }] = useLoginMutation();
+  const [guestLogin, { isLoading: isGuestLoginLoading }] =
+    useGuestLoginMutation();
   const [verifyLoginOtp, { isLoading: isOtpLoading }] =
     useVerifyLoginOtpMutation();
 
@@ -102,6 +105,19 @@ function Login() {
       toast.success("OTP resent.");
     } catch (err: any) {
       toast.error(err?.data?.message || err?.error || "Failed to resend OTP");
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    try {
+      const res = await guestLogin({}).unwrap();
+      dispatch(setCredentials({ ...res }));
+      toast.success("Continuing as guest.");
+      navigate("/");
+    } catch (err: any) {
+      toast.error(err?.data?.message || err?.error || "Guest login failed", {
+        description: "Demo mode is unavailable right now.",
+      });
     }
   };
 
@@ -182,6 +198,18 @@ function Login() {
                 {!isLoginLoading && (
                   <span className="font-semibold">Sign In</span>
                 )}
+              </Button>
+              <Button
+                type="button"
+                disabled={isGuestLoginLoading}
+                variant="outline"
+                className="mt-3 w-full rounded-lg"
+                onClick={handleGuestLogin}
+              >
+                {isGuestLoginLoading && (
+                  <Loader className="animate-spin size-4 mr-2" />
+                )}
+                <span className="font-semibold">Continue as Guest</span>
               </Button>
             </div>
           )}

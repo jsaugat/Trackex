@@ -47,6 +47,12 @@ const buildAuthPayload = (user, token) => {
   };
 };
 
+const ensureGuestLoginEnabled = () => {
+  if (process.env.ENABLE_GUEST_LOGIN !== "true") {
+    throw new AppError("Guest login is disabled.", 403);
+  }
+};
+
 /**
  *  @desc    Validate credentials and start email OTP login verification
  *  @route   POST /api/auth/login
@@ -110,6 +116,40 @@ const verifyLoginOtp = asyncHandler(async (req, res) => {
   await user.clearLoginOtp();
 
   // Successful OTP verification; issue JWT token for authenticated sessions.
+  const token = generateToken(res, user._id);
+
+  res.status(200).json(buildAuthPayload(user, token));
+});
+
+/**
+ *  @desc    Login with pre-seeded guest account (no credentials/OTP)
+ *  @route   POST /api/auth/guest
+ *  @access  Public (env-gated)
+ */
+const guestLogin = asyncHandler(async (req, res) => {
+  ensureGuestLoginEnabled();
+
+  const guestEmail = process.env.GUEST_LOGIN_EMAIL || "guest@trackex.com";
+
+  const user = await User.findOne({ email: guestEmail }).populate(
+    "organization",
+  );
+
+  if (!user) {
+    throw new AppError(
+      "Demo account is not seeded. Run the seed script and try again.",
+      404,
+    );
+  }
+
+  if (!user.organization) {
+    throw new AppError("Demo account is missing organization mapping.", 400);
+  }
+
+  if (user.role !== "manager") {
+    throw new AppError("Demo account role must be manager.", 400);
+  }
+
   const token = generateToken(res, user._id);
 
   res.status(200).json(buildAuthPayload(user, token));
@@ -296,6 +336,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 export {
   loginUser,
   verifyLoginOtp,
+  guestLogin,
   registerUser,
   logoutUser,
   getUserProfile,

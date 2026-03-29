@@ -81,7 +81,13 @@ Trackex is a MERN stack expense and revenue tracking application designed for or
 
    `bun install`
 
-3. Set environment variables in .env (MongoDB URI, JWT secret, etc.)
+3. Set environment variables in `.env`:
+   - `MONGO_URL`
+   - `JWT_SECRET_KEY`
+   - `CORS_ORIGIN`
+   - `CLIENT_URL`
+   - `ENABLE_GUEST_LOGIN=true`
+   - `GUEST_LOGIN_EMAIL=guest@trackex.com`
 
 4. Start development servers:
    `bun run client` & `bun run server`
@@ -90,9 +96,21 @@ Trackex is a MERN stack expense and revenue tracking application designed for or
 
 ## Demo & Guest Access
 
-**Guest login:** `guest@trackex.com` / `guest123`
+- Login page includes **Continue as Guest** for instant access (no email/password/OTP input).
+- Backend endpoint: `POST /api/auth/guest`.
+- Endpoint is available only when `ENABLE_GUEST_LOGIN=true`.
+- Demo account is resolved from `GUEST_LOGIN_EMAIL` (default `guest@trackex.com`).
 
-Guest users access pre-seeded realistic 90-day transaction data across categories, allowing exploration of charts, budgets, and audit logs without creating an account.
+Seed demo org + guest data:
+
+```bash
+cd server
+MONGO_URL=<your-mongo-uri> ENABLE_GUEST_LOGIN=true GUEST_LOGIN_EMAIL=guest@trackex.com node scripts/seedOrgData.js
+```
+
+Demo credentials (fallback login, if needed):
+
+- `guest@trackex.com / guest123`
 
 ## Miscelleanous
 

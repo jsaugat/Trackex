@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAppSelector, useAppDispatch } from "@/hooks/storeHooks";
+import { skipToken } from "@reduxjs/toolkit/query";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,13 +41,14 @@ import NoRecords from "@/components/NoRecords";
 export default function Users() {
   const [searchQuery, setSearchQuery] = useState("");
   const currentUser = useAppSelector((state) => state.auth.userInfo);
+  const currentUserRole = currentUser?.role;
   const usersData = useAppSelector((state) => state.users.data || []);
   const {
     data: fetchedUsers,
     isLoading: isGettingUsers,
     error,
     refetch: refetchUsers,
-  } = useGetUsersQuery();
+  } = useGetUsersQuery(skipToken);
   const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
   const dispatch = useAppDispatch();
 
@@ -117,6 +119,7 @@ export default function Users() {
               userId={user._id}
               role={user.role}
               registeredOn={user.createdAt}
+              currentUserRole={currentUserRole}
               handleDeleteUser={handleDeleteUser}
               isDeleting={isDeleting}
               //
@@ -134,6 +137,7 @@ const UserCard = ({
   email,
   userId,
   role,
+  currentUserRole,
   handleDeleteUser,
   isDeleting,
   refetchUsers,
@@ -142,6 +146,8 @@ const UserCard = ({
   const dispatch = useAppDispatch();
   const canChangeRole = role !== "owner";
   const nextRole = role === "manager" ? "member" : "manager";
+  const canManageUsers = currentUserRole === "owner";
+  const canShowActions = canManageUsers && role !== "owner";
 
   const handleRoleChange = async (idToUpdate) => {
     try {
@@ -179,7 +185,10 @@ const UserCard = ({
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <p>{name}</p>
               {role === "owner" && (
-                <Crown className="size-5 text-amber-500" strokeWidth={"2.5px"} />
+                <Crown
+                  className="size-5 text-amber-500"
+                  strokeWidth={"2.5px"}
+                />
               )}
               {role === "manager" && (
                 <ShieldCheck
@@ -191,51 +200,53 @@ const UserCard = ({
             <span className="text-googleBlue">{email}</span>
           </div>
         </section>
-        <section className="buttons grid gap-2">
-          <ChangeRoleAlertDialog
-            trigger={
-              <Button
-                variant={role === "manager" ? "secondary" : "default"}
-                size="sm"
-                className="flex items-center gap-2"
-                disabled={!canChangeRole}
-              >
-                {role === "manager" ? (
-                  <>
-                    <ShieldX className="size-4" strokeWidth={"2px"} />
-                    <span>Set Member</span>
-                  </>
-                ) : (
-                  <>
-                    <ShieldCheck className="size-4" strokeWidth={"2px"} />
-                    <span>Set Manager</span>
-                  </>
-                )}
-              </Button>
-            }
-            userId={userId}
-            makeManager={role === "manager" ? false : true}
-            canChangeRole={canChangeRole}
-            nextRole={nextRole}
-            isChangingRole={isChangingRole}
-            handleRoleChange={handleRoleChange}
-          />
-          <DeleteAlertDialog
-            trigger={
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <Trash2 className="size-3" strokeWidth={"1.5px"} />
-                <span>Remove</span>
-              </Button>
-            }
-            userId={userId}
-            handleDeleteUser={handleDeleteUser}
-            isDeleting={isDeleting}
-          />
-        </section>
+        {canShowActions && (
+          <section className="buttons grid gap-2">
+            <ChangeRoleAlertDialog
+              trigger={
+                <Button
+                  variant={role === "manager" ? "secondary" : "default"}
+                  size="sm"
+                  className="flex items-center gap-2"
+                  disabled={!canChangeRole}
+                >
+                  {role === "manager" ? (
+                    <>
+                      <ShieldX className="size-4" strokeWidth={"2px"} />
+                      <span>Set Member</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShieldCheck className="size-4" strokeWidth={"2px"} />
+                      <span>Set Manager</span>
+                    </>
+                  )}
+                </Button>
+              }
+              userId={userId}
+              makeManager={role === "manager" ? false : true}
+              canChangeRole={canChangeRole}
+              nextRole={nextRole}
+              isChangingRole={isChangingRole}
+              handleRoleChange={handleRoleChange}
+            />
+            <DeleteAlertDialog
+              trigger={
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <Trash2 className="size-3" strokeWidth={"1.5px"} />
+                  <span>Remove</span>
+                </Button>
+              }
+              userId={userId}
+              handleDeleteUser={handleDeleteUser}
+              isDeleting={isDeleting}
+            />
+          </section>
+        )}
       </section>
     </figure>
   );
