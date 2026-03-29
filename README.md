@@ -36,13 +36,6 @@ Trackex is a MERN stack expense and revenue tracking application designed for or
 - Admin-only timeline view of recent activities
 - Reusable logging system integrated into backend controllers
 
-### Mobile & Responsive Design
-
-- Sidebar collapses to bottom tab bar on mobile
-- Transaction modal goes full-screen
-- Charts scroll horizontally on small screens
-- Dashboard KPI cards stack correctly
-
 ---
 
 ## Tech Stack
