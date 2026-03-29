@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useAppSelector, useAppDispatch } from "@/hooks/storeHooks";
-import { skipToken } from "@reduxjs/toolkit/query";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,7 +47,7 @@ export default function Users() {
     isLoading: isGettingUsers,
     error,
     refetch: refetchUsers,
-  } = useGetUsersQuery(skipToken);
+  } = useGetUsersQuery(undefined);
   const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
   const dispatch = useAppDispatch();
 
@@ -146,8 +145,10 @@ const UserCard = ({
   const dispatch = useAppDispatch();
   const canChangeRole = role !== "owner";
   const nextRole = role === "manager" ? "member" : "manager";
-  const canManageUsers = currentUserRole === "owner";
-  const canShowActions = canManageUsers && role !== "owner";
+  const isOwner = currentUserRole === "owner";
+  const isManager = currentUserRole === "manager";
+  const canShowActions =
+    (isOwner && role !== "owner") || (isManager && role === "member");
 
   const handleRoleChange = async (idToUpdate) => {
     try {
@@ -170,20 +171,20 @@ const UserCard = ({
   };
 
   return (
-    <figure className="p-4 bg-background border rounded-2xl shadow-md shadow-indigo-400 dark:shadow-none backdrop-blur-sm flex justify-around items-center gap-4">
-      <section>
+    <figure className="min-h-43 p-4 bg-background border rounded-2xl shadow-md shadow-indigo-400 dark:shadow-none backdrop-blur-sm flex items-center gap-4">
+      <section className="shrink-0">
         <img
           width={90}
           src={`https://api.dicebear.com/7.x/lorelei/svg?seed=${name}`}
           alt="avatar"
-          className="rounded-full bg-muted dark:bg-foreground"
+          className="rounded-full bg-muted dark:bg-foreground border"
         />
       </section>
-      <section className="space-y-2">
-        <section className="flex flex-1 justify-between items-center">
+      <section className="flex-1 min-w-0 space-y-3">
+        <section className="flex justify-between items-center">
           <div className="flex flex-col items-start">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <p>{name}</p>
+            <h3 className="text-lg font-semibold flex items-center gap-2 leading-none">
+              <p className="truncate">{name}</p>
               {role === "owner" && (
                 <Crown
                   className="size-5 text-amber-500"
@@ -197,56 +198,60 @@ const UserCard = ({
                 />
               )}
             </h3>
-            <span className="text-googleBlue">{email}</span>
+            <span className="text-googleBlue text-sm break-all">{email}</span>
           </div>
         </section>
-        {canShowActions && (
-          <section className="buttons grid gap-2">
-            <ChangeRoleAlertDialog
-              trigger={
-                <Button
-                  variant={role === "manager" ? "secondary" : "default"}
-                  size="sm"
-                  className="flex items-center gap-2"
-                  disabled={!canChangeRole}
-                >
-                  {role === "manager" ? (
-                    <>
-                      <ShieldX className="size-4" strokeWidth={"2px"} />
-                      <span>Set Member</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShieldCheck className="size-4" strokeWidth={"2px"} />
-                      <span>Set Manager</span>
-                    </>
-                  )}
-                </Button>
-              }
-              userId={userId}
-              makeManager={role === "manager" ? false : true}
-              canChangeRole={canChangeRole}
-              nextRole={nextRole}
-              isChangingRole={isChangingRole}
-              handleRoleChange={handleRoleChange}
-            />
-            <DeleteAlertDialog
-              trigger={
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2"
-                >
-                  <Trash2 className="size-3" strokeWidth={"1.5px"} />
-                  <span>Remove</span>
-                </Button>
-              }
-              userId={userId}
-              handleDeleteUser={handleDeleteUser}
-              isDeleting={isDeleting}
-            />
-          </section>
-        )}
+        <section className="buttons grid gap-2 min-h-18">
+          {canShowActions ? (
+            <>
+              <ChangeRoleAlertDialog
+                trigger={
+                  <Button
+                    variant={role === "manager" ? "secondary" : "default"}
+                    size="sm"
+                    className="w-full flex items-center gap-2"
+                    disabled={!canChangeRole}
+                  >
+                    {role === "manager" ? (
+                      <>
+                        <ShieldX className="size-4" strokeWidth={"2px"} />
+                        <span>Set Member</span>
+                      </>
+                    ) : (
+                      <>
+                        <ShieldCheck className="size-4" strokeWidth={"2px"} />
+                        <span>Set Manager</span>
+                      </>
+                    )}
+                  </Button>
+                }
+                userId={userId}
+                makeManager={role === "manager" ? false : true}
+                canChangeRole={canChangeRole}
+                nextRole={nextRole}
+                isChangingRole={isChangingRole}
+                handleRoleChange={handleRoleChange}
+              />
+              <DeleteAlertDialog
+                trigger={
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full flex items-center gap-2"
+                  >
+                    <Trash2 className="size-3" strokeWidth={"1.5px"} />
+                    <span>Remove</span>
+                  </Button>
+                }
+                userId={userId}
+                handleDeleteUser={handleDeleteUser}
+                isDeleting={isDeleting}
+              />
+            </>
+          ) : (
+            <div className="h-full rounded-md border border-dashed border-border/80 bg-muted/20" />
+          )}
+        </section>
       </section>
     </figure>
   );

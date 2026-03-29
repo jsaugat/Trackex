@@ -10,6 +10,8 @@
  *   - Set `SEED_FORCE=true` to delete existing org data before seeding.
  */
 
+import "dotenv/config";
+
 import mongoose from "mongoose";
 import Category from "../src/models/Category.js";
 import Revenue from "../src/models/Revenue.js";
@@ -24,6 +26,35 @@ const DEMO_OWNER_EMAIL = process.env.DEMO_OWNER_EMAIL || "owner@trackex.com";
 const DEMO_OWNER_PASSWORD = process.env.DEMO_OWNER_PASSWORD || "owner123";
 const DEMO_GUEST_EMAIL = process.env.GUEST_LOGIN_EMAIL || "guest@trackex.com";
 const DEMO_GUEST_PASSWORD = process.env.DEMO_GUEST_PASSWORD || "guest123";
+const DEMO_TEAM_PASSWORD = process.env.DEMO_TEAM_PASSWORD || "guest123";
+
+const demoTeamUsers = [
+  {
+    name: "Maya Manager",
+    email: "maya.manager@trackex.com",
+    role: "manager",
+  },
+  {
+    name: "Ravi Manager",
+    email: "ravi.manager@trackex.com",
+    role: "manager",
+  },
+  {
+    name: "Asha Member",
+    email: "asha.member@trackex.com",
+    role: "member",
+  },
+  {
+    name: "Noah Member",
+    email: "noah.member@trackex.com",
+    role: "member",
+  },
+  {
+    name: "Emma Member",
+    email: "emma.member@trackex.com",
+    role: "member",
+  },
+];
 
 const daysAgo = (days) => {
   const date = new Date();
@@ -168,6 +199,76 @@ const ensureDemoGuestManager = async (organizationId) => {
   }
 };
 
+const upsertDemoOrgUser = async ({
+  name,
+  email,
+  password,
+  role,
+  organizationId,
+}) => {
+  const existingUser = await User.findOne({ email });
+
+  if (!existingUser) {
+    await User.create({
+      name,
+      email,
+      password,
+      role,
+      organization: organizationId,
+    });
+
+    return "created";
+  }
+
+  if (String(existingUser.organization) !== String(organizationId)) {
+    console.warn(
+      `Skipped demo user ${email}: email already belongs to another organization.`,
+    );
+    return "skipped";
+  }
+
+  let shouldSave = false;
+  if (existingUser.name !== name) {
+    existingUser.name = name;
+    shouldSave = true;
+  }
+
+  if (existingUser.role !== role) {
+    existingUser.role = role;
+    shouldSave = true;
+  }
+
+  if (shouldSave) {
+    await existingUser.save();
+    return "updated";
+  }
+
+  return "unchanged";
+};
+
+const ensureDemoTeamUsers = async (organizationId) => {
+  const summary = {
+    created: 0,
+    updated: 0,
+    unchanged: 0,
+    skipped: 0,
+  };
+
+  for (const user of demoTeamUsers) {
+    const status = await upsertDemoOrgUser({
+      ...user,
+      password: DEMO_TEAM_PASSWORD,
+      organizationId,
+    });
+
+    summary[status] += 1;
+  }
+
+  console.log(
+    `Demo users seeded (created: ${summary.created}, updated: ${summary.updated}, unchanged: ${summary.unchanged}, skipped: ${summary.skipped}).`,
+  );
+};
+
 const seed = async () => {
   if (!process.env.MONGO_URL) {
     throw new Error("Missing MONGO_URL env var.");
@@ -177,6 +278,7 @@ const seed = async () => {
 
   const organization = await ensureDemoOrganization();
   await ensureDemoGuestManager(organization._id);
+  await ensureDemoTeamUsers(organization._id);
 
   const existingCategoryCount = await Category.countDocuments({
     organization: organization._id,

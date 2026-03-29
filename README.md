@@ -85,12 +85,18 @@ Seed demo org + guest data:
 
 ```bash
 cd server
-MONGO_URL=<your-mongo-uri> ENABLE_GUEST_LOGIN=true GUEST_LOGIN_EMAIL=guest@trackex.com node scripts/seedOrgData.js
+MONGO_URL=<your-mongo-uri> ENABLE_GUEST_LOGIN=true GUEST_LOGIN_EMAIL=guest@trackex.com npm run seed:demo
 ```
 
 Demo credentials (fallback login, if needed):
 
 - `guest@trackex.com / guest123`
+- `owner@trackex.com / owner123`
+- `maya.manager@trackex.com / guest123`
+- `ravi.manager@trackex.com / guest123`
+- `asha.member@trackex.com / guest123`
+- `noah.member@trackex.com / guest123`
+- `emma.member@trackex.com / guest123`
 
 ## Miscelleanous
 
