@@ -16,6 +16,7 @@ import mongoose from "mongoose";
 import Category from "../src/models/Category.js";
 import Revenue from "../src/models/Revenue.js";
 import Expense from "../src/models/Expense.js";
+import AuditLog from "../src/models/AuditLog.js";
 import Organization from "../src/models/Organization.js";
 import User from "../src/models/User.js";
 
@@ -269,6 +270,196 @@ const ensureDemoTeamUsers = async (organizationId) => {
   );
 };
 
+const getAuditSeedEntries = ({
+  organizationId,
+  ownerId,
+  guestId,
+  memberIds,
+}) => {
+  const [firstMemberId, secondMemberId] = memberIds;
+
+  return [
+    {
+      organization: organizationId,
+      actor: ownerId,
+      action: "invite.sent",
+      entity: "invite",
+      entityId: new mongoose.Types.ObjectId().toString(),
+      meta: {
+        role: "member",
+        email: "asha.member@trackex.com",
+      },
+      createdAt: daysAgo(26),
+      updatedAt: daysAgo(26),
+    },
+    {
+      organization: organizationId,
+      actor: ownerId,
+      action: "invite.accepted",
+      entity: "invite",
+      entityId: new mongoose.Types.ObjectId().toString(),
+      meta: {
+        acceptedBy: "asha.member@trackex.com",
+        role: "member",
+      },
+      createdAt: daysAgo(25),
+      updatedAt: daysAgo(25),
+    },
+    {
+      organization: organizationId,
+      actor: guestId,
+      action: "transaction.created",
+      entity: "expense",
+      entityId: new mongoose.Types.ObjectId().toString(),
+      meta: {
+        amount: 555,
+        category: "Internet",
+        description: "Vianet",
+      },
+      createdAt: daysAgo(20),
+      updatedAt: daysAgo(20),
+    },
+    {
+      organization: organizationId,
+      actor: guestId,
+      action: "transaction.created",
+      entity: "revenue",
+      entityId: new mongoose.Types.ObjectId().toString(),
+      meta: {
+        amount: 34000,
+        category: "Eye Care",
+        description: "Drops",
+      },
+      createdAt: daysAgo(18),
+      updatedAt: daysAgo(18),
+    },
+    {
+      organization: organizationId,
+      actor: ownerId,
+      action: "user.role_changed",
+      entity: "user",
+      entityId: firstMemberId
+        ? String(firstMemberId)
+        : new mongoose.Types.ObjectId().toString(),
+      meta: {
+        fromRole: "member",
+        toRole: "manager",
+      },
+      createdAt: daysAgo(12),
+      updatedAt: daysAgo(12),
+    },
+    {
+      organization: organizationId,
+      actor: ownerId,
+      action: "user.role_changed",
+      entity: "user",
+      entityId: firstMemberId
+        ? String(firstMemberId)
+        : new mongoose.Types.ObjectId().toString(),
+      meta: {
+        fromRole: "manager",
+        toRole: "member",
+      },
+      createdAt: daysAgo(10),
+      updatedAt: daysAgo(10),
+    },
+    {
+      organization: organizationId,
+      actor: guestId,
+      action: "transaction.updated",
+      entity: "revenue",
+      entityId: new mongoose.Types.ObjectId().toString(),
+      meta: {
+        field: "amount",
+        previousValue: 5000,
+        nextValue: 5200,
+      },
+      createdAt: daysAgo(7),
+      updatedAt: daysAgo(7),
+    },
+    {
+      organization: organizationId,
+      actor: guestId,
+      action: "transaction.deleted",
+      entity: "expense",
+      entityId: new mongoose.Types.ObjectId().toString(),
+      meta: {
+        amount: 399,
+        category: "Internet",
+      },
+      createdAt: daysAgo(5),
+      updatedAt: daysAgo(5),
+    },
+    {
+      organization: organizationId,
+      actor: ownerId,
+      action: "invite.revoked",
+      entity: "invite",
+      entityId: new mongoose.Types.ObjectId().toString(),
+      meta: {
+        email: "old.member@trackex.com",
+      },
+      createdAt: daysAgo(3),
+      updatedAt: daysAgo(3),
+    },
+    {
+      organization: organizationId,
+      actor: guestId,
+      action: "user.role_changed",
+      entity: "user",
+      entityId: secondMemberId
+        ? String(secondMemberId)
+        : new mongoose.Types.ObjectId().toString(),
+      meta: {
+        fromRole: "member",
+        toRole: "manager",
+      },
+      createdAt: daysAgo(1),
+      updatedAt: daysAgo(1),
+    },
+  ];
+};
+
+const ensureDemoAuditLogs = async (organizationId) => {
+  const existingLogCount = await AuditLog.countDocuments({
+    organization: organizationId,
+  });
+
+  if (existingLogCount > 0 && !FORCE) {
+    console.log("Audit log seed skipped: logs already exist for org.");
+    return;
+  }
+
+  const users = await User.find({ organization: organizationId }).select(
+    "_id email role",
+  );
+
+  const owner = users.find((user) => user.role === "owner");
+  const guest = users.find((user) => user.email === DEMO_GUEST_EMAIL);
+  const members = users.filter((user) => user.role === "member");
+
+  if (!owner || !guest) {
+    console.warn(
+      "Audit log seed skipped: required demo owner/guest users were not found.",
+    );
+    return;
+  }
+
+  if (existingLogCount > 0 && FORCE) {
+    await AuditLog.deleteMany({ organization: organizationId });
+  }
+
+  const entries = getAuditSeedEntries({
+    organizationId,
+    ownerId: owner._id,
+    guestId: guest._id,
+    memberIds: members.map((member) => member._id),
+  });
+
+  await AuditLog.insertMany(entries);
+  console.log(`Audit logs seeded (${entries.length} entries).`);
+};
+
 const seed = async () => {
   if (!process.env.MONGO_URL) {
     throw new Error("Missing MONGO_URL env var.");
@@ -279,6 +470,7 @@ const seed = async () => {
   const organization = await ensureDemoOrganization();
   await ensureDemoGuestManager(organization._id);
   await ensureDemoTeamUsers(organization._id);
+  await ensureDemoAuditLogs(organization._id);
 
   const existingCategoryCount = await Category.countDocuments({
     organization: organization._id,
